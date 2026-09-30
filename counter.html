@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PokéChamp — Pokémon vs Pokémon Counter Analysis</title>
+  <meta name="description" content="Competitive 1v1 counter analysis between two Pokémon. Compare speed tiers, offensive roles, moveset matchups, type effectiveness, and determine who wins.">
+  <link rel="stylesheet" href="index.css">
+  <link rel="stylesheet" href="counter.css">
+</head>
+<body>
+
+  <!-- Top Navigation Header -->
+  <header class="header-nav">
+    <div class="brand">
+      <span>⚡ POKÉCHAMP</span>
+      <span class="brand-badge">Season 6 Singles Tier List</span>
+    </div>
+    <nav class="page-nav">
+      <a href="index.html" class="page-nav-btn">📋 Tier List</a>
+      <a href="counter.html" class="page-nav-btn active">⚔️ Counter Analysis</a>
+    </nav>
+    <div class="nav-stats">
+      <div class="stat-pill">
+        <span>Meta:</span>
+        <strong>Regulation M-C</strong>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="container">
+    <div class="counter-hero">
+      <h1 class="counter-title">⚔️ Pokémon Counter Analysis</h1>
+      <p class="counter-subtitle">Select two Pokémon from the meta to see a detailed head-to-head matchup breakdown — speed tiers, roles, moveset coverage, and type matchups.</p>
+    </div>
+
+    <!-- Selection Panel -->
+    <section class="selector-panel">
+      <!-- Left Pokemon -->
+      <div class="selector-side" id="selector-left">
+        <div class="selector-label">Pokémon A</div>
+        <div class="selector-search-wrap">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="search-left" class="search-input" placeholder="Search Pokémon..." autocomplete="off">
+          <div class="autocomplete-list" id="ac-left"></div>
+        </div>
+        <div class="selected-preview" id="preview-left">
+          <div class="preview-empty">
+            <span class="preview-empty-icon">🎯</span>
+            <p>Select a Pokémon to begin</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- VS Badge -->
+      <div class="vs-divider">
+        <div class="vs-badge">VS</div>
+        <button class="btn-analyze" id="btn-analyze" disabled>
+          <span>Analyze Matchup</span>
+          <span class="analyze-arrow">→</span>
+        </button>
+      </div>
+
+      <!-- Right Pokemon -->
+      <div class="selector-side" id="selector-right">
+        <div class="selector-label">Pokémon B</div>
+        <div class="selector-search-wrap">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="search-right" class="search-input" placeholder="Search Pokémon..." autocomplete="off">
+          <div class="autocomplete-list" id="ac-right"></div>
+        </div>
+        <div class="selected-preview" id="preview-right">
+          <div class="preview-empty">
+            <span class="preview-empty-icon">🎯</span>
+            <p>Select a Pokémon to begin</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Analysis Results -->
+    <section id="analysis-results" class="analysis-hidden">
+      <!-- Verdict Banner -->
+      <div class="verdict-banner" id="verdict-banner">
+        <div class="verdict-icon" id="verdict-icon">⚡</div>
+        <div class="verdict-text" id="verdict-text">Analyzing...</div>
+        <div class="verdict-score" id="verdict-score"></div>
+      </div>
+
+      <!-- Analysis Grid -->
+      <div class="analysis-grid">
+
+        <!-- Speed Tier Card -->
+        <div class="analysis-card">
+          <h2 class="analysis-card-title">⚡ Speed Tier</h2>
+          <div id="speed-analysis"></div>
+        </div>
+
+        <!-- Role Analysis Card -->
+        <div class="analysis-card">
+          <h2 class="analysis-card-title">🎭 Offensive Role</h2>
+          <div id="role-analysis"></div>
+        </div>
+
+        <!-- Moveset Coverage Card (A attacks B) -->
+        <div class="analysis-card full-width">
+          <h2 class="analysis-card-title" id="moveset-a-title">⚔️ Pokémon A → Pokémon B (Move Coverage)</h2>
+          <div id="moveset-a-analysis"></div>
+        </div>
+
+        <!-- Moveset Coverage Card (B attacks A) -->
+        <div class="analysis-card full-width">
+          <h2 class="analysis-card-title" id="moveset-b-title">⚔️ Pokémon B → Pokémon A (Move Coverage)</h2>
+          <div id="moveset-b-analysis"></div>
+        </div>
+
+        <!-- Matchup Summary -->
+        <div class="analysis-card full-width">
+          <h2 class="analysis-card-title">📊 Overall Matchup Summary</h2>
+          <div id="matchup-summary"></div>
+        </div>
+
+      </div>
+    </section>
+  </main>
+
+  <script src="counter.js"></script>
+</body>
+</html>

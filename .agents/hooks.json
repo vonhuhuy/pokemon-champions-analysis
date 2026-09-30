@@ -1,0 +1,15 @@
+{
+  "version": "1.0",
+  "rules": [
+    {
+      "description": "Auto-allow python3 -c commands",
+      "command": "python3 -c *",
+      "action": "allow"
+    },
+    {
+      "description": "Auto-allow python3 script execution",
+      "command": "python3 scratch/*.py",
+      "action": "allow"
+    }
+  ]
+}

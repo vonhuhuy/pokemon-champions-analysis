@@ -1,0 +1,663 @@
+{
+  "Garchompite Z": {
+    "name": "Mega Garchomp",
+    "spe": 92,
+    "atk": 170,
+    "def": 115,
+    "spa": 120,
+    "spd": 95,
+    "hp": 108
+  },
+  "Salamencite": {
+    "name": "Mega Salamence",
+    "spe": 120,
+    "atk": 145,
+    "def": 130,
+    "spa": 120,
+    "spd": 90,
+    "hp": 95
+  },
+  "Golisopite": {
+    "name": "Mega Golisopod",
+    "spe": 40,
+    "atk": 155,
+    "def": 170,
+    "spa": 70,
+    "spd": 115,
+    "hp": 75
+  },
+  "Lucarionite Z": {
+    "name": "Mega Lucario",
+    "spe": 112,
+    "atk": 145,
+    "def": 88,
+    "spa": 145,
+    "spd": 70,
+    "hp": 70
+  },
+  "Lucarionite": {
+    "name": "Mega Lucario",
+    "spe": 112,
+    "atk": 145,
+    "def": 88,
+    "spa": 145,
+    "spd": 70,
+    "hp": 70
+  },
+  "Charizardite Y": {
+    "name": "Mega Charizard Y",
+    "spe": 100,
+    "atk": 104,
+    "def": 78,
+    "spa": 159,
+    "spd": 115,
+    "hp": 78
+  },
+  "Charizardite X": {
+    "name": "Mega Charizard X",
+    "spe": 100,
+    "atk": 130,
+    "def": 111,
+    "spa": 130,
+    "spd": 85,
+    "hp": 78,
+    "types": [
+      "Fire",
+      "Dragon"
+    ]
+  },
+  "Metagrossite": {
+    "name": "Mega Metagross",
+    "spe": 110,
+    "atk": 145,
+    "def": 150,
+    "spa": 105,
+    "spd": 110,
+    "hp": 80
+  },
+  "Greninjite": {
+    "name": "Mega Greninja",
+    "spe": 132,
+    "atk": 125,
+    "def": 77,
+    "spa": 133,
+    "spd": 81,
+    "hp": 72
+  },
+  "Blastoisinite": {
+    "name": "Mega Blastoise",
+    "spe": 78,
+    "atk": 103,
+    "def": 120,
+    "spa": 135,
+    "spd": 115,
+    "hp": 79
+  },
+  "Dragoninite": {
+    "name": "Mega Dragonite",
+    "spe": 100,
+    "atk": 164,
+    "def": 110,
+    "spa": 110,
+    "spd": 110,
+    "hp": 91
+  },
+  "Swampertite": {
+    "name": "Mega Swampert",
+    "spe": 70,
+    "atk": 150,
+    "def": 110,
+    "spa": 95,
+    "spd": 110,
+    "hp": 100
+  },
+  "Gengarite": {
+    "name": "Mega Gengar",
+    "spe": 130,
+    "atk": 65,
+    "def": 80,
+    "spa": 170,
+    "spd": 95,
+    "hp": 60
+  },
+  "Blazikenite": {
+    "name": "Mega Blaziken",
+    "spe": 100,
+    "atk": 160,
+    "def": 80,
+    "spa": 130,
+    "spd": 80,
+    "hp": 80
+  },
+  "Raichunite Y": {
+    "name": "Mega Raichu Y",
+    "spe": 130,
+    "atk": 100,
+    "def": 65,
+    "spa": 130,
+    "spd": 90,
+    "hp": 60
+  },
+  "Delphoxite": {
+    "name": "Mega Delphox",
+    "spe": 124,
+    "atk": 79,
+    "def": 82,
+    "spa": 144,
+    "spd": 110,
+    "hp": 75
+  },
+  "Scizorite": {
+    "name": "Mega Scizor",
+    "spe": 75,
+    "atk": 150,
+    "def": 140,
+    "spa": 65,
+    "spd": 100,
+    "hp": 70
+  },
+  "Banettite": {
+    "name": "Mega Banette",
+    "spe": 75,
+    "atk": 165,
+    "def": 75,
+    "spa": 93,
+    "spd": 83,
+    "hp": 64
+  },
+  "Clefablite": {
+    "name": "Mega Clefable",
+    "spe": 60,
+    "atk": 80,
+    "def": 103,
+    "spa": 125,
+    "spd": 100,
+    "hp": 95
+  },
+  "Staraptite": {
+    "name": "Mega Staraptor",
+    "spe": 120,
+    "atk": 150,
+    "def": 80,
+    "spa": 60,
+    "spd": 70,
+    "hp": 85
+  },
+  "Absolite Z": {
+    "name": "Mega Absol",
+    "spe": 125,
+    "atk": 150,
+    "def": 60,
+    "spa": 115,
+    "spd": 60,
+    "hp": 65
+  },
+  "Absolite": {
+    "name": "Mega Absol",
+    "spe": 125,
+    "atk": 150,
+    "def": 60,
+    "spa": 115,
+    "spd": 60,
+    "hp": 65
+  },
+  "Tyranitarite": {
+    "name": "Mega Tyranitar",
+    "spe": 71,
+    "atk": 164,
+    "def": 150,
+    "spa": 105,
+    "spd": 120,
+    "hp": 100
+  },
+  "Lopunnite": {
+    "name": "Mega Lopunny",
+    "spe": 135,
+    "atk": 136,
+    "def": 94,
+    "spa": 54,
+    "spd": 96,
+    "hp": 65,
+    "types": [
+      "Normal",
+      "Fighting"
+    ]
+  },
+  "Mawilite": {
+    "name": "Mega Mawile",
+    "spe": 50,
+    "atk": 105,
+    "def": 125,
+    "spa": 55,
+    "spd": 95,
+    "hp": 50
+  },
+  "Floettite": {
+    "name": "Mega Floette",
+    "spe": 95,
+    "atk": 75,
+    "def": 87,
+    "spa": 145,
+    "spd": 148,
+    "hp": 54
+  },
+  "Venusaurite": {
+    "name": "Mega Venusaur",
+    "spe": 80,
+    "atk": 100,
+    "def": 123,
+    "spa": 122,
+    "spd": 120,
+    "hp": 80
+  },
+  "Starminite": {
+    "name": "Mega Starmie",
+    "spe": 140,
+    "atk": 85,
+    "def": 105,
+    "spa": 130,
+    "spd": 105,
+    "hp": 60
+  },
+  "Meganiumite": {
+    "name": "Mega Meganium",
+    "spe": 80,
+    "atk": 92,
+    "def": 130,
+    "spa": 103,
+    "spd": 130,
+    "hp": 80
+  },
+  "Scovillainite": {
+    "name": "Mega Scovillain",
+    "spe": 105,
+    "atk": 128,
+    "def": 85,
+    "spa": 128,
+    "spd": 85,
+    "hp": 75
+  },
+  "Victreebelite": {
+    "name": "Mega Victreebel",
+    "spe": 90,
+    "atk": 125,
+    "def": 85,
+    "spa": 120,
+    "spd": 80,
+    "hp": 80
+  },
+  "Froslassite": {
+    "name": "Mega Froslass",
+    "spe": 130,
+    "atk": 100,
+    "def": 90,
+    "spa": 100,
+    "spd": 90,
+    "hp": 70
+  },
+  "Gardevoirite": {
+    "name": "Mega Gardevoir",
+    "spe": 100,
+    "atk": 85,
+    "def": 65,
+    "spa": 165,
+    "spd": 135,
+    "hp": 68
+  },
+  "Scolipite": {
+    "name": "Mega Scolipede",
+    "spe": 132,
+    "atk": 130,
+    "def": 109,
+    "spa": 65,
+    "spd": 79,
+    "hp": 60
+  },
+  "Kangaskhanite": {
+    "name": "Mega Kangaskhan",
+    "spe": 100,
+    "atk": 125,
+    "def": 100,
+    "spa": 60,
+    "spd": 100,
+    "hp": 105
+  },
+  "Chandelurite": {
+    "name": "Mega Chandelure",
+    "spe": 100,
+    "atk": 75,
+    "def": 100,
+    "spa": 175,
+    "spd": 100,
+    "hp": 60
+  },
+  "Dragalgite": {
+    "name": "Mega Dragalge",
+    "spe": 54,
+    "atk": 95,
+    "def": 110,
+    "spa": 127,
+    "spd": 143,
+    "hp": 65
+  },
+  "Sceptilite": {
+    "name": "Mega Sceptile",
+    "spe": 145,
+    "atk": 110,
+    "def": 75,
+    "spa": 145,
+    "spd": 85,
+    "hp": 70,
+    "types": [
+      "Grass",
+      "Dragon"
+    ]
+  },
+  "Alakazite": {
+    "name": "Mega Alakazam",
+    "spe": 150,
+    "atk": 50,
+    "def": 65,
+    "spa": 175,
+    "spd": 105,
+    "hp": 55
+  },
+  "Pyroarite": {
+    "name": "Mega Pyroar",
+    "spe": 126,
+    "atk": 78,
+    "def": 92,
+    "spa": 139,
+    "spd": 86,
+    "hp": 86
+  },
+  "Aggronite": {
+    "name": "Mega Aggron",
+    "spe": 50,
+    "atk": 140,
+    "def": 230,
+    "spa": 60,
+    "spd": 80,
+    "hp": 70,
+    "types": [
+      "Steel"
+    ]
+  },
+  "Heracronite": {
+    "name": "Mega Heracross",
+    "spe": 75,
+    "atk": 175,
+    "def": 115,
+    "spa": 40,
+    "spd": 105,
+    "hp": 80
+  },
+  "Sharpedonite": {
+    "name": "Mega Sharpedo",
+    "spe": 105,
+    "atk": 140,
+    "def": 70,
+    "spa": 110,
+    "spd": 65,
+    "hp": 70
+  },
+  "Eelektrossite": {
+    "name": "Mega Eelektross",
+    "spe": 70,
+    "atk": 135,
+    "def": 100,
+    "spa": 125,
+    "spd": 100,
+    "hp": 85
+  },
+  "Altarianite": {
+    "name": "Mega Altaria",
+    "spe": 80,
+    "atk": 110,
+    "def": 110,
+    "spa": 110,
+    "spd": 105,
+    "hp": 75,
+    "types": [
+      "Dragon",
+      "Fairy"
+    ]
+  },
+  "Glalitite": {
+    "name": "Mega Glalie",
+    "spe": 100,
+    "atk": 120,
+    "def": 80,
+    "spa": 120,
+    "spd": 80,
+    "hp": 80
+  },
+  "Aerodactylite": {
+    "name": "Mega Aerodactyl",
+    "spe": 150,
+    "atk": 135,
+    "def": 85,
+    "spa": 70,
+    "spd": 95,
+    "hp": 80
+  },
+  "Scraftinite": {
+    "name": "Mega Scrafty",
+    "spe": 68,
+    "atk": 120,
+    "def": 135,
+    "spa": 45,
+    "spd": 135,
+    "hp": 65
+  },
+  "Hawluchanite": {
+    "name": "Mega Hawlucha",
+    "spe": 138,
+    "atk": 122,
+    "def": 95,
+    "spa": 74,
+    "spd": 83,
+    "hp": 78
+  },
+  "Chimechite": {
+    "name": "Mega Chimecho",
+    "spe": 85,
+    "atk": 50,
+    "def": 90,
+    "spa": 125,
+    "spd": 110,
+    "hp": 75
+  },
+  "Feraligite": {
+    "name": "Mega Feraligatr",
+    "spe": 88,
+    "atk": 145,
+    "def": 120,
+    "spa": 89,
+    "spd": 93,
+    "hp": 85
+  },
+  "Pidgeotite": {
+    "name": "Mega Pidgeot",
+    "spe": 121,
+    "atk": 80,
+    "def": 80,
+    "spa": 135,
+    "spd": 80,
+    "hp": 83
+  },
+  "Malamarite": {
+    "name": "Mega Malamar",
+    "spe": 83,
+    "atk": 112,
+    "def": 108,
+    "spa": 78,
+    "spd": 95,
+    "hp": 86
+  },
+  "Chesnaughtite": {
+    "name": "Mega Chesnaught",
+    "spe": 74,
+    "atk": 137,
+    "def": 142,
+    "spa": 84,
+    "spd": 95,
+    "hp": 88
+  },
+  "Ampharosite": {
+    "name": "Mega Ampharos",
+    "spe": 45,
+    "atk": 95,
+    "def": 105,
+    "spa": 165,
+    "spd": 110,
+    "hp": 90,
+    "types": [
+      "Electric",
+      "Dragon"
+    ]
+  },
+  "Abomasite": {
+    "name": "Mega Abomasnow",
+    "spe": 30,
+    "atk": 132,
+    "def": 105,
+    "spa": 132,
+    "spd": 105,
+    "hp": 90
+  },
+  "Steelixite": {
+    "name": "Mega Steelix",
+    "spe": 30,
+    "atk": 125,
+    "def": 230,
+    "spa": 55,
+    "spd": 95,
+    "hp": 75
+  },
+  "Beedrillite": {
+    "name": "Mega Beedrill",
+    "spe": 145,
+    "atk": 150,
+    "def": 40,
+    "spa": 15,
+    "spd": 80,
+    "hp": 65
+  },
+  "Pinsirite": {
+    "name": "Mega Pinsir",
+    "spe": 105,
+    "atk": 155,
+    "def": 120,
+    "spa": 65,
+    "spd": 90,
+    "hp": 65,
+    "types": [
+      "Bug",
+      "Flying"
+    ]
+  },
+  "Crabominite": {
+    "name": "Mega Crabominable",
+    "spe": 73,
+    "atk": 162,
+    "def": 97,
+    "spa": 62,
+    "spd": 87,
+    "hp": 97
+  },
+  "Medichamite": {
+    "name": "Mega Medicham",
+    "spe": 100,
+    "atk": 100,
+    "def": 85,
+    "spa": 80,
+    "spd": 85,
+    "hp": 60
+  },
+  "Barbaracite": {
+    "name": "Mega Barbaracle",
+    "spe": 88,
+    "atk": 135,
+    "def": 135,
+    "spa": 64,
+    "spd": 106,
+    "hp": 72
+  },
+  "Emboarite": {
+    "name": "Mega Emboar",
+    "spe": 75,
+    "atk": 153,
+    "def": 85,
+    "spa": 120,
+    "spd": 85,
+    "hp": 110
+  },
+  "Audinite": {
+    "name": "Mega Audino",
+    "spe": 50,
+    "atk": 60,
+    "def": 126,
+    "spa": 80,
+    "spd": 126,
+    "hp": 103,
+    "types": [
+      "Normal",
+      "Fairy"
+    ]
+  },
+  "Manectite": {
+    "name": "Mega Manectric",
+    "spe": 135,
+    "atk": 75,
+    "def": 80,
+    "spa": 135,
+    "spd": 80,
+    "hp": 70
+  },
+  "Drampanite": {
+    "name": "Mega Drampa",
+    "spe": 46,
+    "atk": 70,
+    "def": 105,
+    "spa": 165,
+    "spd": 115,
+    "hp": 78
+  },
+  "Golurkite": {
+    "name": "Mega Golurk",
+    "spe": 75,
+    "atk": 154,
+    "def": 100,
+    "spa": 65,
+    "spd": 100,
+    "hp": 89
+  },
+  "Cameruptite": {
+    "name": "Mega Camerupt",
+    "spe": 20,
+    "atk": 120,
+    "def": 100,
+    "spa": 145,
+    "spd": 105,
+    "hp": 70
+  },
+  "Falinksite": {
+    "name": "Mega Falinks",
+    "spe": 105,
+    "atk": 130,
+    "def": 120,
+    "spa": 70,
+    "spd": 80,
+    "hp": 65
+  },
+  "Meowsticite": {
+    "name": "Mega Meowstic",
+    "spe": 124,
+    "atk": 58,
+    "def": 96,
+    "spa": 113,
+    "spd": 101,
+    "hp": 74
+  }
+}

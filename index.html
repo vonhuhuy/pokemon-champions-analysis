@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PokéChamp — Competitive Singles Tier List & Strategy Database</title>
+  <meta name="description" content="Explore top Pokémon Champions Singles ranked ladder tier list (Season 6), analyzing base stats, type effectiveness, most used moves, held items, abilities, and stat distributions for competitive battle strategies.">
+  <link rel="stylesheet" href="index.css">
+</head>
+<body>
+
+  <!-- Top Navigation Header -->
+  <header class="header-nav">
+    <div class="brand">
+      <span>⚡ POKÉCHAMP</span>
+      <span class="brand-badge">Season 6 Singles Tier List</span>
+    </div>
+    <nav class="page-nav">
+      <a href="index.html" class="page-nav-btn active">📋 Tier List</a>
+      <a href="counter.html" class="page-nav-btn">⚔️ Counter Analysis</a>
+    </nav>
+    <div class="nav-stats">
+      <div class="stat-pill">
+        <span>Database Size:</span>
+        <strong id="stat-total">262 Pokémon</strong>
+      </div>
+      <div class="stat-pill">
+        <span>Meta Standard:</span>
+        <strong>Regulation M-C</strong>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="container">
+    
+    <!-- Control & Search Bar -->
+    <section class="control-bar">
+      <!-- Tier Filter Tabs -->
+      <div class="tier-tabs">
+        <button class="tab-btn active" data-tier="ALL">
+          <span>All Pokémon</span>
+          <span class="brand-badge" id="count-all">262</span>
+        </button>
+        <button class="tab-btn tab-s" data-tier="S">
+          <span>S - Ubiquitous</span>
+          <span class="brand-badge" id="count-s">13</span>
+        </button>
+        <button class="tab-btn tab-a" data-tier="A">
+          <span>A - Common</span>
+          <span class="brand-badge" id="count-a">39</span>
+        </button>
+        <button class="tab-btn tab-b" data-tier="B">
+          <span>B - Played</span>
+          <span class="brand-badge" id="count-b">65</span>
+        </button>
+        <button class="tab-btn tab-c" data-tier="C">
+          <span>C - Niche</span>
+          <span class="brand-badge" id="count-c">66</span>
+        </button>
+        <button class="tab-btn tab-d" data-tier="D">
+          <span>D - Rare</span>
+          <span class="brand-badge" id="count-d">79</span>
+        </button>
+      </div>
+
+      <!-- Filter Inputs -->
+      <div class="filter-inputs">
+        <div class="search-wrapper">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="search-input" class="search-input" placeholder="Search by Pokémon name, move (e.g. Earthquake), or item (e.g. Choice Scarf)...">
+        </div>
+        <select id="type-select" class="select-input">
+          <option value="ALL">All Types</option>
+          <option value="Dragon">Dragon</option>
+          <option value="Ground">Ground</option>
+          <option value="Water">Water</option>
+          <option value="Fairy">Fairy</option>
+          <option value="Ice">Ice</option>
+          <option value="Steel">Steel</option>
+          <option value="Ghost">Ghost</option>
+          <option value="Fighting">Fighting</option>
+          <option value="Fire">Fire</option>
+          <option value="Grass">Grass</option>
+          <option value="Electric">Electric</option>
+          <option value="Flying">Flying</option>
+          <option value="Rock">Rock</option>
+          <option value="Dark">Dark</option>
+          <option value="Poison">Poison</option>
+          <option value="Normal">Normal</option>
+          <option value="Psychic">Psychic</option>
+          <option value="Bug">Bug</option>
+        </select>
+        <select id="sort-select" class="select-input">
+          <option value="rank-asc">Rank: Top Usage (#1 -> #262)</option>
+          <option value="bst-desc">Base Stat Total (BST: High -> Low)</option>
+          <option value="rank-desc">Rank: Bottom (#262 -> #1)</option>
+          <option value="name-asc">Name: A - Z</option>
+        </select>
+      </div>
+    </section>
+
+    <!-- Pokemon Cards Grid -->
+    <section class="pokemon-grid" id="pokemon-grid">
+      <!-- Dynamic Pokemon Cards rendered here -->
+    </section>
+  </main>
+
+  <!-- Detailed Pokemon Modal -->
+  <div class="modal-overlay" id="detail-modal">
+    <div class="modal-content" id="modal-content">
+      <button class="modal-close" id="modal-close">&times;</button>
+      <div id="modal-body">
+        <!-- Dynamic Modal details -->
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
