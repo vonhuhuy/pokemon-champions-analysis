@@ -18,6 +18,15 @@ PokéChamp is an interactive competitive Pokémon singles analytics dashboard an
   - Hard counters and soft checks calculated using defensive bulk, offensive type coverage, and base speed tiering.
   - Threat breakdown, common sets, and synergy recommendations.
 
+- **🛡️ Team Builder & Synergy Matrix (`teambuilder.html`)**:
+  - Full 6-slot competitive roster builder with slot customization (Tera Type, Held Item, Ability).
+  - **16-Character Alphanumeric `teamhash` Serialization**: Encapsulates the entire 6-Pokémon squad, Tera types, item presets, and abilities into an exact 16-character Base62 string (e.g., `teamhash=01FaBQm8R0PQHmjw`) with zero backend database required.
+  - Real-time **Defensive Weakness Matrix** tracking weaknesses, resistances, and immunities with severe vulnerability alerts.
+  - **Offensive STAB Coverage** tracking super-effective coverage against all 18 elemental types.
+  - **Speed Tier Ladder** comparing your team against Regulation M-C speed benchmarks.
+  - **Synergistic Teammate Recommendations** dynamically aggregated from ladder usage data.
+  - 1-click **Pokémon Showdown Text Export** and URL link sharing.
+
 - **💾 Data Pipeline**:
   - Automated scrapers and enrichment scripts (`scratch/`) synthesizing competitive battle ladder usage data into lightweight JSON and SQLite schemas (`data/`).
 
@@ -28,7 +37,7 @@ PokéChamp is an interactive competitive Pokémon singles analytics dashboard an
 
 ## 🏁 Getting Started
 
-Simply open `index.html` or `counter.html` in your web browser, or serve locally with any static HTTP server:
+Simply open `index.html`, `counter.html`, or `teambuilder.html` in your web browser, or serve locally with any static HTTP server:
 
 ```bash
 # Using Python 3

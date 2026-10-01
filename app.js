@@ -94,6 +94,7 @@ function filterAndSortData() {
 function render() {
   const grid = document.getElementById('pokemon-grid');
   const filtered = filterAndSortData();
+  const takenRanks = getTakenRanksFromStorage();
   
   if (filtered.length === 0) {
     grid.innerHTML = `
@@ -110,6 +111,7 @@ function render() {
     const topItem = p.items[0] ? p.items[0].name : 'N/A';
     const topAbility = p.abilities[0] ? p.abilities[0].name : 'N/A';
     const bs = p.base_stats || { hp: '?', atk: '?', def: '?', spa: '?', spd: '?', spe: '?', bst: '?' };
+    const isTaken = takenRanks.has(p.rank);
     
     return `
       <div class="poke-card">
@@ -162,9 +164,20 @@ function render() {
           </div>
         </div>
 
-        <button class="btn-details" onclick="openModal(${p.rank})">
-          Full Battle Breakdown & Base Stats →
-        </button>
+        <div style="display:flex; gap: 0.5rem; margin-top: 0.5rem;">
+          <button class="btn-details" onclick="openModal(${p.rank})" style="flex: 1;">
+            Breakdown →
+          </button>
+          ${isTaken ? `
+            <button disabled style="background: rgba(16,185,129,0.15); border: 1px solid rgba(16,185,129,0.3); color: #34d399; padding: 0.5rem 0.85rem; border-radius: 10px; font-weight: 700; font-size: 0.82rem; display: inline-flex; align-items: center; gap: 0.35rem; cursor: default;" title="Already in your team">
+              ✓ In Team
+            </button>
+          ` : `
+            <button onclick="addToTeamFromList(${p.rank})" style="background: rgba(99,102,241,0.2); border: 1px solid var(--primary); color: #a5b4fc; padding: 0.5rem 0.85rem; border-radius: 10px; font-weight: 700; cursor: pointer; font-size: 0.82rem; display: inline-flex; align-items: center; gap: 0.35rem; transition: all 0.2s ease;" title="Add to Team Builder">
+              ➕ Add
+            </button>
+          `}
+        </div>
       </div>
     `;
   }).join('');
@@ -177,9 +190,11 @@ function openModal(rank) {
   const modalBody = document.getElementById('modal-body');
   const bs = p.base_stats || { hp: 0, atk: 0, def: 0, spa: 0, spd: 0, spe: 0, bst: 0 };
   const eff = p.type_effectiveness || { weaknesses_4x: [], weaknesses_2x: [], resistances_half: [], resistances_quarter: [], immunities: [] };
+  const takenRanks = getTakenRanksFromStorage();
+  const isTaken = takenRanks.has(p.rank);
   
   modalBody.innerHTML = `
-    <div style="display:flex; justify-content:space-between; align-items:center; border-bottom: 1px solid var(--border-card); padding-bottom: 1rem;">
+    <div style="display:flex; justify-content:space-between; align-items:center; border-bottom: 1px solid var(--border-card); padding-bottom: 1rem; flex-wrap: wrap; gap: 0.75rem;">
       <div>
         <span class="poke-rank-badge" style="font-size: 0.9rem;">RANK #${p.rank} — ${p.tier_label}</span>
         <h1 style="font-size: 2.2rem; font-weight:800; color: #fff; line-height: 1.1;">${p.name}</h1>
@@ -187,7 +202,18 @@ function openModal(rank) {
           ${p.types.map(t => `<span class="type-badge type-${t}">${t}</span>`).join('')}
         </div>
       </div>
-      <span class="tier-tag ${p.tier.toLowerCase()}" style="font-size: 1.2rem; padding: 0.5rem 1rem;">${p.tier}-TIER</span>
+      <div style="display:flex; flex-direction:column; align-items:flex-end; gap:0.5rem;">
+        <span class="tier-tag ${p.tier.toLowerCase()}" style="font-size: 1.2rem; padding: 0.5rem 1rem;">${p.tier}-TIER</span>
+        ${isTaken ? `
+          <button disabled style="background: rgba(16,185,129,0.15); border: 1px solid rgba(16,185,129,0.3); color: #34d399; padding: 0.4rem 0.85rem; border-radius: 8px; font-weight: 600; font-size: 0.82rem; display: flex; align-items: center; gap: 0.35rem; cursor: default;">
+            ✓ Already in Team
+          </button>
+        ` : `
+          <button onclick="addToTeamFromList(${p.rank})" style="background: var(--primary); border: 1px solid var(--primary); color: #fff; padding: 0.4rem 0.85rem; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 0.82rem; display: flex; align-items: center; gap: 0.35rem; box-shadow: 0 0 10px var(--primary-glow);">
+            ➕ Add to Team Builder
+          </button>
+        `}
+      </div>
     </div>
 
     <!-- Base Stats Panel -->
@@ -381,3 +407,119 @@ function openModal(rank) {
 function closeModal() {
   document.getElementById('detail-modal').classList.remove('active');
 }
+
+// =====================================================================
+// Cross-Page Team Builder Synchronization
+// =====================================================================
+const APP_ALPHABET = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+const APP_BASE = 62n;
+const APP_SLOT_MAX = 263 * 19 * 4 * 2;
+
+function getTakenRanksFromStorage() {
+  try {
+    const savedHash = localStorage.getItem('pokechamp_teamhash') || '0000000000000000';
+    const slots = decodeTeamHash(savedHash);
+    return new Set(slots.filter(s => s && s.pokemonId).map(s => s.pokemonId));
+  } catch (e) {
+    return new Set();
+  }
+}
+
+function decodeTeamHash(hashStr) {
+  if (!hashStr || hashStr.length !== 16) return [null, null, null, null, null, null];
+  let num = 0n;
+  for (let i = 0; i < 16; i++) {
+    const idx = APP_ALPHABET.indexOf(hashStr[i]);
+    if (idx === -1) return [null, null, null, null, null, null];
+    num = num * APP_BASE + BigInt(idx);
+  }
+  const slots = [];
+  for (let i = 0; i < 6; i++) {
+    const slotCode = Number(num % BigInt(APP_SLOT_MAX));
+    num = num / BigInt(APP_SLOT_MAX);
+    const abilityIdx = slotCode % 2;
+    let rem = Math.floor(slotCode / 2);
+    const itemIdx = rem % 4;
+    rem = Math.floor(rem / 4);
+    const teraIdx = rem % 19;
+    const pokemonId = Math.floor(rem / 19);
+    slots.push(pokemonId === 0 ? null : { pokemonId, teraIdx, itemIdx, abilityIdx });
+  }
+  return slots.reverse();
+}
+
+function encodeTeamSlots(slots) {
+  let num = 0n;
+  for (let i = 0; i < 6; i++) {
+    const s = slots[i];
+    let pokemonId = 0, teraIdx = 0, itemIdx = 0, abilityIdx = 0;
+    if (s && s.pokemonId) {
+      pokemonId = s.pokemonId;
+      teraIdx = s.teraIdx || 0;
+      itemIdx = s.itemIdx || 0;
+      abilityIdx = s.abilityIdx || 0;
+    }
+    const slotCode = BigInt(pokemonId * (19 * 4 * 2) + teraIdx * (4 * 2) + itemIdx * 2 + abilityIdx);
+    num = num * BigInt(APP_SLOT_MAX) + slotCode;
+  }
+  const chars = [];
+  for (let i = 0; i < 16; i++) {
+    chars.push(APP_ALPHABET[Number(num % APP_BASE)]);
+    num = num / APP_BASE;
+  }
+  return chars.reverse().join('');
+}
+
+function addToTeamFromList(rank) {
+  const p = pokemonData.find(x => x.rank === Number(rank));
+  if (!p) return;
+
+  const savedHash = localStorage.getItem('pokechamp_teamhash') || '0000000000000000';
+  const slots = decodeTeamHash(savedHash);
+
+  // Check if already in team
+  if (slots.some(s => s && s.pokemonId === p.rank)) {
+    showAppToast(`${p.name} is already in your team!`);
+    return;
+  }
+
+  // Find first empty slot
+  const emptyIdx = slots.findIndex(s => s === null);
+  if (emptyIdx === -1) {
+    showAppToast(`Team is full (6/6). Open <a href="teambuilder.html" style="color:#38bdf8; text-decoration:underline;">Team Builder</a> to edit.`);
+    return;
+  }
+
+  slots[emptyIdx] = { pokemonId: p.rank, teraIdx: 0, itemIdx: 0, abilityIdx: 0 };
+  const newHash = encodeTeamSlots(slots);
+  try {
+    localStorage.setItem('pokechamp_teamhash', newHash);
+  } catch (e) {}
+
+  showAppToast(`➕ Added ${p.name} to Team (Slot ${emptyIdx + 1})! <a href="teambuilder.html?teamhash=${newHash}" style="color:#38bdf8; text-decoration:underline; font-weight:700; margin-left:0.5rem;">View Team →</a>`);
+  render();
+  if (document.getElementById('detail-modal').classList.contains('active')) {
+    openModal(p.rank);
+  }
+}
+
+let appToastTimeout = null;
+function showAppToast(htmlMsg) {
+  let toast = document.getElementById('toast');
+  if (!toast) {
+    toast = document.createElement('div');
+    toast.id = 'toast';
+    toast.className = 'toast';
+    document.body.appendChild(toast);
+  }
+  toast.innerHTML = htmlMsg;
+  toast.classList.add('show');
+
+  if (appToastTimeout) clearTimeout(appToastTimeout);
+  appToastTimeout = setTimeout(() => {
+    toast.classList.remove('show');
+  }, 3500);
+}
+
+window.addToTeamFromList = addToTeamFromList;
+

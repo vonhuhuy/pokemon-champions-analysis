@@ -166,7 +166,20 @@ function getEffectiveSpeed(p) {
     note = 'w/ Choice Scarf (1.5×)';
   }
 
-  return { spe: calcSpe, rawSpe: calcFinalStat('spe', baseSpe, topEv.spe, boost, reduce), baseSpe, note, isMega };
+  const spVal = parseStatPoints(topEv.spe);
+  const isBoost = boost === 'spe';
+  const isReduce = reduce === 'spe';
+  const natureStr = isBoost ? '+10% Nature' : (isReduce ? '-10% Nature' : '');
+
+  return {
+    spe: calcSpe,
+    rawSpe: calcFinalStat('spe', baseSpe, topEv.spe, boost, reduce),
+    baseSpe,
+    spVal,
+    natureStr,
+    note,
+    isMega
+  };
 }
 
 // ---- Determine offensive role ----
@@ -345,36 +358,28 @@ function buildMatchupScore(pA, pB) {
 function renderSpeedAnalysis(ctx) {
   const { speedA, speedB, fasterA, fasterB, tieSpeed, pA, pB } = ctx;
 
-  const arrowA = fasterA ? '⚡ Faster' : (tieSpeed ? '— Tie' : '');
-  const arrowB = fasterB ? '⚡ Faster' : (tieSpeed ? '— Tie' : '');
-
-  const scarfA = pA.items[0]?.name === 'Choice Scarf';
-  const scarfB = pB.items[0]?.name === 'Choice Scarf';
-  const megaA = !!(megaDB[pA.items[0]?.name || '']);
-  const megaB = !!(megaDB[pB.items[0]?.name || '']);
-
   let detail = '';
-  if (fasterA) detail = `<strong>${pA.name}</strong> moves first. `;
-  else if (fasterB) detail = `<strong>${pB.name}</strong> moves first. `;
-  else detail = `Both Pokémon have equal speed (${speedA.spe}). Speed tie — whoever goes first depends on luck. `;
+  if (fasterA) detail = `<strong>${pA.name}</strong> moves first with <strong>${speedA.spe}</strong> Speed vs ${pB.name}'s <strong>${speedB.spe}</strong>. `;
+  else if (fasterB) detail = `<strong>${pB.name}</strong> moves first with <strong>${speedB.spe}</strong> Speed vs ${pA.name}'s <strong>${speedA.spe}</strong>. `;
+  else detail = `Both Pokémon have equal Level 50 speed (${speedA.spe}). Speed tie — turn order is a 50/50 roll. `;
 
-  if (speedA.note) detail += `${pA.name} uses ${speedA.note}. `;
-  if (speedB.note) detail += `${pB.name} uses ${speedB.note}. `;
-
-  const baseA = speedA.baseSpe ?? (pA.base_stats?.spe || 0);
-  const baseB = speedB.baseSpe ?? (pB.base_stats?.spe || 0);
-
-  if (!speedA.note && !speedB.note) {
-    detail += `Level 50 speed: ${pA.name} ${speedA.spe} vs ${pB.name} ${speedB.spe} (Base: ${baseA} vs ${baseB}).`;
+  function speedSub(s) {
+    const parts = [`Base ${s.baseSpe}`];
+    if (s.spVal > 0) parts.push(`${s.spVal} SP`);
+    if (s.natureStr) parts.push(s.natureStr);
+    if (s.note) parts.push(s.note);
+    return parts.join(' · ');
   }
+
+  detail += `Speed comparison is based on calculated Level 50 final stats (Base + Top EVs + Nature + Item).`;
 
   return `
     <div class="speed-compare">
       <div class="speed-pokemon">
+        <div class="speed-label-tag">Final Speed (Lv 50)</div>
         <div class="speed-val">${speedA.spe}</div>
         <div class="speed-name">${pA.name}</div>
-        ${speedA.note ? `<div class="speed-note">${speedA.note}</div>` : ''}
-        ${baseA !== speedA.spe ? `<div class="speed-note">Base: ${baseA}</div>` : ''}
+        <div class="speed-note">${speedSub(speedA)}</div>
         ${fasterA ? '<div class="speed-winner-badge">FASTER ⚡</div>' : ''}
         ${tieSpeed ? '<div class="speed-winner-badge" style="background: linear-gradient(135deg,#6b7280,#4b5563);">TIE</div>' : ''}
       </div>
@@ -382,10 +387,10 @@ function renderSpeedAnalysis(ctx) {
         ${fasterA ? '←' : (fasterB ? '→' : '=') }
       </div>
       <div class="speed-pokemon">
+        <div class="speed-label-tag">Final Speed (Lv 50)</div>
         <div class="speed-val">${speedB.spe}</div>
         <div class="speed-name">${pB.name}</div>
-        ${speedB.note ? `<div class="speed-note">${speedB.note}</div>` : ''}
-        ${baseB !== speedB.spe ? `<div class="speed-note">Base: ${baseB}</div>` : ''}
+        <div class="speed-note">${speedSub(speedB)}</div>
         ${fasterB ? '<div class="speed-winner-badge">FASTER ⚡</div>' : ''}
         ${tieSpeed ? '<div class="speed-winner-badge" style="background: linear-gradient(135deg,#6b7280,#4b5563);">TIE</div>' : ''}
       </div>
@@ -743,6 +748,9 @@ function renderPreview(pokemon, side) {
       ${evRow}
       ${finalRow}
       ${natureRow}
+      <button onclick="addToTeamFromCounter(${pokemon.rank})" style="margin-top:0.6rem; width:100%; background:rgba(99,102,241,0.2); border:1px solid var(--primary); color:#a5b4fc; padding:0.4rem; border-radius:8px; font-weight:700; font-size:0.8rem; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:0.35rem; transition:all 0.2s ease;">
+        ➕ Add ${pokemon.name} to Team
+      </button>
     </div>
   `;
 }
@@ -838,3 +846,102 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   document.getElementById('btn-analyze').addEventListener('click', runAnalysis);
 });
+
+// =====================================================================
+// Cross-Page Team Builder Synchronization
+// =====================================================================
+const COUNTER_ALPHABET = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+const COUNTER_BASE = 62n;
+const COUNTER_SLOT_MAX = 263 * 19 * 4 * 2;
+
+function decodeCounterTeamHash(hashStr) {
+  if (!hashStr || hashStr.length !== 16) return [null, null, null, null, null, null];
+  let num = 0n;
+  for (let i = 0; i < 16; i++) {
+    const idx = COUNTER_ALPHABET.indexOf(hashStr[i]);
+    if (idx === -1) return [null, null, null, null, null, null];
+    num = num * COUNTER_BASE + BigInt(idx);
+  }
+  const slots = [];
+  for (let i = 0; i < 6; i++) {
+    const slotCode = Number(num % BigInt(COUNTER_SLOT_MAX));
+    num = num / BigInt(COUNTER_SLOT_MAX);
+    const abilityIdx = slotCode % 2;
+    let rem = Math.floor(slotCode / 2);
+    const itemIdx = rem % 4;
+    rem = Math.floor(rem / 4);
+    const teraIdx = rem % 19;
+    const pokemonId = Math.floor(rem / 19);
+    slots.push(pokemonId === 0 ? null : { pokemonId, teraIdx, itemIdx, abilityIdx });
+  }
+  return slots.reverse();
+}
+
+function encodeCounterTeamSlots(slots) {
+  let num = 0n;
+  for (let i = 0; i < 6; i++) {
+    const s = slots[i];
+    let pokemonId = 0, teraIdx = 0, itemIdx = 0, abilityIdx = 0;
+    if (s && s.pokemonId) {
+      pokemonId = s.pokemonId;
+      teraIdx = s.teraIdx || 0;
+      itemIdx = s.itemIdx || 0;
+      abilityIdx = s.abilityIdx || 0;
+    }
+    const slotCode = BigInt(pokemonId * (19 * 4 * 2) + teraIdx * (4 * 2) + itemIdx * 2 + abilityIdx);
+    num = num * BigInt(COUNTER_SLOT_MAX) + slotCode;
+  }
+  const chars = [];
+  for (let i = 0; i < 16; i++) {
+    chars.push(COUNTER_ALPHABET[Number(num % COUNTER_BASE)]);
+    num = num / COUNTER_BASE;
+  }
+  return chars.reverse().join('');
+}
+
+function addToTeamFromCounter(rank) {
+  const p = pokemonDB.find(x => x.rank === Number(rank));
+  if (!p) return;
+
+  const savedHash = localStorage.getItem('pokechamp_teamhash') || '0000000000000000';
+  const slots = decodeCounterTeamHash(savedHash);
+
+  // Check if already in team
+  if (slots.some(s => s && s.pokemonId === p.rank)) {
+    showCounterToast(`${p.name} is already in your team!`);
+    return;
+  }
+
+  // Find first empty slot
+  const emptyIdx = slots.findIndex(s => s === null);
+  if (emptyIdx === -1) {
+    showCounterToast(`Team is full (6/6). Open <a href="teambuilder.html" style="color:#38bdf8; text-decoration:underline;">Team Builder</a> to edit.`);
+    return;
+  }
+
+  slots[emptyIdx] = { pokemonId: p.rank, teraIdx: 0, itemIdx: 0, abilityIdx: 0 };
+  const newHash = encodeCounterTeamSlots(slots);
+  localStorage.setItem('pokechamp_teamhash', newHash);
+  showCounterToast(`➕ Added ${p.name} to Team (Slot ${emptyIdx + 1})! <a href="teambuilder.html?teamhash=${newHash}" style="color:#38bdf8; text-decoration:underline; font-weight:700; margin-left:0.5rem;">View Team →</a>`);
+}
+
+let counterToastTimeout = null;
+function showCounterToast(htmlMsg) {
+  let toast = document.getElementById('toast');
+  if (!toast) {
+    toast = document.createElement('div');
+    toast.id = 'toast';
+    toast.className = 'toast';
+    document.body.appendChild(toast);
+  }
+  toast.innerHTML = htmlMsg;
+  toast.classList.add('show');
+
+  if (counterToastTimeout) clearTimeout(counterToastTimeout);
+  counterToastTimeout = setTimeout(() => {
+    toast.classList.remove('show');
+  }, 3500);
+}
+
+window.addToTeamFromCounter = addToTeamFromCounter;
+

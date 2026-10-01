@@ -19,6 +19,7 @@
     <nav class="page-nav">
       <a href="index.html" class="page-nav-btn">📋 Tier List</a>
       <a href="counter.html" class="page-nav-btn active">⚔️ Counter Analysis</a>
+      <a href="teambuilder.html" class="page-nav-btn">🛡️ Team Builder</a>
     </nav>
     <div class="nav-stats">
       <div class="stat-pill">
@@ -93,7 +94,10 @@
 
         <!-- Speed Tier Card -->
         <div class="analysis-card">
-          <h2 class="analysis-card-title">⚡ Speed Tier</h2>
+          <h2 class="analysis-card-title">
+            <span>⚡ Speed Tier</span>
+            <span class="card-subtitle-badge">Final Stats (Lv 50)</span>
+          </h2>
           <div id="speed-analysis"></div>
         </div>
 
@@ -124,6 +128,9 @@
       </div>
     </section>
   </main>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="toast"></div>
 
   <script src="counter.js"></script>
 </body>

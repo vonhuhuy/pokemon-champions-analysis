@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PokéChamp — Competitive Pokémon Team Builder & Synergy Matrix</title>
+  <meta name="description" content="Build, optimize, and analyze competitive 6-Pokémon teams with real-time defensive synergy, speed tiers, offensive coverage, and 16-character teamhash sharing.">
+  <link rel="stylesheet" href="index.css">
+  <link rel="stylesheet" href="teambuilder.css">
+</head>
+<body>
+
+  <!-- Top Navigation Header -->
+  <header class="header-nav">
+    <div class="brand">
+      <span>⚡ POKÉCHAMP</span>
+      <span class="brand-badge">Team Builder</span>
+    </div>
+    <nav class="page-nav">
+      <a href="index.html" class="page-nav-btn">📋 Tier List</a>
+      <a href="counter.html" class="page-nav-btn">⚔️ Counter Analysis</a>
+      <a href="teambuilder.html" class="page-nav-btn active">🛡️ Team Builder</a>
+    </nav>
+    <div class="nav-stats">
+      <div class="stat-pill">
+        <span>Team Status:</span>
+        <strong id="nav-team-count">0 / 6 Pokémon</strong>
+      </div>
+      <div class="stat-pill">
+        <span>Meta Standard:</span>
+        <strong>Regulation M-C</strong>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="container">
+    
+    <!-- Hero & Serialization Bar -->
+    <section class="tb-hero">
+      <div class="tb-hero-left">
+        <h1 class="tb-title">🛡️ Competitive Team Builder</h1>
+        <p class="tb-subtitle">Assemble your 6-Pokémon squad, evaluate defensive synergy and speed tiers, and share your team instantly with a compact 16-character key.</p>
+      </div>
+
+      <!-- Quick Preset & Team Actions -->
+      <div class="tb-presets-bar">
+        <span class="preset-label">Quick Presets:</span>
+        <button class="preset-btn" data-preset="meta-s">🏆 S-Tier Core</button>
+        <button class="preset-btn" data-preset="rain">🌧️ Rain Offense</button>
+        <button class="preset-btn" data-preset="balance">🧱 Bulky Balance</button>
+        <button class="preset-btn" data-preset="hyper">⚡ Hyper Offense</button>
+        <button class="preset-btn btn-clear-team" id="btn-clear-team">✕ Clear</button>
+      </div>
+    </section>
+
+    <!-- Share & Serialization Bar -->
+    <section class="hash-bar-card">
+      <div class="hash-info">
+        <div class="hash-tag-label">
+          <span class="hash-dot"></span>
+          <span>16-CHAR SERIALIZED KEY</span>
+        </div>
+        <div class="hash-display-wrap">
+          <code id="teamhash-display" class="hash-code">0000000000000000</code>
+        </div>
+      </div>
+
+      <div class="hash-actions">
+        <button id="btn-copy-hash" class="btn-hash-action" title="Copy 16-character alphanumeric key">
+          <span>📋</span> Copy Hash
+        </button>
+        <button id="btn-copy-link" class="btn-hash-action btn-primary-action" title="Copy full shareable URL with teamhash">
+          <span>🔗</span> Share Team Link
+        </button>
+        <button id="btn-import-hash" class="btn-hash-action" title="Import a 16-character teamhash">
+          <span>📥</span> Import Hash
+        </button>
+        <button id="btn-export-showdown" class="btn-hash-action" title="Export to Pokémon Showdown format">
+          <span>⚔️</span> Showdown Text
+        </button>
+      </div>
+    </section>
+
+    <!-- Team Summary Stats Ribbon -->
+    <section class="team-summary-ribbon" id="team-summary-ribbon">
+      <div class="summary-stat-box">
+        <span class="stat-lbl">Roster Size</span>
+        <span class="stat-val" id="summary-roster-count">0 / 6</span>
+      </div>
+      <div class="summary-stat-box">
+        <span class="stat-lbl">Average BST</span>
+        <span class="stat-val" id="summary-avg-bst">—</span>
+      </div>
+      <div class="summary-stat-box">
+        <span class="stat-lbl">Offensive Bias</span>
+        <span class="stat-val" id="summary-offensive-bias">—</span>
+      </div>
+      <div class="summary-stat-box">
+        <span class="stat-lbl">Top Speed</span>
+        <span class="stat-val" id="summary-top-speed" style="color: #38bdf8;">—</span>
+      </div>
+      <div class="summary-stat-box">
+        <span class="stat-lbl">Defensive Health</span>
+        <span class="stat-val" id="summary-defensive-health">—</span>
+      </div>
+    </section>
+
+    <!-- 6-Slot Team Grid -->
+    <section class="team-grid" id="team-grid">
+      <!-- 6 Slot Cards Rendered Reactively via JS -->
+    </section>
+
+    <!-- Synergy & Team Analytics Section -->
+    <section class="analytics-container">
+      <div class="analytics-tabs">
+        <button class="analytics-tab-btn active" data-tab="defensive">
+          🛡️ Defensive Weakness Matrix
+        </button>
+        <button class="analytics-tab-btn" data-tab="offensive">
+          ⚔️ Offensive STAB Coverage
+        </button>
+        <button class="analytics-tab-btn" data-tab="speed">
+          ⚡ Speed Tier Ladder
+        </button>
+        <button class="analytics-tab-btn" data-tab="teammates">
+          🤝 Suggested Teammates
+        </button>
+      </div>
+
+      <!-- Tab 1: Defensive Matrix -->
+      <div class="tab-pane active" id="pane-defensive">
+        <div class="pane-header">
+          <div>
+            <h3>Team Defensive Synergy & Vulnerabilities</h3>
+            <p>Analyzes defensive weaknesses (2x, 4x), resistances (0.5x, 0.25x), and immunities (0x) across all 18 elemental types.</p>
+          </div>
+          <div class="tera-toggle-wrap">
+            <label class="toggle-label">
+              <input type="checkbox" id="toggle-apply-tera">
+              <span class="toggle-slider"></span>
+              <span class="toggle-text">Preview Active Tera Types</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Vulnerability Warnings Banner -->
+        <div id="vulnerability-alerts" class="vulnerability-alerts"></div>
+
+        <!-- Type Matrix Grid -->
+        <div class="type-matrix-grid" id="type-matrix-grid">
+          <!-- 18 Type Cards Generated Dynamically -->
+        </div>
+      </div>
+
+      <!-- Tab 2: Offensive STAB Coverage -->
+      <div class="tab-pane" id="pane-offensive">
+        <div class="pane-header">
+          <div>
+            <h3>Offensive STAB & Coverage Breakdown</h3>
+            <p>Checks how many opponent types can be struck for super-effective (2x) STAB damage by your current squad.</p>
+          </div>
+          <div id="coverage-score-pill" class="coverage-score-pill">
+            0 / 18 Types Covered
+          </div>
+        </div>
+        <div class="offensive-grid" id="offensive-grid">
+          <!-- Offensive Type Cards Generated Dynamically -->
+        </div>
+      </div>
+
+      <!-- Tab 3: Speed Tiers -->
+      <div class="tab-pane" id="pane-speed">
+        <div class="pane-header">
+          <div>
+            <h3>Competitive Speed Tier Ladder</h3>
+            <p>Compares your team's base Speed stats alongside pivotal ranked Regulation M-C benchmark speed tiers.</p>
+          </div>
+        </div>
+        <div class="speed-ladder-wrap" id="speed-ladder-wrap">
+          <!-- Speed bars rendered dynamically -->
+        </div>
+      </div>
+
+      <!-- Tab 4: Synergistic Teammates -->
+      <div class="tab-pane" id="pane-teammates">
+        <div class="pane-header">
+          <div>
+            <h3>Data-Driven Teammate Recommendations</h3>
+            <p>Calculates highest meta synergy partners based on battle ladder usage data for your currently chosen Pokémon.</p>
+          </div>
+        </div>
+        <div class="teammates-recommend-grid" id="teammates-recommend-grid">
+          <!-- Teammates rendered dynamically -->
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Pokemon Picker Modal -->
+  <div class="modal-overlay" id="picker-modal">
+    <div class="picker-modal-box">
+      <div class="picker-header">
+        <div>
+          <h2 id="picker-title">Select Pokémon for Slot 1</h2>
+          <p class="picker-subtitle">Choose from 262 competitive singles Pokémon</p>
+        </div>
+        <button class="modal-close-btn" id="picker-close">✕</button>
+      </div>
+
+      <!-- Search & Filters -->
+      <div class="picker-filters">
+        <div class="search-wrap">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="picker-search" class="search-input" placeholder="Search by name, move, item, or ability..." autocomplete="off">
+        </div>
+
+        <div class="picker-filter-row">
+          <div class="tier-pill-group">
+            <button class="picker-tier-btn active" data-tier="ALL">All</button>
+            <button class="picker-tier-btn" data-tier="S">S</button>
+            <button class="picker-tier-btn" data-tier="A">A</button>
+            <button class="picker-tier-btn" data-tier="B">B</button>
+            <button class="picker-tier-btn" data-tier="C">C</button>
+            <button class="picker-tier-btn" data-tier="D">D</button>
+          </div>
+
+          <div class="picker-select-group">
+            <select id="picker-type-select" class="picker-select">
+              <option value="ALL">All Types</option>
+              <option value="Dragon">Dragon</option>
+              <option value="Steel">Steel</option>
+              <option value="Water">Water</option>
+              <option value="Fairy">Fairy</option>
+              <option value="Ghost">Ghost</option>
+              <option value="Fire">Fire</option>
+              <option value="Grass">Grass</option>
+              <option value="Electric">Electric</option>
+              <option value="Ground">Ground</option>
+              <option value="Fighting">Fighting</option>
+              <option value="Dark">Dark</option>
+              <option value="Flying">Flying</option>
+              <option value="Ice">Ice</option>
+              <option value="Psychic">Psychic</option>
+              <option value="Rock">Rock</option>
+              <option value="Poison">Poison</option>
+              <option value="Bug">Bug</option>
+              <option value="Normal">Normal</option>
+            </select>
+
+            <select id="picker-sort-select" class="picker-select">
+              <option value="rank-asc">Sort: Rank (High to Low)</option>
+              <option value="bst-desc">Sort: BST (Highest)</option>
+              <option value="spe-desc">Sort: Speed (Fastest)</option>
+              <option value="atk-desc">Sort: Attack (Highest)</option>
+              <option value="spa-desc">Sort: Sp. Atk (Highest)</option>
+              <option value="name-asc">Sort: Name (A-Z)</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Picker Pokemon Grid -->
+      <div class="picker-grid" id="picker-grid">
+        <!-- Rendered dynamically -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Import Hash Modal -->
+  <div class="modal-overlay" id="import-modal">
+    <div class="dialog-modal-box">
+      <div class="dialog-header">
+        <h3>📥 Import Team Hash</h3>
+        <button class="modal-close-btn" id="import-close">✕</button>
+      </div>
+      <p class="dialog-desc">Enter any 16-character alphanumeric <code>teamhash</code> to load the team:</p>
+      <div class="dialog-input-wrap">
+        <input type="text" id="import-hash-input" class="dialog-input" placeholder="e.g. 01NlukICnCDEMNWS" maxlength="16" autocomplete="off" spellcheck="false">
+      </div>
+      <div class="dialog-footer">
+        <button class="btn-cancel" id="btn-import-cancel">Cancel</button>
+        <button class="btn-confirm" id="btn-import-submit">Load Team</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Showdown Export Modal -->
+  <div class="modal-overlay" id="showdown-modal">
+    <div class="dialog-modal-box showdown-box">
+      <div class="dialog-header">
+        <h3>⚔️ Pokémon Showdown Team Export</h3>
+        <button class="modal-close-btn" id="showdown-close">✕</button>
+      </div>
+      <p class="dialog-desc">Copy and paste this team into Pokémon Showdown Teambuilder:</p>
+      <textarea id="showdown-textarea" class="showdown-textarea" readonly></textarea>
+      <div class="dialog-footer">
+        <button class="btn-cancel" id="btn-showdown-close">Close</button>
+        <button class="btn-confirm" id="btn-copy-showdown">📋 Copy to Clipboard</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="toast"></div>
+
+  <!-- Scripts -->
+  <script src="teambuilder.js"></script>
+</body>
+</html>
