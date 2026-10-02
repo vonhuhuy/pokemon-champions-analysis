@@ -585,9 +585,10 @@
 .slot-right-col {
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;
-  padding-top: 1.65rem;
-  gap: 0.38rem;
+  justify-content: center;
+  padding-top: 1.85rem;
+  padding-bottom: 0.25rem;
+  gap: 0.42rem;
 }
 
 .slot-stat-row {

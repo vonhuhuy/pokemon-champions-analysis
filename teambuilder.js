@@ -2885,7 +2885,7 @@ function buildOffensiveStabTooltipHtml(targetType) {
     <div class="tb-tip-sections-wrap">
       <div class="tb-tip-section">
         <div class="tb-tip-sec-hdr">
-          <span class="tb-tip-sec-tag advantage">⚔️ STAB Dealers (${dealers.length})</span>
+          <span class="tb-tip-sec-tag advantage">⚔️ STAB Attacks (${dealers.length})</span>
           <span class="tb-tip-sec-sub">Deals 200% STAB Damage</span>
         </div>
         ${renderDealerRows()}
