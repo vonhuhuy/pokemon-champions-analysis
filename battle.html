@@ -7,7 +7,7 @@
   <meta name="description" content="Simulate competitive Pokémon 6v6 team battles. Analyzes head-to-head advantage, offensive type coverage, defensive exposure, physical vs special bulk pairings, and ranks team member usefulness.">
   <link rel="stylesheet" href="index.css?v=2.8">
   <link rel="stylesheet" href="teambuilder.css?v=2.7">
-  <link rel="stylesheet" href="battle.css?v=1.3">
+  <link rel="stylesheet" href="battle.css?v=2.0">
 </head>
 <body>
 
@@ -123,13 +123,13 @@
           </div>
         </div>
 
-        <!-- Column 2: Opponent / Enemy Team (Editable) -->
+        <!-- Column 2: Enemy Team (Editable) -->
         <div class="roster-col roster-col-enemy">
           <div class="roster-header">
             <div class="roster-title-group">
               <span class="roster-icon">⚔️</span>
               <div>
-                <h2 class="roster-title">Enemy Opponent Team</h2>
+                <h2 class="roster-title">Enemy Team</h2>
                 <div class="roster-meta-tags">
                   <span class="enemy-count-badge" id="enemy-count-badge">0 / 6 Pokémon</span>
                   <span class="editable-badge">✏️ Fully Customizable</span>
@@ -137,7 +137,7 @@
               </div>
             </div>
             <div class="roster-actions">
-              <button id="btn-add-enemy-poke" class="btn-battle-pill" title="Add or Replace Opponent Pokémon">
+              <button id="btn-add-enemy-poke" class="btn-battle-pill" title="Add or Replace Enemy Pokémon">
                 ➕ Add Pokémon
               </button>
               <button id="btn-import-enemy-hash" class="btn-battle-pill" title="Import an enemy teamhash">
@@ -151,7 +151,7 @@
 
           <!-- Enemy Presets Bar -->
           <div class="enemy-presets-strip">
-            <span class="presets-label">Opponent Presets:</span>
+            <span class="presets-label">Enemy Team Presets:</span>
             <button class="preset-pill-btn active" data-preset="meta-s">🏆 S-Tier Core</button>
             <button class="preset-pill-btn" data-preset="rain">🌧️ Rain Offense</button>
             <button class="preset-pill-btn" data-preset="balance">🧱 Bulky Balance</button>
@@ -279,10 +279,10 @@
               </div>
             </div>
 
-            <!-- Right: Defensive Exposure vs Opponent STABs & Moves -->
+            <!-- Right: Defensive Exposure vs Enemy STABs & Moves -->
             <div class="coverage-box">
               <div class="coverage-box-header">
-                <h4>🛡️ Defensive Exposure (Opponent Threats vs Our Team)</h4>
+                <h4>🛡️ Defensive Exposure (Enemy Threats vs Our Team)</h4>
                 <span class="badge-accent">Defensive Integrity</span>
               </div>
               <p class="box-sub">Elemental attacking types carried by the enemy and how our team withstands them:</p>
@@ -300,8 +300,8 @@
 
           <!-- All 18 Types Matrix Row -->
           <div class="all-types-coverage-section">
-            <h4 class="sub-heading">🌐 Comprehensive 18-Type Opponent Weakness Distribution</h4>
-            <p class="sub-desc">Count of opponent Pokémon vulnerable to each elemental type:</p>
+            <h4 class="sub-heading">🌐 Comprehensive 18-Type Enemy Weakness Distribution</h4>
+            <p class="sub-desc">Count of enemy Pokémon vulnerable to each elemental type:</p>
             <div class="types-weakness-pills-row" id="types-weakness-pills-row">
               <!-- 18 type pills rendered with count of enemy weaknesses -->
             </div>
@@ -341,7 +341,7 @@
             </div>
 
             <div class="physpec-card">
-              <h4>Opponent Team Defensive Skew</h4>
+              <h4>Enemy Team Defensive Skew</h4>
               <div class="stat-split-bar-wrap">
                 <div class="split-labels">
                   <span id="enemy-def-label">🛡️ Physical Bulk: —</span>
@@ -385,12 +385,12 @@
 
           <!-- Detailed Table of Bulk Profiles -->
           <div class="bulk-profiles-table-card">
-            <h4 class="sub-heading">📋 Full Opponent Bulk & Vulnerability Reference</h4>
+            <h4 class="sub-heading">📋 Full Enemy Bulk & Vulnerability Reference</h4>
             <div class="bulk-table-wrap">
               <table class="bulk-table" id="enemy-bulk-table">
                 <thead>
                   <tr>
-                    <th>Opponent</th>
+                    <th>Enemy Pokémon</th>
                     <th>Role</th>
                     <th>HP</th>
                     <th>Def</th>
@@ -454,11 +454,11 @@
               </div>
             </div>
 
-            <!-- Card 4: Most Dangerous Opponent Sweeper -->
+            <!-- Card 4: Most Dangerous Enemy Sweeper -->
             <div class="tactics-card">
               <div class="tactics-card-head">
                 <span class="t-icon">🚨</span>
-                <h4>Opponent's Most Dangerous Threat</h4>
+                <h4>Enemy's Most Dangerous Threat</h4>
               </div>
               <div id="tactics-threat-content" class="tactics-card-body">
                 <!-- Populated via JS -->
@@ -473,14 +473,14 @@
   </main>
 
   <!-- ========================================================= -->
-  <!-- MODAL 1: Opponent Pokémon Selector Modal -->
+  <!-- MODAL 1: Enemy Pokémon Selector Modal -->
   <!-- ========================================================= -->
   <div class="modal-overlay" id="modal-enemy-picker" style="display: none;">
     <div class="modal-card modal-picker-card">
       <div class="modal-header">
         <div class="modal-title-wrap">
           <span class="modal-icon">➕</span>
-          <h3>Add Opponent Pokémon (Slot <span id="picker-target-slot-num">1</span>)</h3>
+          <h3>Add Enemy Pokémon (Slot <span id="picker-target-slot-num">1</span>)</h3>
         </div>
         <button class="modal-close-btn" id="btn-close-picker">✕</button>
       </div>
@@ -601,7 +601,7 @@
 
       <div class="modal-body-content">
         <p class="modal-desc">
-          Paste a 16-character alphanumeric teamhash to load an exact opponent composition:
+          Paste a 16-character alphanumeric teamhash to load an exact enemy composition:
         </p>
 
         <div class="hash-input-group">
@@ -613,14 +613,14 @@
   </div>
 
   <!-- ========================================================= -->
-  <!-- MODAL 5: Edit Opponent Pokémon Modal -->
+  <!-- MODAL 5: Edit Enemy Pokémon Modal -->
   <!-- ========================================================= -->
   <div class="modal-overlay" id="modal-enemy-editor" style="display: none;">
     <div class="modal-card modal-editor-card">
       <div class="modal-header">
         <div class="modal-title-wrap">
           <span class="modal-icon">✏️</span>
-          <h3>Customize Opponent: <span id="editor-poke-title-name">Pokémon</span> (Slot <span id="editor-slot-num">1</span>)</h3>
+          <h3>Customize Enemy Pokémon: <span id="editor-poke-title-name">Pokémon</span> (Slot <span id="editor-slot-num">1</span>)</h3>
         </div>
         <div class="modal-header-actions">
           <button class="btn-battle-pill" id="editor-btn-replace" title="Replace with a different Pokémon">🔄 Replace Pokémon</button>
@@ -644,6 +644,6 @@
 
   <!-- Scripts -->
   <script src="type-tooltip.js"></script>
-  <script src="battle.js?v=1.3"></script>
+  <script src="battle.js?v=2.0"></script>
 </body>
 </html>

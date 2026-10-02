@@ -841,7 +841,7 @@ function updateOverviewMeters(totalDuels, ourWins, ourSpeedEdges, equityPct, ene
     verdictText = '🔴 High Risk Matchup';
   } else if (equityPct <= 45) {
     verdictClass = 'verdict-unfavored';
-    verdictText = '🟠 Opponent Advantage';
+    verdictText = '🟠 Enemy Advantage';
   }
 
   const statVerdict = document.getElementById('stat-overall-verdict');
@@ -912,7 +912,7 @@ function renderRosters() {
         return `
           <div class="battle-slot-card-empty" onclick="openEnemyPicker(${idx})">
             <span class="empty-plus-icon">+</span>
-            <span class="empty-slot-text">Add Opponent Pokémon</span>
+            <span class="empty-slot-text">Add Enemy Pokémon</span>
           </div>
         `;
       }
@@ -1167,7 +1167,7 @@ function renderRankingsTab(matrix) {
 
         <div class="ranking-record-section">
           <div class="record-labels">
-            <span>Matchup Record vs Opponents:</span>
+            <span>Matchup Record vs Enemy:</span>
             <span class="record-counts">${data.wins}W - ${data.evens}E - ${data.losses}L</span>
           </div>
           <div class="record-track">
@@ -1211,7 +1211,7 @@ function renderMatrixTab(matrix) {
   let headerHtml = `
     <thead>
       <tr>
-        <th class="th-corner">Our Team \\ Opponent</th>
+        <th class="th-corner">Our Team \\ Enemy</th>
         ${filledEnemy.map(({ build }) => `
           <th class="matrix-col-header">
             <div class="col-header-content">
@@ -1510,10 +1510,10 @@ function renderPhyspecTab() {
   const enemySummary = document.getElementById('enemy-physpec-summary');
   if (enemySummary) {
     enemySummary.textContent = avgEnemyDef > avgEnemySpd + 15
-      ? `Opponent leans physically defensive (Def ${avgEnemyDef} vs SpD ${avgEnemySpd}). Prioritize special attackers!`
+      ? `Enemy team leans physically defensive (Def ${avgEnemyDef} vs SpD ${avgEnemySpd}). Prioritize special attackers!`
       : (avgEnemySpd > avgEnemyDef + 15
-        ? `Opponent leans specially defensive (SpD ${avgEnemySpd} vs Def ${avgEnemyDef}). Overwhelm them with physical attacks!`
-        : 'Opponent has evenly balanced physical and special bulk.');
+        ? `Enemy team leans specially defensive (SpD ${avgEnemySpd} vs Def ${avgEnemyDef}). Overwhelm them with physical attacks!`
+        : 'Enemy team has evenly balanced physical and special bulk.');
   }
 
   // High-Value Exploits & Traps Lists
@@ -1744,7 +1744,7 @@ function setupUI() {
       btn.classList.add('active');
       loadPresetEnemy(btn.dataset.preset);
       recalculateBattle();
-      showToast(`Loaded Opponent Preset: ${btn.textContent.trim()}`);
+      showToast(`Loaded Enemy Preset: ${btn.textContent.trim()}`);
     });
   });
 
@@ -1755,7 +1755,7 @@ function setupUI() {
       enemySlots = [null, null, null, null, null, null];
       enemyHash = encodeTeam(enemySlots);
       recalculateBattle();
-      showToast('Cleared opponent team');
+      showToast('Cleared enemy team');
     });
   }
 
@@ -1843,7 +1843,7 @@ function setupUI() {
         enemyHash = hash;
         modalEnemyHash.style.display = 'none';
         recalculateBattle();
-        showToast(`Imported Opponent from hash: ${hash}`);
+        showToast(`Imported Enemy Team from hash: ${hash}`);
       } catch (err) {
         alert(err.message);
       }
@@ -1911,7 +1911,7 @@ function setupUI() {
   if (btnCloseEditorModal) btnCloseEditorModal.addEventListener('click', closeEnemyEditor);
   if (btnSaveDone) {
     btnSaveDone.addEventListener('click', () => {
-      const pName = (editingEnemySlotIdx !== null && enemySlots[editingEnemySlotIdx]) ? enemySlots[editingEnemySlotIdx].pokemon.name : 'Opponent';
+      const pName = (editingEnemySlotIdx !== null && enemySlots[editingEnemySlotIdx]) ? enemySlots[editingEnemySlotIdx].pokemon.name : 'Enemy Pokémon';
       closeEnemyEditor();
       showToast(`Saved customized build for ${pName}`);
     });
@@ -1921,7 +1921,7 @@ function setupUI() {
       if (editingEnemySlotIdx !== null) {
         removeEnemySlot(editingEnemySlotIdx);
         closeEnemyEditor();
-        showToast('Removed opponent Pokémon');
+        showToast('Removed enemy Pokémon');
       }
     });
   }
@@ -1934,6 +1934,32 @@ function setupUI() {
       }
     });
   }
+
+  // Close modals on overlay backdrop click
+  document.querySelectorAll('.modal-overlay').forEach(overlay => {
+    overlay.addEventListener('click', (e) => {
+      if (e.target === overlay) {
+        overlay.style.display = 'none';
+        if (overlay.id === 'modal-enemy-editor') {
+          closeEnemyEditor();
+        }
+      }
+    });
+  });
+
+  // Close modals on Escape key
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      document.querySelectorAll('.modal-overlay').forEach(overlay => {
+        if (overlay.style.display === 'flex') {
+          overlay.style.display = 'none';
+          if (overlay.id === 'modal-enemy-editor') {
+            closeEnemyEditor();
+          }
+        }
+      });
+    }
+  });
 }
 
 // =====================================================================
@@ -2040,7 +2066,7 @@ function renderEditorModalBody() {
   }
 
   const itemChipsHtml = topItems.map(it => {
-    const isAct = it.name.toLowerCase() === slot.item.toLowerCase();
+    const isAct = (it.name || '').toLowerCase() === (slot.item || '').toLowerCase();
     const icon = getItemSpriteUrl(it.name);
     return `
       <button class="editor-chip ${isAct ? 'active' : ''}" onclick="setEnemyItem('${it.name}')">
@@ -2052,7 +2078,7 @@ function renderEditorModalBody() {
   }).join('');
 
   const metaItemChipsHtml = commonMetaItems.map(itName => {
-    const isAct = itName.toLowerCase() === slot.item.toLowerCase();
+    const isAct = (itName || '').toLowerCase() === (slot.item || '').toLowerCase();
     const icon = getItemSpriteUrl(itName);
     return `
       <button class="editor-chip ${isAct ? 'active' : ''}" onclick="setEnemyItem('${itName}')">
@@ -2064,7 +2090,7 @@ function renderEditorModalBody() {
 
   // 4. Ability Section
   const abilityChipsHtml = (p.abilities || []).map(ab => {
-    const isAct = ab.name.toLowerCase() === slot.ability.toLowerCase();
+    const isAct = (ab.name || '').toLowerCase() === (slot.ability || '').toLowerCase();
     return `
       <button class="editor-chip ${isAct ? 'active' : ''}" onclick="setEnemyAbility('${ab.name}')">
         <span>🌟 <strong>${ab.name}</strong></span>
@@ -2079,7 +2105,7 @@ function renderEditorModalBody() {
   `).join('');
 
   const topAlignmentsHtml = (p.stat_alignments || []).slice(0, 4).map(al => {
-    const natName = al.alignment.split(' ')[0];
+    const natName = al.alignment ? al.alignment.split(' ')[0] : '';
     const isAct = natName === slot.nature;
     return `
       <button class="editor-chip ${isAct ? 'active' : ''}" onclick="setEnemyNature('${natName}')">
@@ -2349,6 +2375,19 @@ window.openEnemyPicker = function(slotIdx) {
   const slotNumSpan = document.getElementById('picker-target-slot-num');
   if (slotNumSpan) slotNumSpan.textContent = slotIdx + 1;
 
+  // Clear previous search and filter state
+  pickerSearch = '';
+  pickerTier = 'ALL';
+  pickerType = 'ALL';
+  const searchInput = document.getElementById('picker-search-input');
+  if (searchInput) searchInput.value = '';
+  const typeSelect = document.getElementById('picker-type-select');
+  if (typeSelect) typeSelect.value = 'ALL';
+  document.querySelectorAll('#picker-tier-buttons .picker-pill').forEach(b => {
+    if (b.dataset.tier === 'ALL') b.classList.add('active');
+    else b.classList.remove('active');
+  });
+
   const modal = document.getElementById('modal-enemy-picker');
   if (modal) {
     modal.style.display = 'flex';
@@ -2403,7 +2442,7 @@ window.selectEnemyPokemon = function(pokemonName) {
     const modal = document.getElementById('modal-enemy-picker');
     if (modal) modal.style.display = 'none';
     recalculateBattle();
-    showToast(`Added ${p.name} to Opponent Team (Slot ${activeEnemyPickerSlot + 1})`);
+    showToast(`Added ${p.name} to Enemy Team (Slot ${activeEnemyPickerSlot + 1})`);
   }
 };
 
@@ -2480,7 +2519,7 @@ window.openDuelModal = function(ourIdx, enemyIdx) {
       <div class="fighter-card">
         <img src="${getSpriteUrl(enemyBuild.pokemon.name)}" class="fighter-sprite" alt="">
         <span class="fighter-name">${enemyBuild.pokemon.name}</span>
-        <span class="fighter-side-tag side-enemy">Opponent</span>
+        <span class="fighter-side-tag side-enemy">Enemy</span>
         <div style="font-size:0.75rem; color:var(--text-muted);">
           Spe ${duel.speB} · Atk ${duel.profB.atk} · SpA ${duel.profB.spa} · Def ${duel.profB.def} · SpD ${duel.profB.spd}
         </div>
