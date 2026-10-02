@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PokéChamp — Battle Analysis & Competitive Team Matchup Simulator</title>
+  <meta name="description" content="Simulate competitive Pokémon 6v6 team battles. Analyzes head-to-head advantage, offensive type coverage, defensive exposure, physical vs special bulk pairings, and ranks team member usefulness.">
+  <link rel="stylesheet" href="index.css?v=2.8">
+  <link rel="stylesheet" href="teambuilder.css?v=2.7">
+  <link rel="stylesheet" href="battle.css?v=1.3">
+</head>
+<body>
+
+  <!-- Top Navigation Header -->
+  <header class="header-nav">
+    <div class="brand">
+      <span>⚡ POKÉCHAMP</span>
+      <span class="brand-badge">Battle Arena</span>
+    </div>
+    <nav class="page-nav">
+      <a href="index.html" class="page-nav-btn">📋 Tier List</a>
+      <a href="counter.html" class="page-nav-btn">⚔️ Counter Analysis</a>
+      <a href="teambuilder.html" class="page-nav-btn">🛡️ Team Builder</a>
+      <a href="battle.html" class="page-nav-btn active">💥 Battle Analysis</a>
+    </nav>
+    <div class="nav-stats">
+      <div class="stat-pill">
+        <span>Matchup Equity:</span>
+        <strong id="nav-matchup-equity">Calculating...</strong>
+      </div>
+      <div class="stat-pill">
+        <span>Meta Standard:</span>
+        <strong>Regulation M-C</strong>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="container battle-container">
+
+    <!-- Hero Header -->
+    <section class="battle-hero">
+      <div class="battle-hero-text">
+        <h1 class="battle-title">💥 Battle Matchup & Team Analysis</h1>
+        <p class="battle-subtitle">
+          Pit your locked roster from the <strong>Team Builder</strong> against any opposing 6-Pokémon composition. 
+          Discover individual advantages, elemental blindspots, physical vs. special defensive pairings, and our team’s tactical utility hierarchy.
+        </p>
+      </div>
+
+      <!-- Quick Action Badges -->
+      <div class="battle-hero-stats" id="battle-summary-strip">
+        <div class="hero-stat-card">
+          <span class="stat-label">Head-to-Head Wins</span>
+          <span class="stat-value text-emerald" id="stat-wins-count">0 / 36</span>
+        </div>
+        <div class="hero-stat-card">
+          <span class="stat-label">Speed Advantage</span>
+          <span class="stat-value text-cyan" id="stat-speed-edge">0 / 36</span>
+        </div>
+        <div class="hero-stat-card">
+          <span class="stat-label">Coverage Hits</span>
+          <span class="stat-value text-amber" id="stat-coverage-rate">0%</span>
+        </div>
+        <div class="hero-stat-card">
+          <span class="stat-label">Team Matchup Rating</span>
+          <span class="stat-value text-purple" id="stat-overall-verdict">—</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Head-to-Head Rosters Section -->
+    <section class="roster-arena-card">
+      <div class="roster-arena-grid">
+
+        <!-- Column 1: Our Team (Locked from Team Builder) -->
+        <div class="roster-col roster-col-our">
+          <div class="roster-header">
+            <div class="roster-title-group">
+              <span class="roster-icon">🛡️</span>
+              <div>
+                <h2 class="roster-title">Our Team</h2>
+                <div class="roster-meta-tags">
+                  <span class="lock-badge" title="Roster is locked from Team Builder">🔒 Locked (Team Builder)</span>
+                  <span class="teamhash-tag">Hash: <code id="our-hash-code">0000000000000000</code></span>
+                </div>
+              </div>
+            </div>
+            <div class="roster-actions">
+              <a id="btn-edit-in-teambuilder" href="teambuilder.html" class="btn-battle-pill btn-tb-edit" title="Edit this team in Team Builder">
+                ✏️ Edit in Builder
+              </a>
+              <button id="btn-switch-our-hash" class="btn-battle-pill" title="Load a different teamhash">
+                📥 Switch Hash
+              </button>
+            </div>
+          </div>
+
+          <!-- Our Team 6 Cards -->
+          <div class="battle-slots-grid" id="our-slots-grid">
+            <!-- Dynamically populated via JS -->
+          </div>
+        </div>
+
+        <!-- Center Matchup Balance Hub -->
+        <div class="roster-center-vs">
+          <div class="vs-glow-orb">
+            <span class="vs-text">VS</span>
+          </div>
+          <div class="matchup-meter-wrap">
+            <div class="meter-labels">
+              <span class="our-side-label">Our Edge</span>
+              <span id="meter-ratio-text" class="meter-ratio">50% / 50%</span>
+              <span class="enemy-side-label">Enemy Edge</span>
+            </div>
+            <div class="meter-bar-track">
+              <div id="meter-bar-fill-our" class="meter-fill-our" style="width: 50%;"></div>
+              <div id="meter-bar-fill-enemy" class="meter-fill-enemy" style="width: 50%;"></div>
+            </div>
+            <div id="matchup-verdict-pill" class="matchup-verdict-pill verdict-even">
+              Balanced Matchup
+            </div>
+          </div>
+        </div>
+
+        <!-- Column 2: Opponent / Enemy Team (Editable) -->
+        <div class="roster-col roster-col-enemy">
+          <div class="roster-header">
+            <div class="roster-title-group">
+              <span class="roster-icon">⚔️</span>
+              <div>
+                <h2 class="roster-title">Enemy Opponent Team</h2>
+                <div class="roster-meta-tags">
+                  <span class="enemy-count-badge" id="enemy-count-badge">0 / 6 Pokémon</span>
+                  <span class="editable-badge">✏️ Fully Customizable</span>
+                </div>
+              </div>
+            </div>
+            <div class="roster-actions">
+              <button id="btn-add-enemy-poke" class="btn-battle-pill" title="Add or Replace Opponent Pokémon">
+                ➕ Add Pokémon
+              </button>
+              <button id="btn-import-enemy-hash" class="btn-battle-pill" title="Import an enemy teamhash">
+                📥 Import Hash
+              </button>
+              <button id="btn-clear-enemy-team" class="btn-battle-pill btn-danger" title="Clear all enemy slots">
+                ✕ Clear
+              </button>
+            </div>
+          </div>
+
+          <!-- Enemy Presets Bar -->
+          <div class="enemy-presets-strip">
+            <span class="presets-label">Opponent Presets:</span>
+            <button class="preset-pill-btn active" data-preset="meta-s">🏆 S-Tier Core</button>
+            <button class="preset-pill-btn" data-preset="rain">🌧️ Rain Offense</button>
+            <button class="preset-pill-btn" data-preset="balance">🧱 Bulky Balance</button>
+            <button class="preset-pill-btn" data-preset="hyper">⚡ Hyper Offense</button>
+            <button class="preset-pill-btn" data-preset="random">🎲 Random Meta</button>
+          </div>
+
+          <!-- Enemy 6 Cards -->
+          <div class="battle-slots-grid" id="enemy-slots-grid">
+            <!-- Dynamically populated via JS -->
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Deep Battle Intelligence Tabs -->
+    <section class="analysis-tabs-card">
+      <div class="tabs-nav-bar">
+        <button class="analysis-tab-btn active" data-tab="rankings">
+          <span class="tab-icon">🏆</span>
+          <span class="tab-title">Member Usefulness & MVP Ranking</span>
+        </button>
+        <button class="analysis-tab-btn" data-tab="matrix">
+          <span class="tab-icon">⚔️</span>
+          <span class="tab-title">Head-to-Head Advantage Matrix (6×6)</span>
+        </button>
+        <button class="analysis-tab-btn" data-tab="coverage">
+          <span class="tab-icon">📊</span>
+          <span class="tab-title">Type Coverage & Vulnerability</span>
+        </button>
+        <button class="analysis-tab-btn" data-tab="physpec">
+          <span class="tab-icon">🛡️</span>
+          <span class="tab-title">Physical vs. Special Pairings</span>
+        </button>
+        <button class="analysis-tab-btn" data-tab="tactics">
+          <span class="tab-icon">🎯</span>
+          <span class="tab-title">Tactical Battle Plan & Lead Advisor</span>
+        </button>
+      </div>
+
+      <!-- Tab Content Area -->
+      <div class="tab-pane-container">
+
+        <!-- ========================================================= -->
+        <!-- TAB 1: Member Usefulness & Ranking -->
+        <!-- ========================================================= -->
+        <div class="battle-pane active" id="pane-rankings">
+          <div class="pane-hero-intro">
+            <div>
+              <h3 class="pane-title">🏆 Team Member Usefulness & Tactical Ranking</h3>
+              <p class="pane-desc">
+                Ranks all 6 members of your team based on their calculated composite effectiveness against this specific opposing lineup.
+                Considers matchup win-rate, key threat elimination, speed dominance, and defensive liability.
+              </p>
+            </div>
+            <div id="recommended-lead-callout" class="lead-callout-card">
+              <!-- Dynamically populated with recommended lead -->
+            </div>
+          </div>
+
+          <div class="member-rankings-grid" id="member-rankings-grid">
+            <!-- Dynamically rendered ranking cards #1 to #6 -->
+          </div>
+        </div>
+
+        <!-- ========================================================= -->
+        <!-- TAB 2: Head-to-Head 6x6 Matrix -->
+        <!-- ========================================================= -->
+        <div class="battle-pane" id="pane-matrix">
+          <div class="pane-hero-intro">
+            <div>
+              <h3 class="pane-title">⚔️ Head-to-Head 6×6 Matchup Advantage Matrix</h3>
+              <p class="pane-desc">
+                Direct pairing of every Pokémon on your team against each member of the opposing squad.
+                Click on any cell to open the <strong>Detailed Duel Breakdown</strong> with speed calculations, move-by-move multipliers, and stat matchups.
+              </p>
+            </div>
+            <div class="matrix-legend">
+              <span class="legend-badge lg-win-plus">+2 Decisive Win</span>
+              <span class="legend-badge lg-win">+1 Favorable</span>
+              <span class="legend-badge lg-even">0 Even Matchup</span>
+              <span class="legend-badge lg-lose">-1 Unfavorable</span>
+              <span class="legend-badge lg-lose-minus">-2 Hard Countered</span>
+            </div>
+          </div>
+
+          <!-- Matrix Table Container -->
+          <div class="matrix-table-wrap">
+            <table class="matchup-matrix-table" id="matchup-matrix-table">
+              <!-- Rendered via JS -->
+            </table>
+          </div>
+        </div>
+
+        <!-- ========================================================= -->
+        <!-- TAB 3: Type Coverage & Vulnerability -->
+        <!-- ========================================================= -->
+        <div class="battle-pane" id="pane-coverage">
+          <div class="pane-hero-intro">
+            <div>
+              <h3 class="pane-title">📊 Elemental Type Coverage & Team Vulnerabilities</h3>
+              <p class="pane-desc">
+                Examines how thoroughly your team's damaging moves cover the enemy roster, identifies unchecked defensive blindspots, and checks for dangerous shared weaknesses against their offensive arsenal.
+              </p>
+            </div>
+          </div>
+
+          <div class="coverage-split-layout">
+            <!-- Left: Offensive Coverage against their 6 -->
+            <div class="coverage-box">
+              <div class="coverage-box-header">
+                <h4>🎯 Offensive Threat Coverage (Our Moves vs Their Pokémon)</h4>
+                <span class="badge-accent" id="coverage-score-pill">Coverage: 0 / 6</span>
+              </div>
+              <p class="box-sub">Super-effective (2× / 4×) move availability for each enemy target:</p>
+              
+              <div class="enemy-coverage-list" id="enemy-coverage-list">
+                <!-- Dynamically populated -->
+              </div>
+
+              <!-- Blindspots Warning Box -->
+              <div id="blindspots-warning-box" class="blindspots-box">
+                <!-- Dynamically populated -->
+              </div>
+            </div>
+
+            <!-- Right: Defensive Exposure vs Opponent STABs & Moves -->
+            <div class="coverage-box">
+              <div class="coverage-box-header">
+                <h4>🛡️ Defensive Exposure (Opponent Threats vs Our Team)</h4>
+                <span class="badge-accent">Defensive Integrity</span>
+              </div>
+              <p class="box-sub">Elemental attacking types carried by the enemy and how our team withstands them:</p>
+
+              <div class="enemy-threats-grid" id="enemy-threats-grid">
+                <!-- Dynamically populated with type breakdown -->
+              </div>
+
+              <!-- Shared Team Weakness Alert Box -->
+              <div id="shared-weakness-box" class="shared-weakness-box">
+                <!-- Dynamically populated -->
+              </div>
+            </div>
+          </div>
+
+          <!-- All 18 Types Matrix Row -->
+          <div class="all-types-coverage-section">
+            <h4 class="sub-heading">🌐 Comprehensive 18-Type Opponent Weakness Distribution</h4>
+            <p class="sub-desc">Count of opponent Pokémon vulnerable to each elemental type:</p>
+            <div class="types-weakness-pills-row" id="types-weakness-pills-row">
+              <!-- 18 type pills rendered with count of enemy weaknesses -->
+            </div>
+          </div>
+        </div>
+
+        <!-- ========================================================= -->
+        <!-- TAB 4: Physical vs Special Pairings -->
+        <!-- ========================================================= -->
+        <div class="battle-pane" id="pane-physpec">
+          <div class="pane-hero-intro">
+            <div>
+              <h3 class="pane-title">🛡️ Physical vs. Special Attack & Defense Pairing Dynamics</h3>
+              <p class="pane-desc">
+                Evaluates the offensive and defensive category splits of both teams. Identifies opposing Pokémon with lopsided defensive bulk that your attackers can exploit, and flags dedicated walls to avoid.
+              </p>
+            </div>
+          </div>
+
+          <!-- Split Meters Section -->
+          <div class="physpec-meters-grid">
+            <div class="physpec-card">
+              <h4>Our Team Damage Split</h4>
+              <div class="stat-split-bar-wrap">
+                <div class="split-labels">
+                  <span id="our-phys-label">⚔️ Physical: 0</span>
+                  <span id="our-spec-label">✨ Special: 0</span>
+                </div>
+                <div class="split-bar-track">
+                  <div id="our-phys-bar" class="split-bar-phys" style="width: 50%;"></div>
+                  <div id="our-spec-bar" class="split-bar-spec" style="width: 50%;"></div>
+                </div>
+              </div>
+              <div class="physpec-notes" id="our-physpec-summary">
+                Balanced physical and special attack distribution.
+              </div>
+            </div>
+
+            <div class="physpec-card">
+              <h4>Opponent Team Defensive Skew</h4>
+              <div class="stat-split-bar-wrap">
+                <div class="split-labels">
+                  <span id="enemy-def-label">🛡️ Physical Bulk: —</span>
+                  <span id="enemy-spd-label">🔮 Special Bulk: —</span>
+                </div>
+                <div class="split-bar-track">
+                  <div id="enemy-def-bar" class="split-bar-phys" style="width: 50%;"></div>
+                  <div id="enemy-spd-bar" class="split-bar-spec" style="width: 50%;"></div>
+                </div>
+              </div>
+              <div class="physpec-notes" id="enemy-physpec-summary">
+                Analyzing opponent defensive vulnerabilities...
+              </div>
+            </div>
+          </div>
+
+          <!-- High-Value Exploits & Defensive Traps -->
+          <div class="physpec-recommendations-grid">
+            <!-- Left: High Value Exploits -->
+            <div class="physpec-box box-exploits">
+              <div class="physpec-box-head">
+                <span class="icon">🎯</span>
+                <h4>High-Value Target Exploits (Hit Their Weak Side)</h4>
+              </div>
+              <div class="physpec-list" id="physpec-exploits-list">
+                <!-- Rendered via JS -->
+              </div>
+            </div>
+
+            <!-- Right: Defensive Traps -->
+            <div class="physpec-box box-traps">
+              <div class="physpec-box-head">
+                <span class="icon">⚠️</span>
+                <h4>Defensive Traps & Walls to Avoid</h4>
+              </div>
+              <div class="physpec-list" id="physpec-traps-list">
+                <!-- Rendered via JS -->
+              </div>
+            </div>
+          </div>
+
+          <!-- Detailed Table of Bulk Profiles -->
+          <div class="bulk-profiles-table-card">
+            <h4 class="sub-heading">📋 Full Opponent Bulk & Vulnerability Reference</h4>
+            <div class="bulk-table-wrap">
+              <table class="bulk-table" id="enemy-bulk-table">
+                <thead>
+                  <tr>
+                    <th>Opponent</th>
+                    <th>Role</th>
+                    <th>HP</th>
+                    <th>Def</th>
+                    <th>SpD</th>
+                    <th>Weak Defense Side</th>
+                    <th>Our Best Counter-Attacker</th>
+                  </tr>
+                </thead>
+                <tbody id="enemy-bulk-table-body">
+                  <!-- Populated via JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ========================================================= -->
+        <!-- TAB 5: Tactical Battle Plan -->
+        <!-- ========================================================= -->
+        <div class="battle-pane" id="pane-tactics">
+          <div class="pane-hero-intro">
+            <div>
+              <h3 class="pane-title">🎯 Tactical Matchup Strategy & Execution Plan</h3>
+              <p class="pane-desc">
+                Comprehensive match strategy synthesized from head-to-head simulations, speed brackets, and defensive pivot routes.
+              </p>
+            </div>
+          </div>
+
+          <div class="tactics-cards-grid">
+            <!-- Card 1: 3v3 Singles Bring-3 Selection -->
+            <div class="tactics-card">
+              <div class="tactics-card-head">
+                <span class="t-icon">🥇</span>
+                <h4>Recommended 3-Pokémon Core (Bring-3 Ranked)</h4>
+              </div>
+              <div id="tactics-bring3-content" class="tactics-card-body">
+                <!-- Populated via JS -->
+              </div>
+            </div>
+
+            <!-- Card 2: Turn 1 Lead Strategy -->
+            <div class="tactics-card">
+              <div class="tactics-card-head">
+                <span class="t-icon">⚡</span>
+                <h4>Opening Lead & Turn 1 Gameplan</h4>
+              </div>
+              <div id="tactics-lead-content" class="tactics-card-body">
+                <!-- Populated via JS -->
+              </div>
+            </div>
+
+            <!-- Card 3: Priority Win Condition -->
+            <div class="tactics-card">
+              <div class="tactics-card-head">
+                <span class="t-icon">👑</span>
+                <h4>Primary Win Condition & Late Game</h4>
+              </div>
+              <div id="tactics-wincon-content" class="tactics-card-body">
+                <!-- Populated via JS -->
+              </div>
+            </div>
+
+            <!-- Card 4: Most Dangerous Opponent Sweeper -->
+            <div class="tactics-card">
+              <div class="tactics-card-head">
+                <span class="t-icon">🚨</span>
+                <h4>Opponent's Most Dangerous Threat</h4>
+              </div>
+              <div id="tactics-threat-content" class="tactics-card-body">
+                <!-- Populated via JS -->
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ========================================================= -->
+  <!-- MODAL 1: Opponent Pokémon Selector Modal -->
+  <!-- ========================================================= -->
+  <div class="modal-overlay" id="modal-enemy-picker" style="display: none;">
+    <div class="modal-card modal-picker-card">
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <span class="modal-icon">➕</span>
+          <h3>Add Opponent Pokémon (Slot <span id="picker-target-slot-num">1</span>)</h3>
+        </div>
+        <button class="modal-close-btn" id="btn-close-picker">✕</button>
+      </div>
+
+      <!-- Search & Filters -->
+      <div class="picker-filter-bar">
+        <div class="search-input-wrap">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="picker-search-input" placeholder="Search by name, type, ability, or move..." autocomplete="off">
+          <button id="picker-search-clear" class="btn-input-clear">✕</button>
+        </div>
+
+        <div class="picker-tier-buttons" id="picker-tier-buttons">
+          <button class="picker-pill active" data-tier="ALL">All Tiers</button>
+          <button class="picker-pill" data-tier="S">S Tier</button>
+          <button class="picker-pill" data-tier="A">A Tier</button>
+          <button class="picker-pill" data-tier="B">B Tier</button>
+          <button class="picker-pill" data-tier="C">C Tier</button>
+        </div>
+
+        <div class="picker-type-select-wrap">
+          <select id="picker-type-select" class="picker-select">
+            <option value="ALL">All Types</option>
+            <option value="Normal">Normal</option>
+            <option value="Fire">Fire</option>
+            <option value="Water">Water</option>
+            <option value="Grass">Grass</option>
+            <option value="Electric">Electric</option>
+            <option value="Ice">Ice</option>
+            <option value="Fighting">Fighting</option>
+            <option value="Poison">Poison</option>
+            <option value="Ground">Ground</option>
+            <option value="Flying">Flying</option>
+            <option value="Psychic">Psychic</option>
+            <option value="Bug">Bug</option>
+            <option value="Rock">Rock</option>
+            <option value="Ghost">Ghost</option>
+            <option value="Dragon">Dragon</option>
+            <option value="Steel">Steel</option>
+            <option value="Dark">Dark</option>
+            <option value="Fairy">Fairy</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Results Grid -->
+      <div class="picker-results-grid" id="picker-results-grid">
+        <!-- Dynamically populated with Pokémon cards -->
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================= -->
+  <!-- MODAL 2: Switch Our Team Hash Modal -->
+  <!-- ========================================================= -->
+  <div class="modal-overlay" id="modal-switch-hash" style="display: none;">
+    <div class="modal-card modal-hash-card">
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <span class="modal-icon">📥</span>
+          <h3>Switch Team Hash</h3>
+        </div>
+        <button class="modal-close-btn" id="btn-close-hash-modal">✕</button>
+      </div>
+
+      <div class="modal-body-content">
+        <p class="modal-desc">
+          Enter a 16-character alphanumeric <strong>teamhash</strong> generated from the PokéChamp Team Builder to test a different team roster:
+        </p>
+
+        <div class="hash-input-group">
+          <input type="text" id="input-switch-hash" class="hash-input" maxlength="16" placeholder="e.g. 8k9X12bQ0A4mZ7yL" autocomplete="off" spellcheck="false">
+          <button id="btn-confirm-switch-hash" class="btn-modal-action">Load Team</button>
+        </div>
+
+        <div class="modal-quick-presets">
+          <span class="quick-label">Or load a preset:</span>
+          <button class="btn-preset-mini" data-preset="meta-s">S-Tier Core</button>
+          <button class="btn-preset-mini" data-preset="rain">Rain Offense</button>
+          <button class="btn-preset-mini" data-preset="balance">Bulky Balance</button>
+          <button class="btn-preset-mini" data-preset="hyper">Hyper Offense</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================= -->
+  <!-- MODAL 3: Detailed Duel Breakdown Modal (Clicked from Matrix) -->
+  <!-- ========================================================= -->
+  <div class="modal-overlay" id="modal-duel-detail" style="display: none;">
+    <div class="modal-card modal-duel-card">
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <span class="modal-icon">⚔️</span>
+          <h3>Head-to-Head Duel Simulation</h3>
+        </div>
+        <button class="modal-close-btn" id="btn-close-duel-modal">✕</button>
+      </div>
+
+      <div class="duel-modal-body" id="duel-modal-body">
+        <!-- Rendered dynamically via JS -->
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================= -->
+  <!-- MODAL 4: Import Enemy Team Hash Modal -->
+  <!-- ========================================================= -->
+  <div class="modal-overlay" id="modal-enemy-hash" style="display: none;">
+    <div class="modal-card modal-hash-card">
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <span class="modal-icon">⚔️</span>
+          <h3>Import Enemy Team Hash</h3>
+        </div>
+        <button class="modal-close-btn" id="btn-close-enemy-hash-modal">✕</button>
+      </div>
+
+      <div class="modal-body-content">
+        <p class="modal-desc">
+          Paste a 16-character alphanumeric teamhash to load an exact opponent composition:
+        </p>
+
+        <div class="hash-input-group">
+          <input type="text" id="input-enemy-hash" class="hash-input" maxlength="16" placeholder="e.g. 8k9X12bQ0A4mZ7yL" autocomplete="off" spellcheck="false">
+          <button id="btn-confirm-enemy-hash" class="btn-modal-action">Import Enemy</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================= -->
+  <!-- MODAL 5: Edit Opponent Pokémon Modal -->
+  <!-- ========================================================= -->
+  <div class="modal-overlay" id="modal-enemy-editor" style="display: none;">
+    <div class="modal-card modal-editor-card">
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <span class="modal-icon">✏️</span>
+          <h3>Customize Opponent: <span id="editor-poke-title-name">Pokémon</span> (Slot <span id="editor-slot-num">1</span>)</h3>
+        </div>
+        <div class="modal-header-actions">
+          <button class="btn-battle-pill" id="editor-btn-replace" title="Replace with a different Pokémon">🔄 Replace Pokémon</button>
+          <button class="modal-close-btn" id="btn-close-editor-modal">✕</button>
+        </div>
+      </div>
+
+      <div class="editor-modal-body" id="editor-modal-body">
+        <!-- Rendered dynamically via JS -->
+      </div>
+
+      <div class="editor-modal-footer">
+        <button class="btn-battle-pill btn-danger" id="editor-btn-remove-slot">✕ Remove from Team</button>
+        <button class="btn-modal-action" id="editor-btn-save-done">✓ Done & Apply</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div id="battle-toast" class="battle-toast"></div>
+
+  <!-- Scripts -->
+  <script src="type-tooltip.js"></script>
+  <script src="battle.js?v=1.3"></script>
+</body>
+</html>

@@ -442,6 +442,11 @@ function updateSerializedHash() {
 
   const newUrl = window.location.pathname + '?teamhash=' + hash;
   window.history.replaceState({ path: newUrl }, '', newUrl);
+
+  const battleBtn = document.getElementById('btn-battle-analysis');
+  if (battleBtn) {
+    battleBtn.href = 'battle.html?teamhash=' + hash;
+  }
 }
 
 function loadTeamFromHash(hash) {
