@@ -609,11 +609,16 @@ function renderTeamSlots() {
 
     return `
       <div class="slot-filled-card">
+        <!-- Top Right Pokemon Element Badges -->
+        <div class="slot-card-types-top" title="${p.name} (${(p.types || []).join('/')})">
+          ${(p.types || []).map(t => `<span class="type-badge type-${t}">${t}</span>`).join('')}
+        </div>
+
         <!-- 2-Column Main Card Body -->
         <div class="slot-card-body-2col">
           <!-- Left Column: Poke Info & Moves -->
           <div class="slot-left-col">
-            <div class="slot-header-block">
+            <div class="slot-header-block" data-tooltip-type="pokemon-roster" data-slot-idx="${idx}">
               <img src="${getSpriteUrl(p.name)}" alt="${p.name}" class="slot-poke-sprite" onerror="this.style.opacity='0.4'">
               <div class="slot-header-info">
                 <div class="slot-card-name" title="${p.name}">${p.name}</div>
@@ -1254,7 +1259,7 @@ function renderDefensiveMatrix() {
     }
 
     return `
-      <div class="type-matrix-card">
+      <div class="type-matrix-card" data-def-matrix-type="${m.type}">
         <div class="type-matrix-top">
           <span class="type-badge type-${m.type}">${m.type}</span>
           <span class="matrix-net-score ${scoreClass}">${scoreSign}${m.netScore.toFixed(0)}</span>
@@ -1273,6 +1278,46 @@ function renderDefensiveMatrix() {
 // Offensive STAB Coverage
 // =====================================================================
 
+function getTeamStabDealers(targetType) {
+  const filled = teamSlots.filter(s => s && s.pokemon);
+  const dealers = [];
+
+  filled.forEach(s => {
+    const poke = s.pokemon;
+    const pokeTypes = poke.types || [];
+    const moves = s.moves || [];
+    const hits = [];
+
+    moves.forEach(mName => {
+      if (!mName) return;
+      const md = movesDB[mName] || {};
+      const cat = (md.category || '').toLowerCase();
+      if (cat === 'status') return;
+      if (md.power === 0 && (cat === 'status' || mName === 'Roost' || mName === 'Recover' || mName === 'Protect' || mName === 'Iron Defense' || mName === 'Nasty Plot' || mName === 'Dragon Dance' || mName === 'Calm Mind' || mName === 'Stealth Rock' || mName === 'Yawn' || mName === 'Whirlwind' || mName === 'Encore' || mName === 'Tailwind')) return;
+
+      const mType = getMoveType(mName, poke);
+      const isStab = pokeTypes.includes(mType) || (s.teraType && s.teraType !== 'Default' && s.teraType === mType);
+      if (!isStab) return;
+
+      const chart = TYPE_CHART[mType] || {};
+      if (chart[targetType] === 2) {
+        hits.push({ move: mName, type: mType });
+      }
+    });
+
+    if (hits.length > 0) {
+      dealers.push({
+        pokemon: poke.name,
+        sprite: getSpriteUrl(poke.name),
+        types: pokeTypes,
+        moves: hits
+      });
+    }
+  });
+
+  return dealers;
+}
+
 function renderOffensiveCoverage() {
   const grid = document.getElementById('offensive-grid');
   const scorePill = document.getElementById('coverage-score-pill');
@@ -1290,42 +1335,37 @@ function renderOffensiveCoverage() {
     return;
   }
 
-  const stabTypes = new Set();
-  filled.forEach(s => {
-    (s.pokemon.types || []).forEach(t => stabTypes.add(t));
-    if (s.teraType && s.teraType !== 'Default') {
-      stabTypes.add(s.teraType);
-    }
-  });
-
   let coveredCount = 0;
 
   const cardsHtml = ALL_TYPES.map(targetType => {
-    const dealers = [];
-
-    stabTypes.forEach(atkType => {
-      const chart = TYPE_CHART[atkType] || {};
-      if (chart[targetType] === 2) {
-        filled.forEach(s => {
-          const hasStab = s.pokemon.types.includes(atkType) || s.teraType === atkType;
-          if (hasStab && !dealers.includes(s.pokemon.name)) {
-            dealers.push(s.pokemon.name);
-          }
-        });
-      }
-    });
-
+    const dealers = getTeamStabDealers(targetType);
     const isCovered = dealers.length > 0;
     if (isCovered) coveredCount++;
 
+    let shortText = 'No STAB hit';
+    let fullTitle = 'No STAB hit';
+
+    if (isCovered) {
+      const firstDealer = dealers[0];
+      const firstMove = firstDealer.moves[0].move;
+      if (dealers.length === 1) {
+        shortText = `${firstDealer.pokemon} (${firstMove})`;
+      } else if (dealers.length === 2) {
+        shortText = `${firstDealer.pokemon} (${firstMove}), ${dealers[1].pokemon}`;
+      } else {
+        shortText = `${firstDealer.pokemon} (${firstMove}) +${dealers.length - 1} more`;
+      }
+      fullTitle = dealers.map(d => `${d.pokemon} (${d.moves.map(m => m.move).join(', ')})`).join(' • ');
+    }
+
     return `
-      <div class="offensive-card ${isCovered ? 'covered' : ''}">
+      <div class="offensive-card ${isCovered ? 'covered' : ''}" data-off-coverage-type="${targetType}">
         <span class="type-badge type-${targetType}">${targetType}</span>
         <span class="offensive-status-badge ${isCovered ? 'covered' : 'missing'}">
           ${isCovered ? `✓ Covered (${dealers.length})` : '✕ Missing STAB'}
         </span>
-        <div class="offensive-dealers" title="${dealers.join(', ')}">
-          ${isCovered ? dealers.slice(0, 2).join(', ') + (dealers.length > 2 ? '...' : '') : 'No STAB hit'}
+        <div class="offensive-dealers" title="${fullTitle}">
+          ${shortText}
         </div>
       </div>
     `;
@@ -2426,7 +2466,595 @@ function setupUIEventListeners() {
       closeShowdown();
       closeSpreadModal();
       closeDrawer();
+      hideTbTooltip();
     }
+  });
+
+  // Setup specialized tooltips for Defensive Matrix, Offensive STAB, and Pokemon Roster
+  setupTbCustomTooltips();
+}
+
+// =====================================================================
+// Specialized Custom Tooltip Engine for Team Builder
+// 1. Team Slot Pokemon Header: Type Effectiveness + Attack Coverage
+// 2. Defensive Weakness Matrix Card: Team Roster Weakness / Resist / Immunity
+// 3. Offensive STAB Coverage Card: Team Roster Pokemon + Moves providing STAB
+// =====================================================================
+
+const TYPE_GLOWS = {
+  Dragon: 'rgba(111, 53, 252, 0.45)',
+  Ground: 'rgba(224, 192, 104, 0.45)',
+  Water: 'rgba(99, 144, 240, 0.45)',
+  Fairy: 'rgba(214, 133, 173, 0.45)',
+  Ice: 'rgba(150, 217, 214, 0.45)',
+  Flying: 'rgba(168, 144, 240, 0.45)',
+  Bug: 'rgba(166, 185, 26, 0.45)',
+  Fighting: 'rgba(194, 46, 40, 0.45)',
+  Steel: 'rgba(183, 183, 206, 0.45)',
+  Ghost: 'rgba(115, 87, 151, 0.45)',
+  Grass: 'rgba(122, 199, 76, 0.45)',
+  Dark: 'rgba(112, 87, 70, 0.45)',
+  Fire: 'rgba(238, 129, 48, 0.45)',
+  Electric: 'rgba(247, 208, 44, 0.45)',
+  Rock: 'rgba(182, 161, 54, 0.45)',
+  Poison: 'rgba(163, 62, 161, 0.45)',
+  Normal: 'rgba(168, 167, 122, 0.45)',
+  Psychic: 'rgba(249, 85, 135, 0.45)'
+};
+
+function calcPokemonTypeEffectiveness(types) {
+  const mults = {};
+  ALL_TYPES.forEach(t => mults[t] = 1);
+  (types || []).forEach(defType => {
+    ALL_TYPES.forEach(atkType => {
+      const chart = TYPE_CHART[atkType] || {};
+      if (chart[defType] !== undefined) {
+        mults[atkType] *= chart[defType];
+      }
+    });
+  });
+  return {
+    weaknesses_4x: ALL_TYPES.filter(t => mults[t] === 4),
+    weaknesses_2x: ALL_TYPES.filter(t => mults[t] === 2),
+    resistances_half: ALL_TYPES.filter(t => mults[t] === 0.5),
+    resistances_quarter: ALL_TYPES.filter(t => mults[t] === 0.25),
+    immunities: ALL_TYPES.filter(t => mults[t] === 0)
+  };
+}
+
+function getPokemonAttackCoverage(slot) {
+  if (!slot || !slot.pokemon) return null;
+  const p = slot.pokemon;
+  const moves = slot.moves || [];
+
+  const damagingMoves = [];
+  moves.forEach(mName => {
+    if (!mName) return;
+    const md = movesDB[mName] || {};
+    const cat = (md.category || '').toLowerCase();
+    if (cat === 'status') return;
+    if (md.power === 0 && (cat === 'status' || mName === 'Roost' || mName === 'Recover' || mName === 'Protect' || mName === 'Iron Defense' || mName === 'Nasty Plot' || mName === 'Dragon Dance' || mName === 'Calm Mind' || mName === 'Stealth Rock' || mName === 'Yawn' || mName === 'Whirlwind' || mName === 'Encore' || mName === 'Tailwind')) return;
+
+    const mType = getMoveType(mName, p);
+    damagingMoves.push({
+      name: mName,
+      type: mType,
+      category: md.category || 'Physical',
+      power: md.power || '—'
+    });
+  });
+
+  if (damagingMoves.length === 0) {
+    return {
+      moves: [],
+      advantages: [],
+      disadvantagesResist: [],
+      disadvantagesImmune: []
+    };
+  }
+
+  const advantages = [];
+  const disadvantagesResist = [];
+  const disadvantagesImmune = [];
+
+  ALL_TYPES.forEach(targetType => {
+    let maxMult = 0;
+    const hittingMoves = [];
+
+    damagingMoves.forEach(m => {
+      const chart = TYPE_CHART[m.type] || {};
+      const mult = chart[targetType] !== undefined ? chart[targetType] : 1;
+      if (mult > maxMult) maxMult = mult;
+      if (mult >= 2) {
+        hittingMoves.push({ move: m.name, type: m.type });
+      }
+    });
+
+    if (maxMult >= 2) {
+      advantages.push({ type: targetType, mult: maxMult, moves: hittingMoves });
+    } else if (maxMult === 0) {
+      disadvantagesImmune.push({ type: targetType, mult: 0 });
+    } else if (maxMult <= 0.5) {
+      disadvantagesResist.push({ type: targetType, mult: maxMult });
+    }
+  });
+
+  return {
+    moves: damagingMoves,
+    advantages,
+    disadvantagesResist,
+    disadvantagesImmune
+  };
+}
+
+function buildPokemonRosterTooltipHtml(slotIdx) {
+  const slot = teamSlots[slotIdx];
+  if (!slot || !slot.pokemon) return '';
+  const p = slot.pokemon;
+  const types = p.types || [];
+  const eff = p.type_effectiveness || calcPokemonTypeEffectiveness(types);
+  const cov = getPokemonAttackCoverage(slot);
+
+  const effRows = [];
+  if (eff.weaknesses_4x && eff.weaknesses_4x.length > 0) {
+    effRows.push({
+      cssClass: 'eff-row-4x',
+      label: '4× Vulnerable',
+      types: eff.weaknesses_4x
+    });
+  }
+  if (eff.weaknesses_2x && eff.weaknesses_2x.length > 0) {
+    effRows.push({
+      cssClass: 'eff-row-2x',
+      label: 'Weakness · 2×',
+      types: eff.weaknesses_2x
+    });
+  }
+  if (eff.resistances_half && eff.resistances_half.length > 0) {
+    effRows.push({
+      cssClass: 'eff-row-half',
+      label: 'Resistance · ½×',
+      types: eff.resistances_half
+    });
+  }
+  if (eff.resistances_quarter && eff.resistances_quarter.length > 0) {
+    effRows.push({
+      cssClass: 'eff-row-quarter',
+      label: 'Strong Resistance · ¼×',
+      types: eff.resistances_quarter
+    });
+  }
+  if (eff.immunities && eff.immunities.length > 0) {
+    effRows.push({
+      cssClass: 'eff-row-0x',
+      label: 'Immunity · 0×',
+      types: eff.immunities
+    });
+  }
+
+  // Attack coverage rows
+  const covAdvHtml = (cov.advantages && cov.advantages.length > 0) ? `
+    <div class="eff-row eff-row-half" style="background: rgba(56, 189, 248, 0.1); border-color: rgba(56, 189, 248, 0.28);">
+      <span class="eff-row-label" style="color: #38bdf8;">Advantage · 2×</span>
+      <div class="eff-row-pills">
+        ${cov.advantages.map(a => {
+          const moveNames = a.moves.map(m => m.move).join(', ');
+          return `<span class="type-badge type-${a.type}" title="${a.type}: Deals 200% with ${moveNames}">${a.type}</span>`;
+        }).join('')}
+      </div>
+    </div>
+  ` : `
+    <div class="eff-row" style="background: rgba(255, 255, 255, 0.03); border-color: rgba(255, 255, 255, 0.06);">
+      <span class="eff-row-label" style="color: var(--text-dim);">Advantage · 2×</span>
+      <span class="tb-tip-empty-state">No super-effective hits</span>
+    </div>
+  `;
+
+  const covResHtml = (cov.disadvantagesResist && cov.disadvantagesResist.length > 0) ? `
+    <div class="eff-row eff-row-2x" style="background: rgba(249, 115, 22, 0.08); border-color: rgba(249, 115, 22, 0.24);">
+      <span class="eff-row-label" style="color: #fb923c;">Disadvantage · ½×</span>
+      <div class="eff-row-pills">
+        ${cov.disadvantagesResist.map(d => `<span class="type-badge type-${d.type}" title="${d.type}: Resists all carried attacks (deals 50%)">${d.type}</span>`).join('')}
+      </div>
+    </div>
+  ` : '';
+
+  const covImmHtml = (cov.disadvantagesImmune && cov.disadvantagesImmune.length > 0) ? `
+    <div class="eff-row eff-row-0x" style="background: rgba(168, 85, 247, 0.1); border-color: rgba(168, 85, 247, 0.3);">
+      <span class="eff-row-label" style="color: #c084fc;">Disadvantage · 0×</span>
+      <div class="eff-row-pills">
+        ${cov.disadvantagesImmune.map(d => `<span class="type-badge type-${d.type}" title="${d.type}: Immune to all carried attacks (deals 0%)">${d.type}</span>`).join('')}
+      </div>
+    </div>
+  ` : '';
+
+  const carriedMovesHtml = (cov.moves && cov.moves.length > 0) ? `
+    <div class="tb-carried-attacks-bar">
+      <span>Carried Attacks:</span>
+      ${cov.moves.map(m => `
+        <span class="tb-carried-move-chip">
+          <span class="type-badge type-${m.type}">${m.type}</span>
+          <span>${m.name}</span>
+        </span>
+      `).join('')}
+    </div>
+  ` : `
+    <div class="tb-carried-attacks-bar">
+      <span class="tb-tip-empty-state">No damaging attacks equipped (status moves only)</span>
+    </div>
+  `;
+
+  return `
+    <div class="tb-tip-header">
+      <div class="tb-tip-title-box">
+        <img src="${getSpriteUrl(p.name)}" alt="${p.name}" class="tb-tip-poke-avatar">
+        <div class="tb-tip-title-col">
+          <div class="tb-tip-main-label">${p.name}</div>
+          <div class="tb-tip-sub-label">Roster Member Effectiveness & Attack Coverage</div>
+        </div>
+      </div>
+      <div class="tb-tip-summary-pills">
+        ${types.map(t => `<span class="type-badge type-${t}">${t}</span>`).join('')}
+      </div>
+    </div>
+
+    <div class="tb-tip-sections-wrap">
+      <!-- 1. Type Effectiveness (Defending) -->
+      <div class="card-eff-block" style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 10px; padding: 0.6rem 0.75rem;">
+        <div class="card-section-header" style="margin-bottom: 0.35rem;">
+          <span class="card-section-title" style="font-size: 0.76rem; font-weight: 800; color: #fff; letter-spacing: 0.03em;">🛡️ TYPE EFFECTIVENESS (Incoming Damage)</span>
+        </div>
+        <div class="card-eff-list">
+          ${effRows.map(r => `
+            <div class="eff-row ${r.cssClass}">
+              <span class="eff-row-label">${r.label}</span>
+              <div class="eff-row-pills">
+                ${r.types.map(t => `<span class="type-badge type-${t}">${t}</span>`).join('')}
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+
+      <!-- 2. Attack Coverage (Offense - Carried Moves) -->
+      <div class="card-eff-block" style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 10px; padding: 0.6rem 0.75rem;">
+        <div class="card-section-header" style="margin-bottom: 0.35rem;">
+          <span class="card-section-title" style="font-size: 0.76rem; font-weight: 800; color: #fff; letter-spacing: 0.03em;">⚔️ ATTACK COVERAGE (Carried Attacks)</span>
+        </div>
+        ${carriedMovesHtml}
+        <div class="card-eff-list">
+          ${covAdvHtml}
+          ${covResHtml}
+          ${covImmHtml}
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function buildDefensiveMatrixTooltipHtml(type) {
+  const filled = teamSlots.filter(s => s && s.pokemon);
+  if (filled.length === 0) return '';
+
+  const weak = [];
+  const resist = [];
+  const immune = [];
+
+  filled.forEach(s => {
+    const mult = getDefensiveMultiplier(type, s.pokemon, s.teraType);
+    const item = {
+      name: s.pokemon.name,
+      sprite: getSpriteUrl(s.pokemon.name),
+      types: s.pokemon.types || [],
+      mult
+    };
+    if (mult >= 2) weak.push(item);
+    else if (mult === 0) immune.push(item);
+    else if (mult < 1) resist.push(item);
+  });
+
+  weak.sort((a, b) => b.mult - a.mult);
+  resist.sort((a, b) => a.mult - b.mult);
+
+  const renderPokeRows = (list) => {
+    if (!list || list.length === 0) {
+      return `<div class="tb-tip-empty-state">None in current team roster</div>`;
+    }
+    return list.map(item => {
+      let pillCls = 'mult-2x';
+      let pillText = `${item.mult}× Weak`;
+      if (item.mult >= 4) { pillCls = 'mult-4x'; pillText = '4× Vulnerable'; }
+      else if (item.mult === 0.5) { pillCls = 'mult-half'; pillText = '½× Resist'; }
+      else if (item.mult === 0.25) { pillCls = 'mult-quarter'; pillText = '¼× Strong Res'; }
+      else if (item.mult === 0) { pillCls = 'mult-0x'; pillText = '0× Immune'; }
+
+      return `
+        <div class="tb-poke-breakdown-row">
+          <div class="tb-poke-row-left">
+            <img src="${item.sprite}" alt="${item.name}" class="tb-poke-mini-sprite" onerror="this.style.opacity='0.4'">
+            <span class="tb-poke-name">${item.name}</span>
+            <div class="tb-poke-type-badges">
+              ${item.types.map(t => `<span class="type-badge type-${t}">${t}</span>`).join('')}
+            </div>
+          </div>
+          <span class="tb-mult-pill ${pillCls}">${pillText}</span>
+        </div>
+      `;
+    }).join('');
+  };
+
+  return `
+    <div class="tb-tip-header">
+      <div class="tb-tip-title-box">
+        <span class="type-badge type-${type}" style="font-size: 0.85rem; padding: 0.25rem 0.65rem;">${type}</span>
+        <div class="tb-tip-title-col">
+          <div class="tb-tip-main-label">${type} Defensive Synergy</div>
+          <div class="tb-tip-sub-label">Team Roster Weaknesses & Resistances</div>
+        </div>
+      </div>
+      <div class="tb-tip-summary-pills">
+        <span class="tb-tip-stat-pill pill-weak">${weak.length} Weak</span>
+        <span class="tb-tip-stat-pill pill-res">${resist.length} Res</span>
+        <span class="tb-tip-stat-pill pill-imm">${immune.length} Imm</span>
+      </div>
+    </div>
+
+    <div class="tb-tip-sections-wrap">
+      <!-- Weakness Section -->
+      <div class="tb-tip-section">
+        <div class="tb-tip-sec-hdr">
+          <span class="tb-tip-sec-tag weak">🚨 Weaknesses (${weak.length})</span>
+          <span class="tb-tip-sec-sub">Takes 200% / 400%</span>
+        </div>
+        ${renderPokeRows(weak)}
+      </div>
+
+      <!-- Resistance Section -->
+      <div class="tb-tip-section">
+        <div class="tb-tip-sec-hdr">
+          <span class="tb-tip-sec-tag resist">🛡️ Resistances (${resist.length})</span>
+          <span class="tb-tip-sec-sub">Takes 50% / 25%</span>
+        </div>
+        ${renderPokeRows(resist)}
+      </div>
+
+      <!-- Immunity Section -->
+      <div class="tb-tip-section">
+        <div class="tb-tip-sec-hdr">
+          <span class="tb-tip-sec-tag immune">✨ Immunities (${immune.length})</span>
+          <span class="tb-tip-sec-sub">Takes 0%</span>
+        </div>
+        ${renderPokeRows(immune)}
+      </div>
+    </div>
+  `;
+}
+
+function buildOffensiveStabTooltipHtml(targetType) {
+  const dealers = getTeamStabDealers(targetType);
+  const isCovered = dealers.length > 0;
+
+  const renderDealerRows = () => {
+    if (!isCovered) {
+      return `
+        <div class="tb-tip-empty-state" style="line-height: 1.5; padding: 0.35rem 0.2rem;">
+          No Pokémon on your current team carries a damaging STAB move that deals super-effective damage to <strong>${targetType}</strong>.
+        </div>
+      `;
+    }
+
+    return dealers.map(d => {
+      const movesHtml = d.moves.map(m => `
+        <span class="tb-dealer-move-tag">
+          <span class="type-badge type-${m.type}">${m.type}</span>
+          <span>${m.move}</span>
+        </span>
+      `).join(' ');
+
+      return `
+        <div class="tb-dealer-row">
+          <div class="tb-poke-row-left">
+            <img src="${d.sprite}" alt="${d.pokemon}" class="tb-poke-mini-sprite" onerror="this.style.opacity='0.4'">
+            <span class="tb-poke-name">${d.pokemon}</span>
+            <div style="margin-left: 0.4rem;">${movesHtml}</div>
+          </div>
+          <span class="tb-mult-pill mult-2x" style="background: rgba(56, 189, 248, 0.2); border-color: rgba(56, 189, 248, 0.45); color: #38bdf8;">
+            2× STAB (200%)
+          </span>
+        </div>
+      `;
+    }).join('');
+  };
+
+  return `
+    <div class="tb-tip-header">
+      <div class="tb-tip-title-box">
+        <span class="type-badge type-${targetType}" style="font-size: 0.85rem; padding: 0.25rem 0.65rem;">${targetType}</span>
+        <div class="tb-tip-title-col">
+          <div class="tb-tip-main-label">Offensive STAB vs ${targetType}</div>
+          <div class="tb-tip-sub-label">Team Members Providing Super-Effective STAB Hits</div>
+        </div>
+      </div>
+      <div class="tb-tip-summary-pills">
+        <span class="tb-tip-stat-pill ${isCovered ? 'pill-adv' : 'pill-weak'}">
+          ${isCovered ? `✓ Covered (${dealers.length})` : '✕ Missing STAB'}
+        </span>
+      </div>
+    </div>
+
+    <div class="tb-tip-sections-wrap">
+      <div class="tb-tip-section">
+        <div class="tb-tip-sec-hdr">
+          <span class="tb-tip-sec-tag advantage">⚔️ STAB Dealers (${dealers.length})</span>
+          <span class="tb-tip-sec-sub">Deals 200% STAB Damage</span>
+        </div>
+        ${renderDealerRows()}
+      </div>
+    </div>
+  `;
+}
+
+// Tooltip DOM Manager
+let tbTooltipEl = null;
+let activeTbTarget = null;
+let tbHideTimeout = null;
+
+function getOrCreateTbTooltip() {
+  if (!tbTooltipEl) {
+    tbTooltipEl = document.createElement('div');
+    tbTooltipEl.id = 'teambuilder-custom-tooltip';
+    tbTooltipEl.className = 'tb-custom-tooltip';
+    tbTooltipEl.setAttribute('role', 'tooltip');
+    tbTooltipEl.setAttribute('aria-hidden', 'true');
+    document.body.appendChild(tbTooltipEl);
+  }
+  return tbTooltipEl;
+}
+
+function positionTbTooltip(targetEl, tipEl) {
+  const rect = targetEl.getBoundingClientRect();
+  tipEl.style.display = 'block';
+  const tipRect = tipEl.getBoundingClientRect();
+  const tipW = tipRect.width || 420;
+  const tipH = tipRect.height || 240;
+
+  let left = rect.left + (rect.width / 2) - (tipW / 2);
+  left = Math.max(12, Math.min(window.innerWidth - tipW - 12, left));
+
+  // Determine vertical placement: above or below without overlapping the target
+  const spaceAbove = rect.top;
+  const spaceBelow = window.innerHeight - rect.bottom;
+
+  let top;
+  if (spaceAbove >= tipH + 14) {
+    // Plenty of space above target
+    top = rect.top - tipH - 10;
+  } else if (spaceBelow >= tipH + 14) {
+    // Plenty of space below target
+    top = rect.bottom + 10;
+  } else if (spaceAbove >= spaceBelow) {
+    // Better above
+    top = Math.max(8, rect.top - tipH - 6);
+  } else {
+    // Better below
+    top = Math.min(window.innerHeight - tipH - 8, rect.bottom + 6);
+  }
+
+  tipEl.style.left = `${Math.round(left)}px`;
+  tipEl.style.top = `${Math.round(top)}px`;
+}
+
+function showTbTooltip(target, html, glowColor) {
+  if (tbHideTimeout) {
+    clearTimeout(tbHideTimeout);
+    tbHideTimeout = null;
+  }
+
+  activeTbTarget = target;
+  const tip = getOrCreateTbTooltip();
+
+  // Hide general type tooltip if active
+  if (window.PokeChampTypeTooltip && window.PokeChampTypeTooltip.hideTooltip) {
+    window.PokeChampTypeTooltip.hideTooltip();
+  }
+
+  tip.innerHTML = html;
+  if (glowColor) {
+    tip.style.setProperty('--tb-tip-glow', glowColor);
+  } else {
+    tip.style.removeProperty('--tb-tip-glow');
+  }
+
+  positionTbTooltip(target, tip);
+  tip.classList.add('active');
+  tip.setAttribute('aria-hidden', 'false');
+}
+
+function hideTbTooltip() {
+  if (tbTooltipEl) {
+    tbTooltipEl.classList.remove('active');
+    tbTooltipEl.setAttribute('aria-hidden', 'true');
+  }
+  activeTbTarget = null;
+}
+
+function scheduleTbHide() {
+  if (tbHideTimeout) clearTimeout(tbHideTimeout);
+  tbHideTimeout = setTimeout(() => {
+    hideTbTooltip();
+  }, 60);
+}
+
+function setupTbCustomTooltips() {
+  document.addEventListener('mouseover', (e) => {
+    // 1. Team Slot Pokemon Header Block
+    const rosterTarget = e.target.closest('[data-tooltip-type="pokemon-roster"]');
+    if (rosterTarget) {
+      if (activeTbTarget === rosterTarget) return;
+      const slotIdx = parseInt(rosterTarget.dataset.slotIdx, 10);
+      const slot = teamSlots[slotIdx];
+      if (slot && slot.pokemon) {
+        const primType = (slot.pokemon.types && slot.pokemon.types[0]) || 'Normal';
+        const glow = TYPE_GLOWS[primType] || 'rgba(99, 102, 241, 0.35)';
+        const html = buildPokemonRosterTooltipHtml(slotIdx);
+        if (html) showTbTooltip(rosterTarget, html, glow);
+      }
+      return;
+    }
+
+    // 2. Defensive Weakness Matrix Card
+    const defTarget = e.target.closest('[data-def-matrix-type]');
+    if (defTarget) {
+      if (activeTbTarget === defTarget) return;
+      const type = defTarget.dataset.defMatrixType;
+      if (type) {
+        const glow = TYPE_GLOWS[type] || 'rgba(99, 102, 241, 0.35)';
+        const html = buildDefensiveMatrixTooltipHtml(type);
+        if (html) showTbTooltip(defTarget, html, glow);
+      }
+      return;
+    }
+
+    // 3. Offensive STAB Coverage Card
+    const offTarget = e.target.closest('[data-off-coverage-type]');
+    if (offTarget) {
+      if (activeTbTarget === offTarget) return;
+      const type = offTarget.dataset.offCoverageType;
+      if (type) {
+        const glow = TYPE_GLOWS[type] || 'rgba(56, 189, 248, 0.35)';
+        const html = buildOffensiveStabTooltipHtml(type);
+        if (html) showTbTooltip(offTarget, html, glow);
+      }
+      return;
+    }
+  }, true);
+
+  document.addEventListener('mouseout', (e) => {
+    if (!activeTbTarget) return;
+    const related = e.relatedTarget;
+    if (related && activeTbTarget.contains(related)) return;
+
+    const rosterTarget = related && related.closest && related.closest('[data-tooltip-type="pokemon-roster"]');
+    const defTarget = related && related.closest && related.closest('[data-def-matrix-type]');
+    const offTarget = related && related.closest && related.closest('[data-off-coverage-type]');
+
+    if (rosterTarget === activeTbTarget || defTarget === activeTbTarget || offTarget === activeTbTarget) {
+      return;
+    }
+
+    scheduleTbHide();
+  }, true);
+
+  window.addEventListener('scroll', () => {
+    if (activeTbTarget) hideTbTooltip();
+  }, { passive: true });
+
+  window.addEventListener('resize', () => {
+    if (activeTbTarget) hideTbTooltip();
+  }, { passive: true });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && activeTbTarget) hideTbTooltip();
   });
 }
 

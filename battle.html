@@ -4,10 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>PokéChamp — Battle Analysis & Competitive Team Matchup Simulator</title>
-  <meta name="description" content="Simulate competitive Pokémon 6v6 team battles. Analyzes head-to-head advantage, offensive type coverage, defensive exposure, physical vs special bulk pairings, and ranks team member usefulness.">
+  <meta name="description" content="Simulate competitive Pokémon 6v6 team battles. Analyzes head-to-head advantage, offensive type coverage, defensive exposure, speed tier ladder across 12 Pokémon, and ranks team member usefulness.">
   <link rel="stylesheet" href="index.css?v=2.8">
   <link rel="stylesheet" href="teambuilder.css?v=2.7">
-  <link rel="stylesheet" href="battle.css?v=2.4">
+  <link rel="stylesheet" href="battle.css?v=2.5">
 </head>
 <body>
 
@@ -177,9 +177,9 @@
           <span class="tab-icon">📊</span>
           <span class="tab-title">Type Coverage & Vulnerability</span>
         </button>
-        <button class="analysis-tab-btn" data-tab="physpec">
-          <span class="tab-icon">🛡️</span>
-          <span class="tab-title">Physical vs. Special Pairings</span>
+        <button class="analysis-tab-btn" data-tab="speed">
+          <span class="tab-icon">⚡</span>
+          <span class="tab-title">Speed Tier Analysis</span>
         </button>
         <button class="analysis-tab-btn" data-tab="tactics">
           <span class="tab-icon">🎯</span>
@@ -303,100 +303,84 @@
         </div>
 
         <!-- ========================================================= -->
-        <!-- TAB 4: Physical vs Special Pairings -->
+        <!-- TAB 4: Speed Tier Analysis across 12 Pokémon -->
         <!-- ========================================================= -->
-        <div class="battle-pane" id="pane-physpec">
+        <div class="battle-pane" id="pane-speed">
           <div class="pane-hero-intro">
             <div>
-              <h3 class="pane-title">🛡️ Physical vs. Special Attack & Defense Pairing Dynamics</h3>
+              <h3 class="pane-title">⚡ Speed Tier Ladder & Turn-Order Control</h3>
               <p class="pane-desc">
-                Evaluates the offensive and defensive category splits of both teams. Identifies opposing Pokémon with lopsided defensive bulk that your attackers can exploit, and flags dedicated walls to avoid.
+                Comprehensive speed hierarchy across all 12 Pokémon on the field. Analyzes exact Level 50 Speed stats factoring in Mega Evolutions, Choice Scarf (1.5×), nature modifiers, and common EV spreads to identify turn-order control and speed-tie coinflips.
               </p>
             </div>
           </div>
 
-          <!-- Split Meters Section -->
-          <div class="physpec-meters-grid">
-            <div class="physpec-card">
-              <h4>Our Team Damage Split</h4>
-              <div class="stat-split-bar-wrap">
-                <div class="split-labels">
-                  <span id="our-phys-label">⚔️ Physical: 0</span>
-                  <span id="our-spec-label">✨ Special: 0</span>
-                </div>
-                <div class="split-bar-track">
-                  <div id="our-phys-bar" class="split-bar-phys" style="width: 50%;"></div>
-                  <div id="our-spec-bar" class="split-bar-spec" style="width: 50%;"></div>
-                </div>
-              </div>
-              <div class="physpec-notes" id="our-physpec-summary">
-                Balanced physical and special attack distribution.
-              </div>
+          <!-- Speed KPIs Overview -->
+          <div class="speed-kpis-grid">
+            <div class="speed-kpi-card" id="kpi-speed-control">
+              <span class="speed-kpi-label">Field Speed Control</span>
+              <div class="speed-kpi-val" id="val-speed-control">—</div>
+              <span class="speed-kpi-sub" id="sub-speed-control">Analyzing turn orders...</span>
             </div>
 
-            <div class="physpec-card">
-              <h4>Enemy Team Defensive Skew</h4>
-              <div class="stat-split-bar-wrap">
-                <div class="split-labels">
-                  <span id="enemy-def-label">🛡️ Physical Bulk: —</span>
-                  <span id="enemy-spd-label">🔮 Special Bulk: —</span>
-                </div>
-                <div class="split-bar-track">
-                  <div id="enemy-def-bar" class="split-bar-phys" style="width: 50%;"></div>
-                  <div id="enemy-spd-bar" class="split-bar-spec" style="width: 50%;"></div>
-                </div>
-              </div>
-              <div class="physpec-notes" id="enemy-physpec-summary">
-                Analyzing opponent defensive vulnerabilities...
-              </div>
+            <div class="speed-kpi-card" id="kpi-speed-fastest">
+              <span class="speed-kpi-label">Fastest on Field</span>
+              <div class="speed-kpi-val" id="val-speed-fastest">—</div>
+              <span class="speed-kpi-sub" id="sub-speed-fastest">—</span>
+            </div>
+
+            <div class="speed-kpi-card" id="kpi-speed-averages">
+              <span class="speed-kpi-label">Average Team Speed</span>
+              <div class="speed-kpi-val" id="val-speed-averages">—</div>
+              <span class="speed-kpi-sub" id="sub-speed-averages">Our Team vs Enemy Team</span>
+            </div>
+
+            <div class="speed-kpi-card" id="kpi-speed-ties">
+              <span class="speed-kpi-label">Speed Ties & Clashes</span>
+              <div class="speed-kpi-val" id="val-speed-ties">0</div>
+              <span class="speed-kpi-sub" id="sub-speed-ties">50/50 turn-order coinflips</span>
             </div>
           </div>
 
-          <!-- High-Value Exploits & Defensive Traps -->
-          <div class="physpec-recommendations-grid">
-            <!-- Left: High Value Exploits -->
-            <div class="physpec-box box-exploits">
-              <div class="physpec-box-head">
-                <span class="icon">🎯</span>
-                <h4>High-Value Target Exploits (Hit Their Weak Side)</h4>
+          <!-- Common EV Spreads & Item Multiplier Distribution Breakdown -->
+          <div class="speed-spreads-summary-card">
+            <div class="spreads-summary-header">
+              <div class="spreads-summary-title">
+                <span class="icon">📊</span>
+                <h4>EV Spread & Speed-Affecting Items Distribution (12 Pokémon)</h4>
               </div>
-              <div class="physpec-list" id="physpec-exploits-list">
-                <!-- Rendered via JS -->
-              </div>
+              <span class="spreads-summary-note">Counts based on active builds & meta database profiles</span>
             </div>
-
-            <!-- Right: Defensive Traps -->
-            <div class="physpec-box box-traps">
-              <div class="physpec-box-head">
-                <span class="icon">⚠️</span>
-                <h4>Defensive Traps & Walls to Avoid</h4>
-              </div>
-              <div class="physpec-list" id="physpec-traps-list">
-                <!-- Rendered via JS -->
-              </div>
+            <div class="spreads-distribution-grid" id="speed-spreads-distribution">
+              <!-- Rendered via JS -->
             </div>
           </div>
 
-          <!-- Detailed Table of Bulk Profiles -->
-          <div class="bulk-profiles-table-card">
-            <h4 class="sub-heading">📋 Full Enemy Bulk & Vulnerability Reference</h4>
-            <div class="bulk-table-wrap">
-              <table class="bulk-table" id="enemy-bulk-table">
-                <thead>
-                  <tr>
-                    <th>Enemy Pokémon</th>
-                    <th>Role</th>
-                    <th>HP</th>
-                    <th>Def</th>
-                    <th>SpD</th>
-                    <th>Weak Defense Side</th>
-                    <th>Our Best Counter-Attacker</th>
-                  </tr>
-                </thead>
-                <tbody id="enemy-bulk-table-body">
-                  <!-- Populated via JS -->
-                </tbody>
-              </table>
+          <!-- The Complete 12-Pokémon Speed Ladder -->
+          <div class="speed-ladder-card">
+            <div class="speed-ladder-header">
+              <div class="speed-ladder-title-col">
+                <h4 class="sub-heading">🏁 12-Pokémon Turn-Order Ladder</h4>
+                <p class="speed-ladder-sub">Sorted descending by active Level 50 Speed stat. Visualizes exact brackets and outspeed margins.</p>
+              </div>
+              <div class="speed-ladder-legend">
+                <span class="legend-pill our"><span class="dot"></span> Our Team</span>
+                <span class="legend-pill enemy"><span class="dot"></span> Enemy Team</span>
+              </div>
+            </div>
+            <div class="speed-ladder-rows-wrap" id="battle-speed-ladder">
+              <!-- Rendered via JS -->
+            </div>
+          </div>
+
+          <!-- Head-to-Head Speed Matchup Breakdown Grid -->
+          <div class="speed-h2h-section">
+            <div class="speed-h2h-header">
+              <h4 class="sub-heading">⚔️ Our Team Outspeed Matrix vs Opponent Roster</h4>
+              <p class="speed-h2h-sub">Breakdown of which enemy Pokémon each of your team members outspeeds, ties with, or is outsped by.</p>
+            </div>
+            <div class="speed-h2h-grid" id="speed-h2h-cards-grid">
+              <!-- Rendered via JS -->
             </div>
           </div>
         </div>
@@ -639,6 +623,6 @@
 
   <!-- Scripts -->
   <script src="type-tooltip.js"></script>
-  <script src="battle.js?v=2.4"></script>
+  <script src="battle.js?v=2.5"></script>
 </body>
 </html>

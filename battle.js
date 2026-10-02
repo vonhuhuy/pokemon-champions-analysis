@@ -995,7 +995,7 @@ function recalculateBattle() {
   renderRankingsTab(matrix);
   renderMatrixTab(matrix);
   renderCoverageTab();
-  renderPhyspecTab();
+  renderSpeedTierTab();
   renderTacticsTab(matrix, avgScore);
 }
 
@@ -1638,174 +1638,362 @@ function renderCoverageTab() {
 }
 
 // =====================================================================
-// TAB 4: Physical vs Special Pairings (Requirement #5)
+// TAB 4: Speed Tier Analysis across 12 Pokémon
 // =====================================================================
 
-function renderPhyspecTab() {
-  const filledOur = ourSlots.filter(Boolean);
-  const filledEnemy = enemySlots.filter(Boolean);
+function renderSpeedTierTab() {
+  const filledOur = ourSlots.filter(s => s && s.pokemon);
+  const filledEnemy = enemySlots.filter(s => s && s.pokemon);
 
-  let ourPhys = 0;
-  let ourSpec = 0;
-  let enemyDefSum = 0;
-  let enemySpdSum = 0;
-
-  for (const our of filledOur) {
-    const prof = getCombatProfile(our);
-    if (prof.isPhysical) ourPhys++;
-    if (prof.isSpecial) ourSpec++;
+  if (filledOur.length === 0 || filledEnemy.length === 0) {
+    return;
   }
 
-  for (const enemy of filledEnemy) {
-    const prof = getCombatProfile(enemy);
-    enemyDefSum += prof.def;
-    enemySpdSum += prof.spd;
-  }
+  // 1. Build unified 12-Pokémon dataset with effective speed, EV spread, nature, and item
+  const all12 = [];
 
-  const avgEnemyDef = filledEnemy.length > 0 ? Math.round(enemyDefSum / filledEnemy.length) : 100;
-  const avgEnemySpd = filledEnemy.length > 0 ? Math.round(enemySpdSum / filledEnemy.length) : 100;
+  filledOur.forEach((slot, slotIdx) => {
+    const p = slot.pokemon;
+    const effSpeed = getEffectiveSpeed(slot);
+    const nat = slot.nature || 'Serious';
+    const natInfo = NATURES[nat] || { plus: null, minus: null };
+    const speEv = slot.spread?.spe || 0;
+    const isScarf = slot.item === 'Choice Scarf';
+    const isMega = !!(megaDB[slot.item] && megaDB[slot.item].spe);
 
-  // Render split labels & bars
-  const ourPhysLabel = document.getElementById('our-phys-label');
-  const ourSpecLabel = document.getElementById('our-spec-label');
-  if (ourPhysLabel) ourPhysLabel.textContent = `⚔️ Physical: ${ourPhys}`;
-  if (ourSpecLabel) ourSpecLabel.textContent = `✨ Special: ${ourSpec}`;
+    all12.push({
+      team: 'our',
+      slotIdx,
+      slot,
+      pokemon: p,
+      name: p.name,
+      types: p.types || [],
+      speed: effSpeed,
+      baseSpe: p.base_stats?.spe || 0,
+      item: slot.item || 'Sitrus Berry',
+      nature: nat,
+      speNatureEffect: natInfo.plus === 'spe' ? '+Spe' : (natInfo.minus === 'spe' ? '-Spe' : 'Neutral'),
+      speEv,
+      isScarf,
+      isMega,
+      statPoints: p.stat_points || [],
+      statAlignments: p.stat_alignments || []
+    });
+  });
 
-  const ourTotalOff = ourPhys + ourSpec || 1;
-  const ourPhysPct = Math.round((ourPhys / ourTotalOff) * 100);
-  const ourSpecPct = 100 - ourPhysPct;
+  filledEnemy.forEach((slot, slotIdx) => {
+    const p = slot.pokemon;
+    const effSpeed = getEffectiveSpeed(slot);
+    const nat = slot.nature || 'Serious';
+    const natInfo = NATURES[nat] || { plus: null, minus: null };
+    const speEv = slot.spread?.spe || 0;
+    const isScarf = slot.item === 'Choice Scarf';
+    const isMega = !!(megaDB[slot.item] && megaDB[slot.item].spe);
 
-  const barOurPhys = document.getElementById('our-phys-bar');
-  const barOurSpec = document.getElementById('our-spec-bar');
-  if (barOurPhys) barOurPhys.style.width = `${ourPhysPct}%`;
-  if (barOurSpec) barOurSpec.style.width = `${ourSpecPct}%`;
+    all12.push({
+      team: 'enemy',
+      slotIdx,
+      slot,
+      pokemon: p,
+      name: p.name,
+      types: p.types || [],
+      speed: effSpeed,
+      baseSpe: p.base_stats?.spe || 0,
+      item: slot.item || 'Sitrus Berry',
+      nature: nat,
+      speNatureEffect: natInfo.plus === 'spe' ? '+Spe' : (natInfo.minus === 'spe' ? '-Spe' : 'Neutral'),
+      speEv,
+      isScarf,
+      isMega,
+      statPoints: p.stat_points || [],
+      statAlignments: p.stat_alignments || []
+    });
+  });
 
-  const enemyDefLabel = document.getElementById('enemy-def-label');
-  const enemySpdLabel = document.getElementById('enemy-spd-label');
-  if (enemyDefLabel) enemyDefLabel.textContent = `🛡️ Avg Def: ${avgEnemyDef}`;
-  if (enemySpdLabel) enemySpdLabel.textContent = `🔮 Avg SpD: ${avgEnemySpd}`;
+  // Sort descending by effective Speed, breaking ties with Base Speed
+  all12.sort((a, b) => b.speed - a.speed || b.baseSpe - a.baseSpe);
 
-  const enemyBulkTotal = avgEnemyDef + avgEnemySpd || 1;
-  const enemyDefPct = Math.round((avgEnemyDef / enemyBulkTotal) * 100);
-  const enemySpdPct = 100 - enemyDefPct;
+  // 2. Compute KPIs
+  const totalPoke = all12.length;
+  const topBracketSize = Math.min(6, totalPoke);
+  const topBracket = all12.slice(0, topBracketSize);
+  const ourInTopBracket = topBracket.filter(x => x.team === 'our').length;
+  const enemyInTopBracket = topBracketSize - ourInTopBracket;
 
-  const barEnemyDef = document.getElementById('enemy-def-bar');
-  const barEnemySpd = document.getElementById('enemy-spd-bar');
-  if (barEnemyDef) barEnemyDef.style.width = `${enemyDefPct}%`;
-  if (barEnemySpd) barEnemySpd.style.width = `${enemySpdPct}%`;
+  const fastest = all12[0];
 
-  const ourSummary = document.getElementById('our-physpec-summary');
-  if (ourSummary) {
-    ourSummary.textContent = ourPhys > ourSpec
-      ? 'Physical-leaning team offense. Ensure you have ways to break through heavy physical walls.'
-      : (ourSpec > ourPhys
-        ? 'Special-leaning team offense. High leverage against physically-defensive cores.'
-        : 'Well-balanced physical and special attack distribution.');
-  }
+  const ourSpeeds = all12.filter(x => x.team === 'our').map(x => x.speed);
+  const enemySpeeds = all12.filter(x => x.team === 'enemy').map(x => x.speed);
+  const ourAvg = ourSpeeds.length > 0 ? Math.round(ourSpeeds.reduce((a, b) => a + b, 0) / ourSpeeds.length) : 0;
+  const enemyAvg = enemySpeeds.length > 0 ? Math.round(enemySpeeds.reduce((a, b) => a + b, 0) / enemySpeeds.length) : 0;
 
-  const enemySummary = document.getElementById('enemy-physpec-summary');
-  if (enemySummary) {
-    enemySummary.textContent = avgEnemyDef > avgEnemySpd + 15
-      ? `Enemy team leans physically defensive (Def ${avgEnemyDef} vs SpD ${avgEnemySpd}). Prioritize special attackers!`
-      : (avgEnemySpd > avgEnemyDef + 15
-        ? `Enemy team leans specially defensive (SpD ${avgEnemySpd} vs Def ${avgEnemyDef}). Overwhelm them with physical attacks!`
-        : 'Enemy team has evenly balanced physical and special bulk.');
-  }
-
-  // High-Value Exploits & Traps Lists
-  const exploitsList = document.getElementById('physpec-exploits-list');
-  const trapsList = document.getElementById('physpec-traps-list');
-
-  const exploits = [];
-  const traps = [];
-
-  for (const enemy of filledEnemy) {
-    const profE = getCombatProfile(enemy);
-    for (const our of filledOur) {
-      const profO = getCombatProfile(our);
-      if (profO.isPhysical && profE.def <= 80 && profE.spd >= 100) {
-        exploits.push({
-          attacker: our.pokemon.name,
-          target: enemy.pokemon.name,
-          desc: `Physical ${our.pokemon.name} punches through ${enemy.pokemon.name}'s weak Physical Defense (${profE.def}) vs high SpD (${profE.spd})`
-        });
-      } else if (profO.isSpecial && profE.spd <= 80 && profE.def >= 100) {
-        exploits.push({
-          attacker: our.pokemon.name,
-          target: enemy.pokemon.name,
-          desc: `Special ${our.pokemon.name} melts ${enemy.pokemon.name}'s weak Special Defense (${profE.spd}) vs high Def (${profE.def})`
-        });
+  // Find exact speed ties between opposing teams
+  const speedClashes = [];
+  all12.filter(x => x.team === 'our').forEach(ourP => {
+    all12.filter(x => x.team === 'enemy').forEach(enmP => {
+      if (ourP.speed === enmP.speed) {
+        speedClashes.push({ our: ourP.name, enemy: enmP.name, speed: ourP.speed });
       }
+    });
+  });
 
-      if (profO.isPhysical && profE.def >= 120 && profO.atk < 140) {
-        traps.push({
-          attacker: our.pokemon.name,
-          wall: enemy.pokemon.name,
-          desc: `${our.pokemon.name}'s physical moves bounce off ${enemy.pokemon.name}'s heavy wall (${profE.def} Def)`
-        });
-      }
+  // Render KPI elements
+  const valControl = document.getElementById('val-speed-control');
+  const subControl = document.getElementById('sub-speed-control');
+  if (valControl) {
+    if (ourInTopBracket > enemyInTopBracket) {
+      valControl.innerHTML = `<span style="color:#38bdf8;">Our Team Advantage (${ourInTopBracket} / ${topBracketSize})</span>`;
+      if (subControl) subControl.textContent = `Controls ${Math.round((ourInTopBracket / topBracketSize) * 100)}% of the fastest speed tiers on the field`;
+    } else if (enemyInTopBracket > ourInTopBracket) {
+      valControl.innerHTML = `<span style="color:#fb7185;">Opponent Advantage (${enemyInTopBracket} / ${topBracketSize})</span>`;
+      if (subControl) subControl.textContent = `Opponent controls ${Math.round((enemyInTopBracket / topBracketSize) * 100)}% of top speed tiers`;
+    } else {
+      valControl.innerHTML = `<span style="color:#facc15;">Evenly Split (${ourInTopBracket} vs ${enemyInTopBracket})</span>`;
+      if (subControl) subControl.textContent = 'Both rosters share equal presence in the top speed bracket';
     }
   }
 
-  if (exploitsList) {
-    exploitsList.innerHTML = exploits.length > 0
-      ? exploits.slice(0, 4).map(ex => `
-          <div class="physpec-item-card">
-            <div class="physpec-item-header">
-              <span class="physpec-item-target">🎯 ${ex.attacker} ➔ ${ex.target}</span>
-            </div>
-            <span class="physpec-item-sub">${ex.desc}</span>
-          </div>
-        `).join('')
-      : '<span style="font-size:0.8rem; color:var(--text-muted);">No extreme lopsided defense exploits found.</span>';
+  const valFastest = document.getElementById('val-speed-fastest');
+  const subFastest = document.getElementById('sub-speed-fastest');
+  if (valFastest && fastest) {
+    const isOurFast = fastest.team === 'our';
+    valFastest.innerHTML = `
+      <div style="display:flex; align-items:center; gap:0.4rem; justify-content:center;">
+        <img src="${getSpriteUrl(fastest.name)}" alt="" style="width:26px; height:26px;">
+        <span style="color:${isOurFast ? '#38bdf8' : '#fb7185'}; font-size:1.05rem;">${fastest.name}</span>
+        <span class="speed-num-tag">${fastest.speed} Spe</span>
+      </div>
+    `;
+    if (subFastest) {
+      const scarfNote = fastest.isScarf ? ' · ⚡ Choice Scarf (1.5×)' : '';
+      subFastest.textContent = `${isOurFast ? '🛡️ Our Team' : '⚔️ Enemy Team'}${scarfNote} · Base ${fastest.baseSpe}`;
+    }
   }
 
-  if (trapsList) {
-    trapsList.innerHTML = traps.length > 0
-      ? traps.slice(0, 4).map(tr => `
-          <div class="physpec-item-card">
-            <div class="physpec-item-header">
-              <span class="physpec-item-target" style="color:#f87171;">🛡️ ${tr.wall} Walls ${tr.attacker}</span>
-            </div>
-            <span class="physpec-item-sub">${tr.desc}</span>
-          </div>
-        `).join('')
-      : '<span style="font-size:0.8rem; color:#6ee7b7;">No severe defensive traps detected.</span>';
+  const valAvg = document.getElementById('val-speed-averages');
+  const subAvg = document.getElementById('sub-speed-averages');
+  if (valAvg) {
+    valAvg.innerHTML = `<span style="color:#38bdf8;">${ourAvg} Spe</span> <span style="color:var(--text-dim); font-size:0.9rem;">vs</span> <span style="color:#fb7185;">${enemyAvg} Spe</span>`;
+    const diff = ourAvg - enemyAvg;
+    if (subAvg) {
+      subAvg.textContent = diff > 0 ? `Our team is +${diff} Spe faster on average` : (diff < 0 ? `Opponent is +${Math.abs(diff)} Spe faster on average` : 'Exact parity in team average speed');
+    }
   }
 
-  // Full Opponent Bulk Reference Table
-  const tableBody = document.getElementById('enemy-bulk-table-body');
-  if (tableBody) {
-    tableBody.innerHTML = filledEnemy.map(enemy => {
-      const prof = getCombatProfile(enemy);
-      const weakSide = prof.def < prof.spd ? 'Physical (Low Def)' : (prof.spd < prof.def ? 'Special (Low SpD)' : 'Even');
-      
-      // Best counter from our team
-      let bestCounter = '—';
-      let highestDmg = 0;
-      for (const our of filledOur) {
-        const duel = calcDuel(our, enemy);
-        if (duel && duel.scoreA > highestDmg) {
-          highestDmg = duel.scoreA;
-          bestCounter = our.pokemon.name;
-        }
-      }
+  const valTies = document.getElementById('val-speed-ties');
+  const subTies = document.getElementById('sub-speed-ties');
+  if (valTies) {
+    valTies.textContent = speedClashes.length;
+    if (subTies) {
+      subTies.textContent = speedClashes.length > 0
+        ? speedClashes.map(c => `${c.our} = ${c.enemy} (${c.speed})`).join(', ')
+        : 'No direct 50/50 speed ties detected';
+    }
+  }
+
+  // 3. EV Spreads & Speed-Affecting Items Distribution Breakdown (Counting common EV spreads and items)
+  const distWrap = document.getElementById('speed-spreads-distribution');
+  if (distWrap) {
+    const maxPlusSpe = all12.filter(x => x.speEv >= 32 && x.speNatureEffect === '+Spe');
+    const maxNeutSpe = all12.filter(x => x.speEv >= 32 && x.speNatureEffect === 'Neutral');
+    const bulkySpe = all12.filter(x => x.speEv === 0 || x.speNatureEffect === '-Spe');
+    const scarfItems = all12.filter(x => x.isScarf);
+
+    const renderPillChips = (list) => {
+      if (list.length === 0) return '<span style="color:var(--text-dim); font-size:0.75rem;">None</span>';
+      return list.map(item => `
+        <span class="spread-poke-chip ${item.team}">
+          <img src="${getSpriteUrl(item.name)}" alt="" class="spread-chip-sprite">
+          <span>${item.name}</span>
+          <span class="chip-spe">${item.speed}</span>
+        </span>
+      `).join('');
+    };
+
+    distWrap.innerHTML = `
+      <div class="spread-dist-pill-card">
+        <div class="spread-card-head">
+          <div class="spread-card-title">
+            <span class="icon">🚀</span>
+            <strong>Max Speed (+Spe Nature)</strong>
+          </div>
+          <span class="spread-card-count">${maxPlusSpe.length} / ${totalPoke}</span>
+        </div>
+        <div class="spread-card-desc">32 Spe points (252 EVs) with Jolly / Timid (+10% Speed multiplier)</div>
+        <div class="spread-card-chips">${renderPillChips(maxPlusSpe)}</div>
+      </div>
+
+      <div class="spread-dist-pill-card">
+        <div class="spread-card-head">
+          <div class="spread-card-title">
+            <span class="icon">🏎️</span>
+            <strong>Max Speed (Neutral Nature)</strong>
+          </div>
+          <span class="spread-card-count">${maxNeutSpe.length} / ${totalPoke}</span>
+        </div>
+        <div class="spread-card-desc">32 Spe points (252 EVs) with Adamant / Modest offensive nature</div>
+        <div class="spread-card-chips">${renderPillChips(maxNeutSpe)}</div>
+      </div>
+
+      <div class="spread-dist-pill-card">
+        <div class="spread-card-head">
+          <div class="spread-card-title">
+            <span class="icon">⚡</span>
+            <strong>Choice Scarf Boost (1.5×)</strong>
+          </div>
+          <span class="spread-card-count">${scarfItems.length} / ${totalPoke}</span>
+        </div>
+        <div class="spread-card-desc">Boosts active speed by +50%, bypassing standard maximum tier caps</div>
+        <div class="spread-card-chips">${renderPillChips(scarfItems)}</div>
+      </div>
+
+      <div class="spread-dist-pill-card">
+        <div class="spread-card-head">
+          <div class="spread-card-title">
+            <span class="icon">🛡️</span>
+            <strong>Bulky / Zero Speed Investment</strong>
+          </div>
+          <span class="spread-card-count">${bulkySpe.length} / ${totalPoke}</span>
+        </div>
+        <div class="spread-card-desc">0 Spe points; dedicated bulk investments (HP/Def/SpD) or Trick Room</div>
+        <div class="spread-card-chips">${renderPillChips(bulkySpe)}</div>
+      </div>
+    `;
+  }
+
+  // 4. Render The Complete 12-Pokémon Speed Ladder
+  const ladderWrap = document.getElementById('battle-speed-ladder');
+  if (ladderWrap) {
+    const highestSpeed = Math.max(280, all12[0]?.speed || 280);
+
+    ladderWrap.innerHTML = all12.map((item, rankIdx) => {
+      const isOur = item.team === 'our';
+      const pct = Math.min(100, Math.max(14, Math.round((item.speed / highestSpeed) * 100)));
+      const rank = rankIdx + 1;
+      let medal = `#${rank}`;
+      if (rank === 1) medal = '🥇 #1';
+      else if (rank === 2) medal = '🥈 #2';
+      else if (rank === 3) medal = '🥉 #3';
+
+      // Meta DB common EV spreads
+      const metaSpreads = (item.statPoints || []).slice(0, 3).map(sp => {
+        const u = sp.usage || '';
+        const spePts = parseInt(sp.spe) || 0;
+        let desc = spePts >= 32 ? 'Max Spe (32)' : (spePts === 0 ? 'Bulky (0 Spe)' : `Spe ${spePts}`);
+        return `${u} ${desc}`;
+      }).join(' • ');
+
+      const itemBadgeClass = item.isScarf ? 'item-badge-scarf' : (item.isMega ? 'item-badge-mega' : 'item-badge-normal');
+      const itemBadgeIcon = item.isScarf ? '⚡' : (item.isMega ? '💎' : '🎒');
 
       return `
-        <tr>
-          <td>
-            <div style="display:flex; align-items:center; gap:0.5rem;">
-              <img src="${getSpriteUrl(enemy.pokemon.name)}" alt="" style="width:28px; height:28px;">
-              <strong>${enemy.pokemon.name}</strong>
+        <div class="speed-ladder-row ${isOur ? 'row-our' : 'row-enemy'}">
+          <div class="ladder-rank-box">${medal}</div>
+
+          <div class="ladder-poke-col">
+            <div class="ladder-team-badge ${isOur ? 'badge-our' : 'badge-enemy'}">
+              ${isOur ? '🛡️ OUR TEAM' : '⚔️ ENEMY'}
             </div>
-          </td>
-          <td><span style="font-size:0.75rem; color:#93c5fd;">${prof.offRole} · ${prof.defRole}</span></td>
-          <td>${prof.hp}</td>
-          <td>${prof.def}</td>
-          <td>${prof.spd}</td>
-          <td><strong style="color:${weakSide.includes('Physical') ? '#f87171' : '#38bdf8'}">${weakSide}</strong></td>
-          <td><span style="color:#34d399; font-weight:700;">${bestCounter}</span></td>
-        </tr>
+            <div class="ladder-poke-info">
+              <img src="${getSpriteUrl(item.name)}" alt="${item.name}" class="ladder-poke-sprite" onerror="this.style.opacity='0.4'">
+              <div class="ladder-poke-meta">
+                <span class="ladder-poke-name">${item.name}</span>
+                <div class="ladder-type-badges">
+                  ${item.types.map(t => `<span class="slot-type-badge" style="background:${TYPE_COLORS[t] || '#666'}">${t}</span>`).join('')}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="ladder-details-col">
+            <div class="ladder-badges-strip">
+              <span class="ladder-spec-pill base-spe" title="Base Speed stat">Base ${item.baseSpe}</span>
+              <span class="ladder-spec-pill ${itemBadgeClass}" title="Held Item">${itemBadgeIcon} ${item.item}</span>
+              <span class="ladder-spec-pill nature-pill" title="Nature and EV Spread">${item.nature} (${item.speNatureEffect}) · ${item.speEv} Spe EVs</span>
+            </div>
+            ${metaSpreads ? `<div class="ladder-meta-spreads" title="Common Meta Database EV Spreads"><strong>Meta Trends:</strong> ${metaSpreads}</div>` : ''}
+            <div class="ladder-bar-container">
+              <div class="ladder-bar-fill ${isOur ? 'fill-our' : 'fill-enemy'}" style="width: ${pct}%;"></div>
+            </div>
+          </div>
+
+          <div class="ladder-speed-stat-box">
+            <span class="ladder-speed-val">${item.speed}</span>
+            <span class="ladder-speed-unit">SPEED</span>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  // 5. Head-to-Head Speed Matchup Breakdown Grid
+  const h2hGrid = document.getElementById('speed-h2h-cards-grid');
+  if (h2hGrid) {
+    const ourPokes = all12.filter(x => x.team === 'our');
+    const enemyPokes = all12.filter(x => x.team === 'enemy');
+
+    h2hGrid.innerHTML = ourPokes.map(our => {
+      const outspeeds = [];
+      const ties = [];
+      const outspedBy = [];
+
+      enemyPokes.forEach(enm => {
+        if (our.speed > enm.speed) {
+          outspeeds.push({ name: enm.name, speed: enm.speed, diff: our.speed - enm.speed });
+        } else if (our.speed === enm.speed) {
+          ties.push({ name: enm.name, speed: enm.speed });
+        } else {
+          outspedBy.push({ name: enm.name, speed: enm.speed, diff: enm.speed - our.speed });
+        }
+      });
+
+      const outspeedRate = Math.round((outspeeds.length / enemyPokes.length) * 100);
+
+      const renderMiniTags = (list, type) => {
+        if (list.length === 0) return '<span style="color:var(--text-dim); font-size:0.75rem;">None</span>';
+        return list.map(item => `
+          <span class="h2h-tag ${type}">
+            <img src="${getSpriteUrl(item.name)}" alt="" class="h2h-tag-sprite">
+            <span>${item.name}</span>
+            <span class="h2h-diff">${type === 'tie' ? `${item.speed}` : (type === 'outspeed' ? `+${item.diff}` : `-${item.diff}`)}</span>
+          </span>
+        `).join('');
+      };
+
+      return `
+        <div class="speed-h2h-card">
+          <div class="speed-h2h-card-top">
+            <div class="speed-h2h-poke-main">
+              <img src="${getSpriteUrl(our.name)}" alt="${our.name}" class="speed-h2h-sprite">
+              <div>
+                <h5 class="speed-h2h-name">${our.name}</h5>
+                <span class="speed-h2h-stat-chip">${our.speed} Spe (${our.nature}, ${our.speEv} Spe)</span>
+              </div>
+            </div>
+            <div class="speed-h2h-rate-badge ${outspeedRate >= 60 ? 'high' : (outspeedRate <= 30 ? 'low' : 'mid')}">
+              ${outspeeds.length} / ${enemyPokes.length} Outsped (${outspeedRate}%)
+            </div>
+          </div>
+
+          <div class="speed-h2h-breakdown-groups">
+            <div class="speed-h2h-group">
+              <span class="h2h-group-label outspeeds">⚡ Outspeeds (${outspeeds.length})</span>
+              <div class="h2h-tags-wrap">${renderMiniTags(outspeeds, 'outspeed')}</div>
+            </div>
+
+            ${ties.length > 0 ? `
+              <div class="speed-h2h-group">
+                <span class="h2h-group-label ties">🎲 Speed Tie (${ties.length})</span>
+                <div class="h2h-tags-wrap">${renderMiniTags(ties, 'tie')}</div>
+              </div>
+            ` : ''}
+
+            <div class="speed-h2h-group">
+              <span class="h2h-group-label outsped">⚠️ Outsped By (${outspedBy.length})</span>
+              <div class="h2h-tags-wrap">${renderMiniTags(outspedBy, 'outsped')}</div>
+            </div>
+          </div>
+        </div>
       `;
     }).join('');
   }
@@ -1956,8 +2144,31 @@ function renderEmptyState() {
   const typesRow = document.getElementById('types-weakness-pills-row');
   if (typesRow) typesRow.innerHTML = '';
 
-  const bulkBody = document.getElementById('enemy-bulk-table-body');
-  if (bulkBody) bulkBody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:1.5rem; color:var(--text-dim);">No enemy Pokémon loaded yet.</td></tr>';
+  const valControl = document.getElementById('val-speed-control');
+  if (valControl) valControl.textContent = '—';
+  const subControl = document.getElementById('sub-speed-control');
+  if (subControl) subControl.textContent = 'Awaiting enemy team selection';
+  const valFastest = document.getElementById('val-speed-fastest');
+  if (valFastest) valFastest.textContent = '—';
+  const subFastest = document.getElementById('sub-speed-fastest');
+  if (subFastest) subFastest.textContent = '—';
+  const valAvg = document.getElementById('val-speed-averages');
+  if (valAvg) valAvg.textContent = '—';
+  const subAvg = document.getElementById('sub-speed-averages');
+  if (subAvg) subAvg.textContent = 'Awaiting enemy team selection';
+  const valTies = document.getElementById('val-speed-ties');
+  if (valTies) valTies.textContent = '0';
+  const subTies = document.getElementById('sub-speed-ties');
+  if (subTies) subTies.textContent = '50/50 turn-order coinflips';
+
+  const distWrap = document.getElementById('speed-spreads-distribution');
+  if (distWrap) distWrap.innerHTML = '<p style="color:var(--text-dim); padding:1rem; grid-column: 1/-1; text-align:center;">Add enemy Pokémon to analyze EV spread & item distribution across 12 Pokémon.</p>';
+
+  const ladderWrap = document.getElementById('battle-speed-ladder');
+  if (ladderWrap) ladderWrap.innerHTML = '<p style="color:var(--text-dim); padding:2rem; text-align:center;">Add enemy Pokémon to generate the complete 12-Pokémon Speed Ladder.</p>';
+
+  const h2hGrid = document.getElementById('speed-h2h-cards-grid');
+  if (h2hGrid) h2hGrid.innerHTML = '<p style="color:var(--text-dim); padding:1rem; grid-column: 1/-1; text-align:center;">Add enemy Pokémon to evaluate turn-order advantages.</p>';
 
   const bring3 = document.getElementById('tactics-bring3-content');
   if (bring3) bring3.innerHTML = '<p style="color:var(--text-dim);">Awaiting enemy team selection.</p>';

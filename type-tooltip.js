@@ -319,6 +319,11 @@
   function resolvePokemonType(target) {
     if (!target || target === document.body || target === document.documentElement) return null;
 
+    // Ignore special cards that have dedicated custom tooltips in Team Builder
+    if (target.closest && target.closest('.type-matrix-card, .offensive-card, .slot-header-block, [data-def-matrix-type], [data-off-coverage-type]')) {
+      return null;
+    }
+
     // Check direct target
     const directType = checkSingleElement(target);
     if (directType) return { type: directType, element: target };
@@ -329,15 +334,6 @@
       const parentType = checkSingleElement(curr);
       if (parentType) return { type: parentType, element: curr };
       curr = curr.parentElement;
-    }
-
-    // Check special cards that represent a single type (e.g. type-matrix-card or offensive-card)
-    if (target.matches && (target.matches('.type-matrix-card') || target.matches('.offensive-card'))) {
-      const childBadge = target.querySelector('.type-badge, [class*="type-"]');
-      if (childBadge) {
-        const childType = checkSingleElement(childBadge);
-        if (childType) return { type: childType, element: target };
-      }
     }
 
     return null;
