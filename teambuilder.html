@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>PokéChamp — Competitive Pokémon Team Builder & Synergy Matrix</title>
   <meta name="description" content="Build, optimize, and analyze competitive 6-Pokémon teams with real-time defensive synergy, speed tiers, offensive coverage, and 16-character teamhash sharing.">
-  <link rel="stylesheet" href="index.css">
-  <link rel="stylesheet" href="teambuilder.css">
+  <link rel="stylesheet" href="index.css?v=2.7">
+  <link rel="stylesheet" href="teambuilder.css?v=2.7">
 </head>
 <body>
 
@@ -39,8 +39,7 @@
     <!-- Hero & Serialization Bar -->
     <section class="tb-hero">
       <div class="tb-hero-left">
-        <h1 class="tb-title">🛡️ Competitive Team Builder</h1>
-        <p class="tb-subtitle">Assemble your 6-Pokémon squad, evaluate defensive synergy and speed tiers, and share your team instantly with a compact 16-character key.</p>
+        <h1 class="tb-title">🛡️ Team Builder</h1>
       </div>
 
       <!-- Quick Preset & Team Actions -->
@@ -59,7 +58,7 @@
       <div class="hash-info">
         <div class="hash-tag-label">
           <span class="hash-dot"></span>
-          <span>16-CHAR SERIALIZED KEY</span>
+          <span>TEAM HASH</span>
         </div>
         <div class="hash-display-wrap">
           <code id="teamhash-display" class="hash-code">0000000000000000</code>
@@ -82,28 +81,9 @@
       </div>
     </section>
 
-    <!-- Team Summary Stats Ribbon -->
-    <section class="team-summary-ribbon" id="team-summary-ribbon">
-      <div class="summary-stat-box">
-        <span class="stat-lbl">Roster Size</span>
-        <span class="stat-val" id="summary-roster-count">0 / 6</span>
-      </div>
-      <div class="summary-stat-box">
-        <span class="stat-lbl">Average BST</span>
-        <span class="stat-val" id="summary-avg-bst">—</span>
-      </div>
-      <div class="summary-stat-box">
-        <span class="stat-lbl">Offensive Bias</span>
-        <span class="stat-val" id="summary-offensive-bias">—</span>
-      </div>
-      <div class="summary-stat-box">
-        <span class="stat-lbl">Top Speed</span>
-        <span class="stat-val" id="summary-top-speed" style="color: #38bdf8;">—</span>
-      </div>
-      <div class="summary-stat-box">
-        <span class="stat-lbl">Defensive Health</span>
-        <span class="stat-val" id="summary-defensive-health">—</span>
-      </div>
+    <!-- QUICK ADD Meta Suggestions (Screenshot Style) -->
+    <section class="quick-add-section" id="quick-add-section">
+      <!-- Populated dynamically via JS -->
     </section>
 
     <!-- 6-Slot Team Grid -->
@@ -173,8 +153,8 @@
       <div class="tab-pane" id="pane-speed">
         <div class="pane-header">
           <div>
-            <h3>Competitive Speed Tier Ladder</h3>
-            <p>Compares your team's base Speed stats alongside pivotal ranked Regulation M-C benchmark speed tiers.</p>
+            <h3>Meta Speed Tier Ladder</h3>
+            <p>Compares your team's actual Level 50 Speed stats alongside pivotal Meta benchmark speed tiers (accounting for Mega Evolutions, EV spreads, and Choice Scarf).</p>
           </div>
         </div>
         <div class="speed-ladder-wrap" id="speed-ladder-wrap">
@@ -213,10 +193,17 @@
       <div class="picker-filters">
         <div class="search-wrap">
           <span class="search-icon">🔍</span>
-          <input type="text" id="picker-search" class="search-input" placeholder="Search by name, move, item, or ability..." autocomplete="off">
+          <input type="text" id="picker-search" class="search-input" placeholder="Search Pokémon..." autocomplete="off">
         </div>
 
-        <div class="picker-filter-row">
+        <!-- Filter Mode Tabs (Type vs Resistance vs Move) + Tier & Sort -->
+        <div class="picker-toolbar">
+          <div class="picker-mode-tabs">
+            <button class="picker-mode-tab active" data-mode="type" id="tab-mode-type">Type</button>
+            <button class="picker-mode-tab" data-mode="resistance" id="tab-mode-resistance">Resistance</button>
+            <button class="picker-mode-tab" data-mode="move" id="tab-mode-move">Move</button>
+          </div>
+
           <div class="tier-pill-group">
             <button class="picker-tier-btn active" data-tier="ALL">All</button>
             <button class="picker-tier-btn" data-tier="S">S</button>
@@ -226,38 +213,84 @@
             <button class="picker-tier-btn" data-tier="D">D</button>
           </div>
 
-          <div class="picker-select-group">
-            <select id="picker-type-select" class="picker-select">
-              <option value="ALL">All Types</option>
-              <option value="Dragon">Dragon</option>
-              <option value="Steel">Steel</option>
-              <option value="Water">Water</option>
-              <option value="Fairy">Fairy</option>
-              <option value="Ghost">Ghost</option>
-              <option value="Fire">Fire</option>
-              <option value="Grass">Grass</option>
-              <option value="Electric">Electric</option>
-              <option value="Ground">Ground</option>
-              <option value="Fighting">Fighting</option>
-              <option value="Dark">Dark</option>
-              <option value="Flying">Flying</option>
-              <option value="Ice">Ice</option>
-              <option value="Psychic">Psychic</option>
-              <option value="Rock">Rock</option>
-              <option value="Poison">Poison</option>
-              <option value="Bug">Bug</option>
-              <option value="Normal">Normal</option>
-            </select>
-
-            <select id="picker-sort-select" class="picker-select">
-              <option value="rank-asc">Sort: Rank (High to Low)</option>
-              <option value="bst-desc">Sort: BST (Highest)</option>
-              <option value="spe-desc">Sort: Speed (Fastest)</option>
-              <option value="atk-desc">Sort: Attack (Highest)</option>
-              <option value="spa-desc">Sort: Sp. Atk (Highest)</option>
-              <option value="name-asc">Sort: Name (A-Z)</option>
-            </select>
+          <div class="picker-sort-group">
+            <span class="picker-sort-label">SORT</span>
+            <button class="picker-sort-pill active" data-sort="rank-asc">Rank</button>
+            <button class="picker-sort-pill" data-sort="use-desc">Use</button>
+            <button class="picker-sort-pill" data-sort="wr-desc">WR</button>
           </div>
+        </div>
+
+        <!-- Mode Content: TYPE Filter (18 elemental pills) -->
+        <div class="picker-subpanel picker-type-subpanel" id="picker-type-panel">
+          <div class="picker-type-pills">
+            <button class="type-pill-btn active" data-type="ALL">ALL</button>
+            <button class="type-pill-btn" data-type="Normal" style="--pill-color: #94a3b8;">NORMAL</button>
+            <button class="type-pill-btn" data-type="Fire" style="--pill-color: #f97316;">FIRE</button>
+            <button class="type-pill-btn" data-type="Water" style="--pill-color: #38bdf8;">WATER</button>
+            <button class="type-pill-btn" data-type="Electric" style="--pill-color: #eab308;">ELECTRIC</button>
+            <button class="type-pill-btn" data-type="Grass" style="--pill-color: #22c55e;">GRASS</button>
+            <button class="type-pill-btn" data-type="Ice" style="--pill-color: #06b6d4;">ICE</button>
+            <button class="type-pill-btn" data-type="Fighting" style="--pill-color: #ef4444;">FIGHTING</button>
+            <button class="type-pill-btn" data-type="Poison" style="--pill-color: #a855f7;">POISON</button>
+            <button class="type-pill-btn" data-type="Ground" style="--pill-color: #d97706;">GROUND</button>
+            <button class="type-pill-btn" data-type="Flying" style="--pill-color: #818cf8;">FLYING</button>
+            <button class="type-pill-btn" data-type="Psychic" style="--pill-color: #ec4899;">PSYCHIC</button>
+            <button class="type-pill-btn" data-type="Bug" style="--pill-color: #84cc16;">BUG</button>
+            <button class="type-pill-btn" data-type="Rock" style="--pill-color: #b45309;">ROCK</button>
+            <button class="type-pill-btn" data-type="Ghost" style="--pill-color: #7c3aed;">GHOST</button>
+            <button class="type-pill-btn" data-type="Dragon" style="--pill-color: #6366f1;">DRAGON</button>
+            <button class="type-pill-btn" data-type="Dark" style="--pill-color: #475569;">DARK</button>
+            <button class="type-pill-btn" data-type="Steel" style="--pill-color: #64748b;">STEEL</button>
+            <button class="type-pill-btn" data-type="Fairy" style="--pill-color: #f472b6;">FAIRY</button>
+          </div>
+        </div>
+
+        <!-- Mode Content: RESISTANCE Filter (18 elemental pills) -->
+        <div class="picker-subpanel picker-resistance-subpanel" id="picker-resistance-panel" style="display: none;">
+          <div class="picker-res-hint-row">
+            <span class="picker-res-hint-text">Filters Pokémon that <strong>resist</strong> or are <strong>immune</strong> (≤ 0.5× / 0×) to incoming attacks:</span>
+          </div>
+          <div class="picker-resistance-pills">
+            <button class="res-pill-btn active" data-res="ALL">ALL</button>
+            <button class="res-pill-btn" data-res="Normal" style="--pill-color: #94a3b8;">NORMAL</button>
+            <button class="res-pill-btn" data-res="Fire" style="--pill-color: #f97316;">FIRE</button>
+            <button class="res-pill-btn" data-res="Water" style="--pill-color: #38bdf8;">WATER</button>
+            <button class="res-pill-btn" data-res="Electric" style="--pill-color: #eab308;">ELECTRIC</button>
+            <button class="res-pill-btn" data-res="Grass" style="--pill-color: #22c55e;">GRASS</button>
+            <button class="res-pill-btn" data-res="Ice" style="--pill-color: #06b6d4;">ICE</button>
+            <button class="res-pill-btn" data-res="Fighting" style="--pill-color: #ef4444;">FIGHTING</button>
+            <button class="res-pill-btn" data-res="Poison" style="--pill-color: #a855f7;">POISON</button>
+            <button class="res-pill-btn" data-res="Ground" style="--pill-color: #d97706;">GROUND</button>
+            <button class="res-pill-btn" data-res="Flying" style="--pill-color: #818cf8;">FLYING</button>
+            <button class="res-pill-btn" data-res="Psychic" style="--pill-color: #ec4899;">PSYCHIC</button>
+            <button class="res-pill-btn" data-res="Bug" style="--pill-color: #84cc16;">BUG</button>
+            <button class="res-pill-btn" data-res="Rock" style="--pill-color: #b45309;">ROCK</button>
+            <button class="res-pill-btn" data-res="Ghost" style="--pill-color: #7c3aed;">GHOST</button>
+            <button class="res-pill-btn" data-res="Dragon" style="--pill-color: #6366f1;">DRAGON</button>
+            <button class="res-pill-btn" data-res="Dark" style="--pill-color: #475569;">DARK</button>
+            <button class="res-pill-btn" data-res="Steel" style="--pill-color: #64748b;">STEEL</button>
+            <button class="res-pill-btn" data-res="Fairy" style="--pill-color: #f472b6;">FAIRY</button>
+          </div>
+        </div>
+
+        <!-- Mode Content: MOVE Filter (Search input + Autocomplete) -->
+        <div class="picker-subpanel picker-move-subpanel" id="picker-move-panel" style="display: none;">
+          <div class="picker-move-search-wrap">
+            <span class="search-icon">⚔️</span>
+            <input type="text" id="picker-move-input" class="search-input" placeholder="Search move (e.g. Stealth Rock, Knock Off, U-turn)..." autocomplete="off">
+            <button class="picker-move-clear-btn" id="picker-move-clear" title="Clear move filter" style="display: none;">✕</button>
+          </div>
+          <div class="picker-move-dropdown" id="picker-move-dropdown" style="display: none;"></div>
+          <div class="picker-active-move-banner" id="picker-active-move-banner" style="display: none;">
+            <span>Filtering Pokémon that learn: <strong id="picker-active-move-name"></strong></span>
+            <button id="picker-active-move-remove" class="picker-active-move-remove">✕ Clear</button>
+          </div>
+        </div>
+
+        <!-- Pool notice banner -->
+        <div class="picker-pool-notice" id="picker-pool-notice">
+          Showing tier-list pool — <span id="picker-pool-count">262</span> Pokémon available
         </div>
       </div>
 
@@ -302,10 +335,21 @@
     </div>
   </div>
 
+  <!-- Right Slide-Out Drawer for Moves, Items, Abilities, Spreads -->
+  <aside class="side-drawer" id="side-drawer">
+    <!-- Populated dynamically -->
+  </aside>
+  <div class="drawer-backdrop" id="drawer-backdrop" onclick="closeDrawer()"></div>
+
+  <!-- Customize Spread Modal -->
+  <div class="modal-overlay" id="spread-modal">
+    <!-- Populated dynamically -->
+  </div>
+
   <!-- Toast Notification -->
   <div id="toast" class="toast"></div>
 
   <!-- Scripts -->
-  <script src="teambuilder.js"></script>
+  <script src="teambuilder.js?v=2.7"></script>
 </body>
 </html>
