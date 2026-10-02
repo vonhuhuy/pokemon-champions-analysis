@@ -1723,6 +1723,18 @@ function renderEmptyState() {
 // Modals & UI Event Listeners
 // =====================================================================
 
+function showModal(modalEl) {
+  if (!modalEl) return;
+  modalEl.classList.add('active', 'open');
+  modalEl.style.display = 'flex';
+}
+
+function hideModal(modalEl) {
+  if (!modalEl) return;
+  modalEl.classList.remove('active', 'open');
+  modalEl.style.display = 'none';
+}
+
 function setupUI() {
   // Tabs Navigation
   const tabButtons = document.querySelectorAll('.analysis-tab-btn');
@@ -1779,13 +1791,13 @@ function setupUI() {
   if (btnSwitchOurHash && modalSwitchHash) {
     btnSwitchOurHash.addEventListener('click', () => {
       if (inputSwitchHash) inputSwitchHash.value = ourHash;
-      modalSwitchHash.style.display = 'flex';
+      showModal(modalSwitchHash);
     });
   }
 
   if (btnCloseHashModal && modalSwitchHash) {
     btnCloseHashModal.addEventListener('click', () => {
-      modalSwitchHash.style.display = 'none';
+      hideModal(modalSwitchHash);
     });
   }
 
@@ -1795,7 +1807,7 @@ function setupUI() {
       try {
         ourSlots = decodeTeam(hash);
         ourHash = hash;
-        modalSwitchHash.style.display = 'none';
+        hideModal(modalSwitchHash);
         recalculateBattle();
         showToast(`Loaded Team from hash: ${hash}`);
       } catch (err) {
@@ -1809,7 +1821,7 @@ function setupUI() {
     btn.addEventListener('click', () => {
       loadPresetOur(btn.dataset.preset);
       if (inputSwitchHash) inputSwitchHash.value = ourHash;
-      if (modalSwitchHash) modalSwitchHash.style.display = 'none';
+      hideModal(modalSwitchHash);
       recalculateBattle();
       showToast(`Loaded preset team: ${btn.textContent.trim()}`);
     });
@@ -1825,13 +1837,13 @@ function setupUI() {
   if (btnImportEnemyHash && modalEnemyHash) {
     btnImportEnemyHash.addEventListener('click', () => {
       if (inputEnemyHash) inputEnemyHash.value = enemyHash !== '0000000000000000' ? enemyHash : '';
-      modalEnemyHash.style.display = 'flex';
+      showModal(modalEnemyHash);
     });
   }
 
   if (btnCloseEnemyHashModal && modalEnemyHash) {
     btnCloseEnemyHashModal.addEventListener('click', () => {
-      modalEnemyHash.style.display = 'none';
+      hideModal(modalEnemyHash);
     });
   }
 
@@ -1841,7 +1853,7 @@ function setupUI() {
       try {
         enemySlots = decodeTeam(hash);
         enemyHash = hash;
-        modalEnemyHash.style.display = 'none';
+        hideModal(modalEnemyHash);
         recalculateBattle();
         showToast(`Imported Enemy Team from hash: ${hash}`);
       } catch (err) {
@@ -1855,7 +1867,7 @@ function setupUI() {
   const modalPicker = document.getElementById('modal-enemy-picker');
   if (btnClosePicker && modalPicker) {
     btnClosePicker.addEventListener('click', () => {
-      modalPicker.style.display = 'none';
+      hideModal(modalPicker);
     });
   }
 
@@ -1898,7 +1910,7 @@ function setupUI() {
   const modalDuel = document.getElementById('modal-duel-detail');
   if (btnCloseDuel && modalDuel) {
     btnCloseDuel.addEventListener('click', () => {
-      modalDuel.style.display = 'none';
+      hideModal(modalDuel);
     });
   }
 
@@ -1939,7 +1951,7 @@ function setupUI() {
   document.querySelectorAll('.modal-overlay').forEach(overlay => {
     overlay.addEventListener('click', (e) => {
       if (e.target === overlay) {
-        overlay.style.display = 'none';
+        hideModal(overlay);
         if (overlay.id === 'modal-enemy-editor') {
           closeEnemyEditor();
         }
@@ -1951,8 +1963,8 @@ function setupUI() {
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
       document.querySelectorAll('.modal-overlay').forEach(overlay => {
-        if (overlay.style.display === 'flex') {
-          overlay.style.display = 'none';
+        if (overlay.classList.contains('active') || overlay.classList.contains('open') || overlay.style.display === 'flex') {
+          hideModal(overlay);
           if (overlay.id === 'modal-enemy-editor') {
             closeEnemyEditor();
           }
@@ -1987,7 +1999,7 @@ window.openEnemyEditor = function(slotIdx, defaultFocus = null) {
 
   renderEditorModalBody();
 
-  if (modal) modal.style.display = 'flex';
+  if (modal) showModal(modal);
 
   if (defaultFocus) {
     setTimeout(() => {
@@ -1999,7 +2011,7 @@ window.openEnemyEditor = function(slotIdx, defaultFocus = null) {
 
 window.closeEnemyEditor = function() {
   const modal = document.getElementById('modal-enemy-editor');
-  if (modal) modal.style.display = 'none';
+  if (modal) hideModal(modal);
   editingEnemySlotIdx = null;
   enemyHash = encodeTeam(enemySlots);
   recalculateBattle();
@@ -2390,7 +2402,7 @@ window.openEnemyPicker = function(slotIdx) {
 
   const modal = document.getElementById('modal-enemy-picker');
   if (modal) {
-    modal.style.display = 'flex';
+    showModal(modal);
     renderPickerResults();
   }
 };
@@ -2418,8 +2430,10 @@ function renderPickerResults() {
     return true;
   });
 
-  container.innerHTML = filtered.slice(0, 60).map(p => `
-    <div class="picker-poke-card" onclick="selectEnemyPokemon('${p.name}')">
+  container.innerHTML = filtered.slice(0, 60).map(p => {
+    const safeName = p.name.replace(/'/g, "\\'");
+    return `
+    <div class="picker-poke-card" onclick="selectEnemyPokemon('${safeName}')">
       <img src="${getSpriteUrl(p.name)}" alt="${p.name}" class="picker-sprite">
       <div class="picker-poke-meta">
         <span class="picker-name">${p.name}</span>
@@ -2431,7 +2445,8 @@ function renderPickerResults() {
         <span style="font-size:0.72rem; color:var(--text-dim);">Tier ${p.tier || 'A'} · Spe ${p.base_stats?.spe || 0}</span>
       </div>
     </div>
-  `).join('');
+  `;
+  }).join('');
 }
 
 window.selectEnemyPokemon = function(pokemonName) {
@@ -2440,7 +2455,7 @@ window.selectEnemyPokemon = function(pokemonName) {
     enemySlots[activeEnemyPickerSlot] = populateDefaultBuild(p);
     enemyHash = encodeTeam(enemySlots);
     const modal = document.getElementById('modal-enemy-picker');
-    if (modal) modal.style.display = 'none';
+    if (modal) hideModal(modal);
     recalculateBattle();
     showToast(`Added ${p.name} to Enemy Team (Slot ${activeEnemyPickerSlot + 1})`);
   }
@@ -2553,7 +2568,7 @@ window.openDuelModal = function(ourIdx, enemyIdx) {
     </div>
   `;
 
-  modal.style.display = 'flex';
+  showModal(modal);
 };
 
 // Toast notification helper
