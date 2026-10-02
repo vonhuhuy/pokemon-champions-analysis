@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>PokéChamp — Competitive Singles Tier List & Strategy Database</title>
   <meta name="description" content="Explore top Pokémon Champions Singles ranked ladder tier list (Season 6), analyzing base stats, type effectiveness, most used moves, held items, abilities, and stat distributions for competitive battle strategies.">
-  <link rel="stylesheet" href="index.css">
+  <link rel="stylesheet" href="index.css?v=2.8">
 </head>
 <body>
 
@@ -65,39 +65,97 @@
         </button>
       </div>
 
-      <!-- Filter Inputs -->
+      <!-- Search & Sort Controls -->
       <div class="filter-inputs">
         <div class="search-wrapper">
           <span class="search-icon">🔍</span>
           <input type="text" id="search-input" class="search-input" placeholder="Search by Pokémon name, move (e.g. Earthquake), or item (e.g. Choice Scarf)...">
         </div>
-        <select id="type-select" class="select-input">
-          <option value="ALL">All Types</option>
-          <option value="Dragon">Dragon</option>
-          <option value="Ground">Ground</option>
-          <option value="Water">Water</option>
-          <option value="Fairy">Fairy</option>
-          <option value="Ice">Ice</option>
-          <option value="Steel">Steel</option>
-          <option value="Ghost">Ghost</option>
-          <option value="Fighting">Fighting</option>
-          <option value="Fire">Fire</option>
-          <option value="Grass">Grass</option>
-          <option value="Electric">Electric</option>
-          <option value="Flying">Flying</option>
-          <option value="Rock">Rock</option>
-          <option value="Dark">Dark</option>
-          <option value="Poison">Poison</option>
-          <option value="Normal">Normal</option>
-          <option value="Psychic">Psychic</option>
-          <option value="Bug">Bug</option>
-        </select>
         <select id="sort-select" class="select-input">
           <option value="rank-asc">Rank: Top Usage (#1 -> #262)</option>
           <option value="bst-desc">Base Stat Total (BST: High -> Low)</option>
           <option value="rank-desc">Rank: Bottom (#262 -> #1)</option>
           <option value="name-asc">Name: A - Z</option>
         </select>
+      </div>
+
+      <!-- Flat Type & Resistance Filter Section -->
+      <div class="type-filter-box">
+        <div class="type-filter-header">
+          <div class="filter-mode-tabs" id="filter-mode-tabs">
+            <button type="button" class="filter-mode-tab active" data-mode="type">
+              <span>🏷️ Type</span>
+              <span class="filter-mode-badge" id="type-badge" style="display: none;">0</span>
+            </button>
+            <button type="button" class="filter-mode-tab" data-mode="resistance">
+              <span>🛡️ Resistance</span>
+              <span class="filter-mode-badge" id="resistance-badge" style="display: none;">0</span>
+            </button>
+          </div>
+          <div class="type-logic-toggle" id="type-logic-toggle">
+            <button type="button" class="logic-btn" data-logic="OR">OR</button>
+            <button type="button" class="logic-btn active" data-logic="AND">AND</button>
+          </div>
+        </div>
+
+        <!-- Panel 1: Type Selection Pills -->
+        <div class="filter-subpanel" id="panel-type">
+          <div class="type-pills-row" id="type-pills-row">
+            <button type="button" class="type-btn-pill type-pill-all active" data-type="ALL">All</button>
+            <button type="button" class="type-btn-pill" data-type="Normal" style="--t-color: #73797f;"><span class="t-icon">⚪</span><span>Normal</span></button>
+            <button type="button" class="type-btn-pill" data-type="Grass" style="--t-color: #33a137;"><span class="t-icon">🌿</span><span>Grass</span></button>
+            <button type="button" class="type-btn-pill" data-type="Fire" style="--t-color: #e65127;"><span class="t-icon">🔥</span><span>Fire</span></button>
+            <button type="button" class="type-btn-pill" data-type="Water" style="--t-color: #2774db;"><span class="t-icon">💧</span><span>Water</span></button>
+            <button type="button" class="type-btn-pill" data-type="Electric" style="--t-color: #d9aa14;"><span class="t-icon">⚡</span><span>Electric</span></button>
+            <button type="button" class="type-btn-pill" data-type="Bug" style="--t-color: #8ca320;"><span class="t-icon">🪲</span><span>Bug</span></button>
+            <button type="button" class="type-btn-pill" data-type="Flying" style="--t-color: #82a4d9;"><span class="t-icon">🪽</span><span>Flying</span></button>
+            <button type="button" class="type-btn-pill" data-type="Rock" style="--t-color: #999573;"><span class="t-icon">🪨</span><span>Rock</span></button>
+            <button type="button" class="type-btn-pill" data-type="Poison" style="--t-color: #873499;"><span class="t-icon">☠️</span><span>Poison</span></button>
+            <button type="button" class="type-btn-pill" data-type="Ground" style="--t-color: #946328;"><span class="t-icon">🌍</span><span>Ground</span></button>
+            <button type="button" class="type-btn-pill" data-type="Ice" style="--t-color: #39b4cb;"><span class="t-icon">❄️</span><span>Ice</span></button>
+            <button type="button" class="type-btn-pill" data-type="Fighting" style="--t-color: #cb731f;"><span class="t-icon">🥊</span><span>Fighting</span></button>
+            <button type="button" class="type-btn-pill" data-type="Psychic" style="--t-color: #db4f6c;"><span class="t-icon">🔮</span><span>Psychic</span></button>
+            <button type="button" class="type-btn-pill" data-type="Ghost" style="--t-color: #5a3666;"><span class="t-icon">👻</span><span>Ghost</span></button>
+            <button type="button" class="type-btn-pill" data-type="Dragon" style="--t-color: #434eb0;"><span class="t-icon">🐉</span><span>Dragon</span></button>
+            <button type="button" class="type-btn-pill" data-type="Dark" style="--t-color: #443f3c;"><span class="t-icon">🌑</span><span>Dark</span></button>
+            <button type="button" class="type-btn-pill" data-type="Steel" style="--t-color: #5f8a9a;"><span class="t-icon">⚙️</span><span>Steel</span></button>
+            <button type="button" class="type-btn-pill" data-type="Fairy" style="--t-color: #cf7ec5;"><span class="t-icon">✨</span><span>Fairy</span></button>
+          </div>
+        </div>
+
+        <!-- Panel 2: Resistance Selection Pills -->
+        <div class="filter-subpanel" id="panel-resistance" style="display: none;">
+          <div class="resistance-hint-text">
+            Filters Pokémon that <strong>resist</strong> or are <strong>immune</strong> (≤ 0.5× / 0×) to incoming attacks:
+          </div>
+          <div class="type-pills-row" id="resistance-pills-row">
+            <button type="button" class="type-btn-pill res-pill-all active" data-res="ALL">All</button>
+            <button type="button" class="type-btn-pill" data-res="Normal" style="--t-color: #73797f;"><span class="t-icon">⚪</span><span>Normal</span></button>
+            <button type="button" class="type-btn-pill" data-res="Grass" style="--t-color: #33a137;"><span class="t-icon">🌿</span><span>Grass</span></button>
+            <button type="button" class="type-btn-pill" data-res="Fire" style="--t-color: #e65127;"><span class="t-icon">🔥</span><span>Fire</span></button>
+            <button type="button" class="type-btn-pill" data-res="Water" style="--t-color: #2774db;"><span class="t-icon">💧</span><span>Water</span></button>
+            <button type="button" class="type-btn-pill" data-res="Electric" style="--t-color: #d9aa14;"><span class="t-icon">⚡</span><span>Electric</span></button>
+            <button type="button" class="type-btn-pill" data-res="Bug" style="--t-color: #8ca320;"><span class="t-icon">🪲</span><span>Bug</span></button>
+            <button type="button" class="type-btn-pill" data-res="Flying" style="--t-color: #82a4d9;"><span class="t-icon">🪽</span><span>Flying</span></button>
+            <button type="button" class="type-btn-pill" data-res="Rock" style="--t-color: #999573;"><span class="t-icon">🪨</span><span>Rock</span></button>
+            <button type="button" class="type-btn-pill" data-res="Poison" style="--t-color: #873499;"><span class="t-icon">☠️</span><span>Poison</span></button>
+            <button type="button" class="type-btn-pill" data-res="Ground" style="--t-color: #946328;"><span class="t-icon">🌍</span><span>Ground</span></button>
+            <button type="button" class="type-btn-pill" data-res="Ice" style="--t-color: #39b4cb;"><span class="t-icon">❄️</span><span>Ice</span></button>
+            <button type="button" class="type-btn-pill" data-res="Fighting" style="--t-color: #cb731f;"><span class="t-icon">🥊</span><span>Fighting</span></button>
+            <button type="button" class="type-btn-pill" data-res="Psychic" style="--t-color: #db4f6c;"><span class="t-icon">🔮</span><span>Psychic</span></button>
+            <button type="button" class="type-btn-pill" data-res="Ghost" style="--t-color: #5a3666;"><span class="t-icon">👻</span><span>Ghost</span></button>
+            <button type="button" class="type-btn-pill" data-res="Dragon" style="--t-color: #434eb0;"><span class="t-icon">🐉</span><span>Dragon</span></button>
+            <button type="button" class="type-btn-pill" data-res="Dark" style="--t-color: #443f3c;"><span class="t-icon">🌑</span><span>Dark</span></button>
+            <button type="button" class="type-btn-pill" data-res="Steel" style="--t-color: #5f8a9a;"><span class="t-icon">⚙️</span><span>Steel</span></button>
+            <button type="button" class="type-btn-pill" data-res="Fairy" style="--t-color: #cf7ec5;"><span class="t-icon">✨</span><span>Fairy</span></button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Filter Results Bar -->
+      <div class="filter-status-row">
+        <span class="filter-status-text">Displaying <strong id="filter-count">262</strong> of <strong id="filter-total">262</strong> Pokémon</span>
+        <button id="clear-filters-btn" class="clear-filters-btn" style="display: none;">✕ Reset Filters</button>
       </div>
     </section>
 
@@ -120,6 +178,6 @@
   <!-- Toast Notification -->
   <div id="toast" class="toast"></div>
 
-  <script src="app.js"></script>
+  <script src="app.js?v=2.8"></script>
 </body>
 </html>
