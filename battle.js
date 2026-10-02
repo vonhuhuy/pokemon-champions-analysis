@@ -95,8 +95,9 @@ const TYPE_CHART = {
 const SLOT_MAX = 263 * 19 * 4 * 2;
 
 const SAMPLE_PRESETS = {
-  'meta-s': ['Garchomp', 'Salamence', 'Primarina', 'Baxcalibur', 'Archaludon', 'Gholdengo'],
-  'rain': ['Pelipper', 'Archaludon', 'Basculegion', 'Rillaboom', 'Gholdengo', 'Corviknight'],
+  'garchomp-z': ['Garchomp', 'Primarina', 'Gholdengo', 'Corviknight', 'Cinderace', 'Archaludon'],
+  'salamence': ['Salamence', 'Hippowdon', 'Primarina', 'Gholdengo', 'Lucario', 'Archaludon'],
+  'mimikyu': ['Mimikyu', 'Baxcalibur', 'Garchomp', 'Primarina', 'Lucario', 'Gholdengo'],
   'balance': ['Hippowdon', 'Corviknight', 'Primarina', 'Gliscor', 'Aegislash', 'Dragonite'],
   'hyper': ['Dragapult', 'Meowscarada', 'Cinderace', 'Sneasler', 'Garchomp', 'Baxcalibur']
 };
@@ -680,58 +681,163 @@ function initRosters() {
       ourSlots = decodeTeam(hashFromUrl);
       ourHash = hashFromUrl;
     } catch (e) {
-      loadPresetOur('meta-s');
+      loadPresetOur('garchomp-z');
     }
   } else if (savedHash && savedHash.length === 16 && savedHash !== '0000000000000000') {
     try {
       ourSlots = decodeTeam(savedHash);
       ourHash = savedHash;
     } catch (e) {
-      loadPresetOur('meta-s');
+      loadPresetOur('garchomp-z');
     }
   } else {
-    loadPresetOur('meta-s');
+    loadPresetOur('garchomp-z');
   }
 
-  // 2. Load Enemy Team
+  // 2. Load Enemy Team (Empty by default)
   if (enemyHashFromUrl && enemyHashFromUrl.length === 16) {
     try {
       enemySlots = decodeTeam(enemyHashFromUrl);
       enemyHash = enemyHashFromUrl;
     } catch (e) {
-      loadPresetEnemy('meta-s');
+      enemySlots = [null, null, null, null, null, null];
+      enemyHash = encodeTeam(enemySlots);
     }
   } else {
-    loadPresetEnemy('meta-s');
+    enemySlots = [null, null, null, null, null, null];
+    enemyHash = encodeTeam(enemySlots);
   }
 
   updateHashDisplays();
 }
 
 function loadPresetOur(presetKey) {
-  const names = SAMPLE_PRESETS[presetKey] || SAMPLE_PRESETS['meta-s'];
+  const names = SAMPLE_PRESETS[presetKey] || SAMPLE_PRESETS['garchomp-z'];
   ourSlots = [null, null, null, null, null, null];
   names.forEach((name, idx) => {
     const p = pokemonDB.find(x => x.name.toLowerCase() === name.toLowerCase());
     if (p) ourSlots[idx] = populateDefaultBuild(p);
   });
+  if (presetKey === 'garchomp-z') {
+    const g = ourSlots.find(s => s && s.pokemon && s.pokemon.name === 'Garchomp');
+    if (g) g.item = 'Garchompite Z';
+  } else if (presetKey === 'salamence') {
+    const s = ourSlots.find(s => s && s.pokemon && s.pokemon.name === 'Salamence');
+    if (s) s.item = 'Salamencite';
+  } else if (presetKey === 'mimikyu') {
+    const m = ourSlots.find(s => s && s.pokemon && s.pokemon.name === 'Mimikyu');
+    if (m) m.item = 'Life Orb';
+  }
   ourHash = encodeTeam(ourSlots);
+}
+
+function generateBalancedRandomMetaTeam() {
+  const pool = pokemonDB.filter(p => ['S', 'A'].includes(p.tier));
+  if (pool.length < 6) return pool.slice(0, 6);
+
+  const team = [];
+  const sPool = pool.filter(p => p.tier === 'S');
+  const first = sPool[Math.floor(Math.random() * sPool.length)] || pool[0];
+  team.push(first);
+
+  while (team.length < 6) {
+    const weaknessCounts = {};
+    const resistanceCounts = {};
+    const attackTypes = new Set();
+    let physCount = 0;
+    let specCount = 0;
+
+    for (const t of ALL_TYPES) {
+      weaknessCounts[t] = 0;
+      resistanceCounts[t] = 0;
+    }
+
+    for (const member of team) {
+      const defM = getDefensiveMultipliers(member.types || []);
+      for (const t of ALL_TYPES) {
+        if (defM[t] > 1) weaknessCounts[t]++;
+        if (defM[t] < 1) resistanceCounts[t]++;
+      }
+      for (const m of (member.moves || []).slice(0, 4)) {
+        const md = movesDB[m.name] || {};
+        if (md.type) attackTypes.add(md.type);
+      }
+      const bst = member.base_stats || {};
+      if ((bst.atk || 0) >= (bst.spa || 0)) physCount++;
+      else specCount++;
+    }
+
+    // Score candidates based on defensive synergy and offensive coverage
+    const candidates = pool.filter(c => !team.some(m => m.name === c.name));
+    const scored = candidates.map(c => {
+      let score = c.tier === 'S' ? 18 : 10;
+      const defM = getDefensiveMultipliers(c.types || []);
+
+      // Defensive synergy: penalize shared weaknesses, reward covering existing weaknesses
+      for (const t of ALL_TYPES) {
+        if (defM[t] > 1) {
+          if (weaknessCounts[t] >= 2) score -= 35; // Severe compounding weakness
+          else if (weaknessCounts[t] >= 1) score -= 14;
+        } else if (defM[t] < 1) {
+          if (weaknessCounts[t] >= 1) score += 22; // Covers a current team weakness
+          else if (resistanceCounts[t] === 0) score += 8; // First resistance to this type
+        }
+        if (defM[t] === 0) score += 16; // Immunity is huge!
+      }
+
+      // Offensive coverage: reward new move types hitting uncovered elements
+      for (const m of (c.moves || []).slice(0, 4)) {
+        const md = movesDB[m.name] || {};
+        if (md.type && !attackTypes.has(md.type)) score += 7;
+      }
+
+      // Type diversity: penalize duplicate types
+      for (const member of team) {
+        const shared = (c.types || []).filter(t => (member.types || []).includes(t));
+        score -= shared.length * 16;
+      }
+
+      // Physical / Special balance
+      const bst = c.base_stats || {};
+      if (physCount > specCount + 1 && (bst.spa || 0) > (bst.atk || 0)) score += 12;
+      if (specCount > physCount + 1 && (bst.atk || 0) > (bst.spa || 0)) score += 12;
+
+      return { poke: c, score };
+    });
+
+    scored.sort((a, b) => b.score - a.score);
+    // Weighted sample from top 4 candidates for fresh variety on each click
+    const topCandidates = scored.slice(0, 4);
+    const chosen = topCandidates[Math.floor(Math.random() * topCandidates.length)].poke;
+    team.push(chosen);
+  }
+
+  return team;
 }
 
 function loadPresetEnemy(presetKey) {
   enemySlots = [null, null, null, null, null, null];
   if (presetKey === 'random') {
-    const pool = pokemonDB.filter(p => ['S', 'A'].includes(p.tier));
-    const shuffled = [...pool].sort(() => 0.5 - Math.random());
-    for (let i = 0; i < 6 && i < shuffled.length; i++) {
-      enemySlots[i] = populateDefaultBuild(shuffled[i]);
+    const balancedTeam = generateBalancedRandomMetaTeam();
+    for (let i = 0; i < 6 && i < balancedTeam.length; i++) {
+      enemySlots[i] = populateDefaultBuild(balancedTeam[i]);
     }
   } else {
-    const names = SAMPLE_PRESETS[presetKey] || SAMPLE_PRESETS['meta-s'];
+    const names = SAMPLE_PRESETS[presetKey] || SAMPLE_PRESETS['garchomp-z'];
     names.forEach((name, idx) => {
       const p = pokemonDB.find(x => x.name.toLowerCase() === name.toLowerCase());
       if (p) enemySlots[idx] = populateDefaultBuild(p);
     });
+    if (presetKey === 'garchomp-z') {
+      const g = enemySlots.find(s => s && s.pokemon && s.pokemon.name === 'Garchomp');
+      if (g) g.item = 'Garchompite Z';
+    } else if (presetKey === 'salamence') {
+      const s = enemySlots.find(s => s && s.pokemon && s.pokemon.name === 'Salamence');
+      if (s) s.item = 'Salamencite';
+    } else if (presetKey === 'mimikyu') {
+      const m = enemySlots.find(s => s && s.pokemon && s.pokemon.name === 'Mimikyu');
+      if (m) m.item = 'Life Orb';
+    }
   }
   enemyHash = encodeTeam(enemySlots);
 }
@@ -1716,7 +1822,61 @@ function renderEmptyState() {
   const statCoverage = document.getElementById('stat-coverage-rate');
   if (statCoverage) statCoverage.textContent = '0%';
   const statVerdict = document.getElementById('stat-overall-verdict');
-  if (statVerdict) statVerdict.textContent = 'Awaiting Teams';
+  if (statVerdict) statVerdict.textContent = 'Awaiting Enemy';
+  const navEquity = document.getElementById('nav-matchup-equity');
+  if (navEquity) navEquity.textContent = 'Awaiting Enemy';
+
+  const ourBar = document.getElementById('meter-our-equity');
+  const enemyBar = document.getElementById('meter-enemy-equity');
+  if (ourBar) ourBar.style.width = '50%';
+  if (enemyBar) enemyBar.style.width = '50%';
+  const ourPct = document.getElementById('pct-our-equity');
+  const enemyPct = document.getElementById('pct-enemy-equity');
+  if (ourPct) ourPct.textContent = '50%';
+  if (enemyPct) enemyPct.textContent = '50%';
+
+  const verdictPill = document.getElementById('matchup-verdict-pill');
+  if (verdictPill) {
+    verdictPill.className = 'matchup-verdict-pill verdict-even';
+    verdictPill.textContent = 'Awaiting Enemy Team';
+  }
+
+  const emptyMsg = `
+    <div style="grid-column: 1/-1; text-align: center; padding: 3rem 1.5rem; background: rgba(15,23,42,0.4); border: 1px dashed rgba(255,255,255,0.12); border-radius: 16px; margin: 1rem 0;">
+      <div style="font-size: 2.2rem; margin-bottom: 0.6rem;">⚔️</div>
+      <h3 style="font-size: 1.15rem; color: #f8fafc; margin-bottom: 0.4rem;">Enemy Team is Empty</h3>
+      <p style="font-size: 0.86rem; color: var(--text-dim); max-width: 440px; margin: 0 auto;">
+        Select one of the <strong>Meta Teams</strong> above (Mega Garchomp Z, Mega Salamence, Mimikyu Core, Bulky Balance, Hyper Offense, or Random Meta), or click <strong>"+ Add Pokémon"</strong> to begin battle analysis!
+      </p>
+    </div>
+  `;
+
+  const rankingsGrid = document.getElementById('member-rankings-grid');
+  if (rankingsGrid) rankingsGrid.innerHTML = emptyMsg;
+
+  const matrixWrap = document.getElementById('matrix-table-wrap');
+  if (matrixWrap) matrixWrap.innerHTML = emptyMsg;
+
+  const threatsGrid = document.getElementById('enemy-threats-grid');
+  if (threatsGrid) threatsGrid.innerHTML = '<p style="color:var(--text-dim); padding:1rem;">Add enemy Pokémon to analyze defensive exposure.</p>';
+
+  const sharedWeakBox = document.getElementById('shared-weakness-box');
+  if (sharedWeakBox) sharedWeakBox.innerHTML = '';
+
+  const typesRow = document.getElementById('types-weakness-pills-row');
+  if (typesRow) typesRow.innerHTML = '';
+
+  const bulkBody = document.getElementById('enemy-bulk-table-body');
+  if (bulkBody) bulkBody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:1.5rem; color:var(--text-dim);">No enemy Pokémon loaded yet.</td></tr>';
+
+  const bring3 = document.getElementById('tactics-bring3-content');
+  if (bring3) bring3.innerHTML = '<p style="color:var(--text-dim);">Awaiting enemy team selection.</p>';
+  const lead = document.getElementById('tactics-lead-content');
+  if (lead) lead.innerHTML = '<p style="color:var(--text-dim);">Awaiting enemy team selection.</p>';
+  const wincon = document.getElementById('tactics-wincon-content');
+  if (wincon) wincon.innerHTML = '<p style="color:var(--text-dim);">Awaiting enemy team selection.</p>';
+  const threat = document.getElementById('tactics-threat-content');
+  if (threat) threat.innerHTML = '<p style="color:var(--text-dim);">Awaiting enemy team selection.</p>';
 }
 
 // =====================================================================
@@ -1756,7 +1916,7 @@ function setupUI() {
       btn.classList.add('active');
       loadPresetEnemy(btn.dataset.preset);
       recalculateBattle();
-      showToast(`Loaded Enemy Preset: ${btn.textContent.trim()}`);
+      showToast(`Loaded Meta Team: ${btn.textContent.trim()}`);
     });
   });
 
@@ -1764,6 +1924,7 @@ function setupUI() {
   const btnClearEnemy = document.getElementById('btn-clear-enemy-team');
   if (btnClearEnemy) {
     btnClearEnemy.addEventListener('click', () => {
+      document.querySelectorAll('.enemy-presets-strip .preset-pill-btn').forEach(b => b.classList.remove('active'));
       enemySlots = [null, null, null, null, null, null];
       enemyHash = encodeTeam(enemySlots);
       recalculateBattle();

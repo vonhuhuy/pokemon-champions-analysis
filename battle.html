@@ -7,7 +7,7 @@
   <meta name="description" content="Simulate competitive Pokémon 6v6 team battles. Analyzes head-to-head advantage, offensive type coverage, defensive exposure, physical vs special bulk pairings, and ranks team member usefulness.">
   <link rel="stylesheet" href="index.css?v=2.8">
   <link rel="stylesheet" href="teambuilder.css?v=2.7">
-  <link rel="stylesheet" href="battle.css?v=2.1">
+  <link rel="stylesheet" href="battle.css?v=2.2">
 </head>
 <body>
 
@@ -78,12 +78,9 @@
           <div class="roster-header">
             <div class="roster-title-group">
               <span class="roster-icon">🛡️</span>
-              <div>
+              <div class="roster-title-with-hash">
                 <h2 class="roster-title">Our Team</h2>
-                <div class="roster-meta-tags">
-                  <span class="lock-badge" title="Roster is locked from Team Builder">🔒 Locked (Team Builder)</span>
-                  <span class="teamhash-tag">Hash: <code id="our-hash-code">0000000000000000</code></span>
-                </div>
+                <span class="teamhash-tag">Hash: <code id="our-hash-code">0000000000000000</code></span>
               </div>
             </div>
             <div class="roster-actions">
@@ -130,10 +127,6 @@
               <span class="roster-icon">⚔️</span>
               <div>
                 <h2 class="roster-title">Enemy Team</h2>
-                <div class="roster-meta-tags">
-                  <span class="enemy-count-badge" id="enemy-count-badge">0 / 6 Pokémon</span>
-                  <span class="editable-badge">✏️ Fully Customizable</span>
-                </div>
               </div>
             </div>
             <div class="roster-actions">
@@ -151,9 +144,10 @@
 
           <!-- Enemy Presets Bar -->
           <div class="enemy-presets-strip">
-            <span class="presets-label">Enemy Team Presets:</span>
-            <button class="preset-pill-btn active" data-preset="meta-s">🏆 S-Tier Core</button>
-            <button class="preset-pill-btn" data-preset="rain">🌧️ Rain Offense</button>
+            <span class="presets-label">Meta Teams:</span>
+            <button class="preset-pill-btn" data-preset="garchomp-z">🐉 Mega Garchomp Z</button>
+            <button class="preset-pill-btn" data-preset="salamence">🦅 Mega Salamence</button>
+            <button class="preset-pill-btn" data-preset="mimikyu">🎭 Mimikyu Core</button>
             <button class="preset-pill-btn" data-preset="balance">🧱 Bulky Balance</button>
             <button class="preset-pill-btn" data-preset="hyper">⚡ Hyper Offense</button>
             <button class="preset-pill-btn" data-preset="random">🎲 Random Meta</button>
@@ -557,9 +551,10 @@
         </div>
 
         <div class="modal-quick-presets">
-          <span class="quick-label">Or load a preset:</span>
-          <button class="btn-preset-mini" data-preset="meta-s">S-Tier Core</button>
-          <button class="btn-preset-mini" data-preset="rain">Rain Offense</button>
+          <span class="quick-label">Or load a meta preset:</span>
+          <button class="btn-preset-mini" data-preset="garchomp-z">Mega Garchomp Z</button>
+          <button class="btn-preset-mini" data-preset="salamence">Mega Salamence</button>
+          <button class="btn-preset-mini" data-preset="mimikyu">Mimikyu Core</button>
           <button class="btn-preset-mini" data-preset="balance">Bulky Balance</button>
           <button class="btn-preset-mini" data-preset="hyper">Hyper Offense</button>
         </div>
@@ -644,6 +639,6 @@
 
   <!-- Scripts -->
   <script src="type-tooltip.js"></script>
-  <script src="battle.js?v=2.1"></script>
+  <script src="battle.js?v=2.2"></script>
 </body>
 </html>
