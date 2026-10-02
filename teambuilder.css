@@ -1460,6 +1460,13 @@
   padding: 0.1rem 0.42rem;
   border-radius: 4px;
   color: #fff;
+  cursor: help;
+  transition: transform 0.15s ease, filter 0.15s ease;
+}
+
+.quick-add-type-badge:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.15);
 }
 
 .btn-quick-add {
