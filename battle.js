@@ -599,21 +599,77 @@ function calcDuel(buildA, buildB) {
     else scoreA -= 0.5;
   }
 
-  // Physical vs Special pairing factor (Requirement #5)
+  // Physical vs Special pairing factor (Requirement #5) - evaluated symmetrically
+  const bestMoveA = (movesAvsB || []).filter(m => m.power > 0).sort((a, b) => b.dmgIndex - a.dmgIndex)[0];
+  const bestMoveB = (movesBvsA || []).filter(m => m.power > 0).sort((a, b) => b.dmgIndex - a.dmgIndex)[0];
+
+  const aHitsPhys = bestMoveA ? bestMoveA.hitsPhys : profA.isPhysical;
+  const aHitsSpec = bestMoveA ? !bestMoveA.hitsPhys : profA.isSpecial;
+
+  const bHitsPhys = bestMoveB ? bestMoveB.hitsPhys : profB.isPhysical;
+  const bHitsSpec = bestMoveB ? !bestMoveB.hitsPhys : profB.isSpecial;
+
+  let aExploitsB = false;
+  let aExploitNote = '';
+  let aWalledByB = false;
+  let aWalledNote = '';
+
+  let bExploitsA = false;
+  let bExploitNote = '';
+  let bWalledByA = false;
+  let bWalledNote = '';
+
+  // Attacker A vs Defender B
+  if (aHitsPhys && profB.def <= 75 && profB.spd >= 100) {
+    scoreA += 0.8;
+    aExploitsB = true;
+    aExploitNote = `Exploits ${pB.name}'s low Physical Defense (${profB.def}) vs high SpD (${profB.spd})`;
+  } else if (aHitsSpec && profB.spd <= 75 && profB.def >= 100) {
+    scoreA += 0.8;
+    aExploitsB = true;
+    aExploitNote = `Exploits ${pB.name}'s low Special Defense (${profB.spd}) vs high Def (${profB.def})`;
+  } else if (aHitsPhys && profB.isPhysWall && superEffHitsA === 0) {
+    scoreA -= 0.9;
+    aWalledByB = true;
+    aWalledNote = `Walled by ${pB.name}'s massive Physical Defense (${profB.def})`;
+  } else if (aHitsSpec && profB.isSpecWall && superEffHitsA === 0) {
+    scoreA -= 0.9;
+    aWalledByB = true;
+    aWalledNote = `Walled by ${pB.name}'s massive Special Defense (${profB.spd})`;
+  }
+
+  // Attacker B vs Defender A (Symmetric counterpart)
+  if (bHitsPhys && profA.def <= 75 && profA.spd >= 100) {
+    scoreA -= 0.8;
+    bExploitsA = true;
+    bExploitNote = `${pB.name} exploits ${pA.name}'s low Physical Defense (${profA.def}) vs high SpD (${profA.spd})`;
+  } else if (bHitsSpec && profA.spd <= 75 && profA.def >= 100) {
+    scoreA -= 0.8;
+    bExploitsA = true;
+    bExploitNote = `${pB.name} exploits ${pA.name}'s low Special Defense (${profA.spd}) vs high Def (${profA.def})`;
+  } else if (bHitsPhys && profA.isPhysWall && superEffHitsB === 0) {
+    scoreA += 0.9;
+    bWalledByA = true;
+    bWalledNote = `Walls ${pB.name} with massive Physical Defense (${profA.def})`;
+  } else if (bHitsSpec && profA.isSpecWall && superEffHitsB === 0) {
+    scoreA += 0.9;
+    bWalledByA = true;
+    bWalledNote = `Walls ${pB.name} with massive Special Defense (${profA.spd})`;
+  }
+
+  // Compose descriptive note for physical/special matchup
   let physpecNote = '';
-  // Attacker A hitting weak side of B
-  if (profA.isPhysical && profB.def <= 75 && profB.spd >= 100) {
-    scoreA += 0.8;
-    physpecNote = `Exploits ${pB.name}'s low Physical Defense (${profB.def}) vs high SpD (${profB.spd})`;
-  } else if (profA.isSpecial && profB.spd <= 75 && profB.def >= 100) {
-    scoreA += 0.8;
-    physpecNote = `Exploits ${pB.name}'s low Special Defense (${profB.spd}) vs high Def (${profB.def})`;
-  } else if (profA.isPhysical && profB.isPhysWall && superEffHitsA === 0) {
-    scoreA -= 0.9;
-    physpecNote = `Walled by ${pB.name}'s massive Physical Defense (${profB.def})`;
-  } else if (profA.isSpecial && profB.isSpecWall && superEffHitsA === 0) {
-    scoreA -= 0.9;
-    physpecNote = `Walled by ${pB.name}'s massive Special Defense (${profB.spd})`;
+  if (aWalledByB && bWalledByA) {
+    physpecNote = "Mutual walling (both Pokémon wall each other's attacks)";
+  } else if (aExploitsB && bExploitsA) {
+    physpecNote = "Both Pokémon exploit each other's lower defensive stat";
+  } else {
+    const notes = [];
+    if (aExploitsB) notes.push(aExploitNote);
+    if (bWalledByA) notes.push(bWalledNote);
+    if (aWalledByB) notes.push(aWalledNote);
+    if (bExploitsA) notes.push(bExploitNote);
+    physpecNote = notes.join('. ');
   }
 
   // Classification Badge: +2, +1, 0, -1, -2
@@ -731,6 +787,14 @@ function loadPresetOur(presetKey) {
   ourHash = encodeTeam(ourSlots);
 }
 
+function getDefensiveMultipliers(defTypes) {
+  const mults = {};
+  for (const atkType of ALL_TYPES) {
+    mults[atkType] = getTypeEffectiveness(atkType, defTypes);
+  }
+  return mults;
+}
+
 function generateBalancedRandomMetaTeam() {
   const pool = pokemonDB.filter(p => ['S', 'A'].includes(p.tier));
   if (pool.length < 6) return pool.slice(0, 6);
@@ -816,11 +880,32 @@ function generateBalancedRandomMetaTeam() {
 }
 
 function loadPresetEnemy(presetKey) {
+  // Completely clear all 6 slots first to ensure a full fresh team replacement
   enemySlots = [null, null, null, null, null, null];
+
   if (presetKey === 'random') {
     const balancedTeam = generateBalancedRandomMetaTeam();
+    let megaAssigned = false;
     for (let i = 0; i < 6 && i < balancedTeam.length; i++) {
-      enemySlots[i] = populateDefaultBuild(balancedTeam[i]);
+      const build = populateDefaultBuild(balancedTeam[i]);
+      const pName = build.pokemon.name;
+
+      if (pName === 'Garchomp') {
+        if (!megaAssigned) { build.item = 'Garchompite Z'; megaAssigned = true; }
+        else build.item = 'Focus Sash';
+      } else if (pName === 'Salamence') {
+        if (!megaAssigned) { build.item = 'Salamencite'; megaAssigned = true; }
+        else build.item = 'Life Orb';
+      } else if (pName === 'Charizard') {
+        if (!megaAssigned) { build.item = 'Charizardite Y'; megaAssigned = true; }
+        else build.item = 'Choice Specs';
+      } else if (pName === 'Lucario') {
+        if (!megaAssigned) { build.item = 'Lucarionite Z'; megaAssigned = true; }
+        else build.item = 'Focus Sash';
+      } else if (pName === 'Mimikyu') {
+        build.item = 'Life Orb';
+      }
+      enemySlots[i] = build;
     }
   } else {
     const names = SAMPLE_PRESETS[presetKey] || SAMPLE_PRESETS['garchomp-z'];
@@ -840,7 +925,10 @@ function loadPresetEnemy(presetKey) {
     }
   }
   enemyHash = encodeTeam(enemySlots);
+  window.enemySlots = enemySlots;
 }
+window.loadPresetEnemy = loadPresetEnemy;
+window.generateBalancedRandomMetaTeam = generateBalancedRandomMetaTeam;
 
 function updateHashDisplays() {
   const ourCode = document.getElementById('our-hash-code');
@@ -859,6 +947,8 @@ function updateHashDisplays() {
 // =====================================================================
 
 function recalculateBattle() {
+  window.ourSlots = ourSlots;
+  window.enemySlots = enemySlots;
   updateHashDisplays();
   renderRosters();
 
@@ -2144,7 +2234,7 @@ let activeEditorMoveSlot = 0;
 let editorItemSearch = '';
 let editorMoveSearch = '';
 
-window.openEnemyEditor = function(slotIdx, defaultFocus = null) {
+function openEnemyEditor(slotIdx, defaultFocus = null) {
   if (slotIdx === null || !enemySlots[slotIdx]) return;
   editingEnemySlotIdx = slotIdx;
   activeEditorMoveSlot = 0;
@@ -2168,15 +2258,17 @@ window.openEnemyEditor = function(slotIdx, defaultFocus = null) {
       if (section) section.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }, 100);
   }
-};
+}
+window.openEnemyEditor = openEnemyEditor;
 
-window.closeEnemyEditor = function() {
+function closeEnemyEditor() {
   const modal = document.getElementById('modal-enemy-editor');
   if (modal) hideModal(modal);
   editingEnemySlotIdx = null;
   enemyHash = encodeTeam(enemySlots);
   recalculateBattle();
-};
+}
+window.closeEnemyEditor = closeEnemyEditor;
 
 function renderEditorModalBody() {
   const body = document.getElementById('editor-modal-body');
@@ -2467,39 +2559,43 @@ function renderEditorModalBody() {
   }
 }
 
-window.setEnemyTeraType = function(teraType) {
+function setEnemyTeraType(teraType) {
   if (editingEnemySlotIdx === null || !enemySlots[editingEnemySlotIdx]) return;
   enemySlots[editingEnemySlotIdx].teraType = teraType;
   renderEditorModalBody();
   enemyHash = encodeTeam(enemySlots);
   recalculateBattle();
-};
+}
+window.setEnemyTeraType = setEnemyTeraType;
 
-window.setEnemyItem = function(itemName) {
+function setEnemyItem(itemName) {
   if (editingEnemySlotIdx === null || !enemySlots[editingEnemySlotIdx]) return;
   enemySlots[editingEnemySlotIdx].item = itemName;
   renderEditorModalBody();
   enemyHash = encodeTeam(enemySlots);
   recalculateBattle();
-};
+}
+window.setEnemyItem = setEnemyItem;
 
-window.setEnemyAbility = function(abilityName) {
+function setEnemyAbility(abilityName) {
   if (editingEnemySlotIdx === null || !enemySlots[editingEnemySlotIdx]) return;
   enemySlots[editingEnemySlotIdx].ability = abilityName;
   renderEditorModalBody();
   enemyHash = encodeTeam(enemySlots);
   recalculateBattle();
-};
+}
+window.setEnemyAbility = setEnemyAbility;
 
-window.setEnemyNature = function(natureName) {
+function setEnemyNature(natureName) {
   if (editingEnemySlotIdx === null || !enemySlots[editingEnemySlotIdx]) return;
   enemySlots[editingEnemySlotIdx].nature = natureName;
   renderEditorModalBody();
   enemyHash = encodeTeam(enemySlots);
   recalculateBattle();
-};
+}
+window.setEnemyNature = setEnemyNature;
 
-window.setEnemySpeedSpread = function(presetType) {
+function setEnemySpeedSpread(presetType) {
   if (editingEnemySlotIdx === null || !enemySlots[editingEnemySlotIdx]) return;
   const slot = enemySlots[editingEnemySlotIdx];
   if (!slot.spread) slot.spread = { hp: 0, atk: 0, def: 0, spa: 0, spd: 0, spe: 0 };
@@ -2513,14 +2609,16 @@ window.setEnemySpeedSpread = function(presetType) {
   renderEditorModalBody();
   enemyHash = encodeTeam(enemySlots);
   recalculateBattle();
-};
+}
+window.setEnemySpeedSpread = setEnemySpeedSpread;
 
-window.setActiveEditorMoveSlot = function(slotIdx) {
+function setActiveEditorMoveSlot(slotIdx) {
   activeEditorMoveSlot = slotIdx;
   renderEditorModalBody();
-};
+}
+window.setActiveEditorMoveSlot = setActiveEditorMoveSlot;
 
-window.setEnemyMove = function(moveName) {
+function setEnemyMove(moveName) {
   if (editingEnemySlotIdx === null || !enemySlots[editingEnemySlotIdx]) return;
   const slot = enemySlots[editingEnemySlotIdx];
   if (!slot.moves) slot.moves = [];
@@ -2529,9 +2627,10 @@ window.setEnemyMove = function(moveName) {
   renderEditorModalBody();
   enemyHash = encodeTeam(enemySlots);
   recalculateBattle();
-};
+}
+window.setEnemyMove = setEnemyMove;
 
-window.clearEnemyMove = function(slotI) {
+function clearEnemyMove(slotI) {
   if (editingEnemySlotIdx === null || !enemySlots[editingEnemySlotIdx]) return;
   const slot = enemySlots[editingEnemySlotIdx];
   if (slot.moves) {
@@ -2540,10 +2639,11 @@ window.clearEnemyMove = function(slotI) {
   renderEditorModalBody();
   enemyHash = encodeTeam(enemySlots);
   recalculateBattle();
-};
+}
+window.clearEnemyMove = clearEnemyMove;
 
 // Open Enemy Picker for a specific slot
-window.openEnemyPicker = function(slotIdx) {
+function openEnemyPicker(slotIdx) {
   activeEnemyPickerSlot = slotIdx;
   const slotNumSpan = document.getElementById('picker-target-slot-num');
   if (slotNumSpan) slotNumSpan.textContent = slotIdx + 1;
@@ -2566,13 +2666,15 @@ window.openEnemyPicker = function(slotIdx) {
     showModal(modal);
     renderPickerResults();
   }
-};
+}
+window.openEnemyPicker = openEnemyPicker;
 
-window.removeEnemySlot = function(slotIdx) {
+function removeEnemySlot(slotIdx) {
   enemySlots[slotIdx] = null;
   enemyHash = encodeTeam(enemySlots);
   recalculateBattle();
-};
+}
+window.removeEnemySlot = removeEnemySlot;
 
 function renderPickerResults() {
   const container = document.getElementById('picker-results-grid');
@@ -2610,7 +2712,7 @@ function renderPickerResults() {
   }).join('');
 }
 
-window.selectEnemyPokemon = function(pokemonName) {
+function selectEnemyPokemon(pokemonName) {
   const p = pokemonDB.find(x => x.name.toLowerCase() === pokemonName.toLowerCase());
   if (p) {
     enemySlots[activeEnemyPickerSlot] = populateDefaultBuild(p);
@@ -2620,10 +2722,11 @@ window.selectEnemyPokemon = function(pokemonName) {
     recalculateBattle();
     showToast(`Added ${p.name} to Enemy Team (Slot ${activeEnemyPickerSlot + 1})`);
   }
-};
+}
+window.selectEnemyPokemon = selectEnemyPokemon;
 
 // Open Duel Modal when clicking matrix cell
-window.openDuelModal = function(ourIdx, enemyIdx) {
+function openDuelModal(ourIdx, enemyIdx) {
   const ourBuild = ourSlots[ourIdx];
   const enemyBuild = enemySlots[enemyIdx];
   if (!ourBuild || !enemyBuild) return;
@@ -2730,7 +2833,8 @@ window.openDuelModal = function(ourIdx, enemyIdx) {
   `;
 
   showModal(modal);
-};
+}
+window.openDuelModal = openDuelModal;
 
 // Toast notification helper
 function showToast(msg) {
