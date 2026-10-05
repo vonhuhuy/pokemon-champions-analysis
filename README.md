@@ -27,8 +27,11 @@ PokéChamp is an interactive competitive Pokémon singles analytics dashboard an
   - **Synergistic Teammate Recommendations** dynamically aggregated from ladder usage data.
   - 1-click **Pokémon Showdown Text Export** and URL link sharing.
 
-- **💾 Data Pipeline**:
-  - Automated scrapers and enrichment scripts (`scratch/`) synthesizing competitive battle ladder usage data into lightweight JSON and SQLite schemas (`data/`).
+- **💾 Data Pipeline & Automation**:
+  - Unified automated data pipeline (`scripts/update_database.py` and `scratch/update_database.py`) synthesizing competitive battle ladder usage data into lightweight JSON and SQLite schemas (`data/`).
+  - **Daily Scheduled GitHub Actions Workflow (`.github/workflows/update_database.yml`)**: Automatically triggers every day at 00:00 UTC (midnight), scrapes the latest ranked singles ladder movements, recalculates type advantages, enriches new moves via PokeAPI, and commits directly back to `main`, automatically deploying fresh data to GitHub Pages.
+  - **Manual 1-Click Trigger**: Run anytime on-demand directly from the GitHub repository under the **Actions** tab ("Update Competitive Database" -> "Run workflow").
+  - **Local CLI Run**: Execute `python3 scripts/update_database.py` (or `python3 scratch/update_database.py`) to trigger an immediate update locally.
 
 ## 🛠️ Tech Stack
 

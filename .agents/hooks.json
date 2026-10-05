@@ -7,8 +7,13 @@
       "action": "allow"
     },
     {
-      "description": "Auto-allow python3 script execution",
+      "description": "Auto-allow python3 scratch script execution",
       "command": "python3 scratch/*.py",
+      "action": "allow"
+    },
+    {
+      "description": "Auto-allow python3 scripts execution",
+      "command": "python3 scripts/*.py",
       "action": "allow"
     }
   ]
