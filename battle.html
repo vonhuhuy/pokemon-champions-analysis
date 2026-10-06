@@ -7,7 +7,7 @@
   <meta name="description" content="Simulate competitive Pokémon 6v6 team battles. Analyzes head-to-head advantage, offensive type coverage, defensive exposure, speed tier ladder across 12 Pokémon, and ranks team member usefulness.">
   <link rel="stylesheet" href="index.css?v=2.8">
   <link rel="stylesheet" href="teambuilder.css?v=2.7">
-  <link rel="stylesheet" href="battle.css?v=2.5">
+  <link rel="stylesheet" href="battle.css?v=2.6">
 </head>
 <body>
 
@@ -458,49 +458,60 @@
       <div class="modal-header">
         <div class="modal-title-wrap">
           <span class="modal-icon">➕</span>
-          <h3>Add Enemy Pokémon (Slot <span id="picker-target-slot-num">1</span>)</h3>
+          <div class="modal-title-text-group">
+            <h3>Add Enemy Pokémon (Slot <span id="picker-target-slot-num">1</span> of 6)</h3>
+            <p class="picker-modal-subtitle">Pick Pokémon to populate slots · Screen stays open until all 6 are chosen</p>
+          </div>
         </div>
-        <button class="modal-close-btn" id="btn-close-picker">✕</button>
+        <button class="modal-close-btn" id="btn-close-picker" title="Close picker">✕</button>
+      </div>
+
+      <!-- 6-Slot Mini Roster Progress Tracker -->
+      <div class="picker-roster-tracker" id="picker-roster-tracker">
+        <!-- Rendered dynamically via JS -->
       </div>
 
       <!-- Search & Filters -->
       <div class="picker-filter-bar">
-        <div class="search-input-wrap">
-          <span class="search-icon">🔍</span>
-          <input type="text" id="picker-search-input" placeholder="Search by name, type, ability, or move..." autocomplete="off">
-          <button id="picker-search-clear" class="btn-input-clear">✕</button>
+        <div class="picker-filter-row-top">
+          <div class="search-input-wrap">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="picker-search-input" placeholder="Search by name, type, ability, or move..." autocomplete="off">
+            <button id="picker-search-clear" class="btn-input-clear">✕</button>
+          </div>
+
+          <div class="picker-tier-buttons" id="picker-tier-buttons">
+            <button class="picker-pill active" data-tier="ALL">All Tiers</button>
+            <button class="picker-pill" data-tier="S">S Tier</button>
+            <button class="picker-pill" data-tier="A">A Tier</button>
+            <button class="picker-pill" data-tier="B">B Tier</button>
+            <button class="picker-pill" data-tier="C">C Tier</button>
+          </div>
         </div>
 
-        <div class="picker-tier-buttons" id="picker-tier-buttons">
-          <button class="picker-pill active" data-tier="ALL">All Tiers</button>
-          <button class="picker-pill" data-tier="S">S Tier</button>
-          <button class="picker-pill" data-tier="A">A Tier</button>
-          <button class="picker-pill" data-tier="B">B Tier</button>
-          <button class="picker-pill" data-tier="C">C Tier</button>
-        </div>
-
-        <div class="picker-type-select-wrap">
-          <select id="picker-type-select" class="picker-select">
-            <option value="ALL">All Types</option>
-            <option value="Normal">Normal</option>
-            <option value="Fire">Fire</option>
-            <option value="Water">Water</option>
-            <option value="Grass">Grass</option>
-            <option value="Electric">Electric</option>
-            <option value="Ice">Ice</option>
-            <option value="Fighting">Fighting</option>
-            <option value="Poison">Poison</option>
-            <option value="Ground">Ground</option>
-            <option value="Flying">Flying</option>
-            <option value="Psychic">Psychic</option>
-            <option value="Bug">Bug</option>
-            <option value="Rock">Rock</option>
-            <option value="Ghost">Ghost</option>
-            <option value="Dragon">Dragon</option>
-            <option value="Steel">Steel</option>
-            <option value="Dark">Dark</option>
-            <option value="Fairy">Fairy</option>
-          </select>
+        <!-- Elemental Type Filter Pills (18 types + ALL) -->
+        <div class="picker-type-pills-row">
+          <div class="picker-type-pills" id="picker-type-pills">
+            <button class="type-pill-btn active" data-type="ALL">ALL</button>
+            <button class="type-pill-btn" data-type="Normal" style="--pill-color: #94a3b8;">NORMAL</button>
+            <button class="type-pill-btn" data-type="Fire" style="--pill-color: #f97316;">FIRE</button>
+            <button class="type-pill-btn" data-type="Water" style="--pill-color: #38bdf8;">WATER</button>
+            <button class="type-pill-btn" data-type="Electric" style="--pill-color: #eab308;">ELECTRIC</button>
+            <button class="type-pill-btn" data-type="Grass" style="--pill-color: #22c55e;">GRASS</button>
+            <button class="type-pill-btn" data-type="Ice" style="--pill-color: #06b6d4;">ICE</button>
+            <button class="type-pill-btn" data-type="Fighting" style="--pill-color: #ef4444;">FIGHTING</button>
+            <button class="type-pill-btn" data-type="Poison" style="--pill-color: #a855f7;">POISON</button>
+            <button class="type-pill-btn" data-type="Ground" style="--pill-color: #d97706;">GROUND</button>
+            <button class="type-pill-btn" data-type="Flying" style="--pill-color: #818cf8;">FLYING</button>
+            <button class="type-pill-btn" data-type="Psychic" style="--pill-color: #ec4899;">PSYCHIC</button>
+            <button class="type-pill-btn" data-type="Bug" style="--pill-color: #84cc16;">BUG</button>
+            <button class="type-pill-btn" data-type="Rock" style="--pill-color: #b45309;">ROCK</button>
+            <button class="type-pill-btn" data-type="Ghost" style="--pill-color: #7c3aed;">GHOST</button>
+            <button class="type-pill-btn" data-type="Dragon" style="--pill-color: #6366f1;">DRAGON</button>
+            <button class="type-pill-btn" data-type="Dark" style="--pill-color: #475569;">DARK</button>
+            <button class="type-pill-btn" data-type="Steel" style="--pill-color: #64748b;">STEEL</button>
+            <button class="type-pill-btn" data-type="Fairy" style="--pill-color: #f472b6;">FAIRY</button>
+          </div>
         </div>
       </div>
 
@@ -623,6 +634,6 @@
 
   <!-- Scripts -->
   <script src="type-tooltip.js"></script>
-  <script src="battle.js?v=2.5"></script>
+  <script src="battle.js?v=2.6"></script>
 </body>
 </html>

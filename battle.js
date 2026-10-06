@@ -2359,10 +2359,27 @@ function setupUI() {
     });
   });
 
+  // Type filter pills
+  document.querySelectorAll('#picker-type-pills .type-pill-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const selected = btn.dataset.type;
+      if (selected === 'ALL') {
+        pickerType = 'ALL';
+      } else {
+        pickerType = (pickerType === selected) ? 'ALL' : selected;
+      }
+      syncTypePillsUI();
+      const pickerTypeSelect = document.getElementById('picker-type-select');
+      if (pickerTypeSelect) pickerTypeSelect.value = pickerType;
+      renderPickerResults();
+    });
+  });
+
   const pickerTypeSelect = document.getElementById('picker-type-select');
   if (pickerTypeSelect) {
     pickerTypeSelect.addEventListener('change', (e) => {
       pickerType = e.target.value;
+      syncTypePillsUI();
       renderPickerResults();
     });
   }
@@ -2631,8 +2648,38 @@ function renderEditorModalBody() {
     `;
   }).join('');
 
-  // Tournament Moves pool for this Pokemon
-  const filteredMoves = (p.moves || []).filter(m => {
+  // Build complete move pool: top ladder moves first, then other learnable moves
+  const moveUsageMap = new Map((p.moves || []).map(m => [m.name, m.usage]));
+  const seenMoveNames = new Set();
+  const allAvailableMoves = [];
+
+  // Add top ladder moves
+  (p.moves || []).forEach(m => {
+    if (!seenMoveNames.has(m.name)) {
+      seenMoveNames.add(m.name);
+      allAvailableMoves.push({
+        name: m.name,
+        type: m.type,
+        usage: m.usage,
+        isTopMeta: true
+      });
+    }
+  });
+
+  // Add all other learnable moves
+  (p.learnable_moves || []).forEach(lm => {
+    if (!seenMoveNames.has(lm.name)) {
+      seenMoveNames.add(lm.name);
+      allAvailableMoves.push({
+        name: lm.name,
+        type: lm.type,
+        usage: null,
+        isTopMeta: false
+      });
+    }
+  });
+
+  const filteredMoves = allAvailableMoves.filter(m => {
     if (!editorMoveSearch) return true;
     return m.name.toLowerCase().includes(editorMoveSearch) || (m.type && m.type.toLowerCase().includes(editorMoveSearch));
   });
@@ -2643,13 +2690,14 @@ function renderEditorModalBody() {
     const cat = (md.category || 'status').toLowerCase();
     const catIcon = cat === 'physical' ? '⚔️' : (cat === 'special' ? '✨' : '🛡️');
     const isEquipped = activeMoves.includes(m.name);
+    const subLabel = m.isTopMeta ? `(${m.usage})` : (md.power ? `BP ${md.power}` : 'Status');
 
     return `
-      <button class="editor-chip ${isEquipped ? 'active' : ''}" onclick="setEnemyMove('${m.name}')" title="${m.name} (${moveType}) - ${cat}">
+      <button class="editor-chip ${isEquipped ? 'active' : ''} ${m.isTopMeta ? 'top-meta-chip' : ''}" onclick="setEnemyMove('${m.name}')" title="${m.name} (${moveType}) - ${cat}">
         <span class="slot-type-badge" style="background:${TYPE_COLORS[moveType] || '#666'}; padding:0.05rem 0.3rem; font-size:0.65rem;">${moveType}</span>
         <span><strong>${m.name}</strong></span>
         <span>${catIcon}</span>
-        <span class="editor-chip-sub">(${m.usage})</span>
+        <span class="editor-chip-sub">${subLabel}</span>
       </button>
     `;
   }).join('');
@@ -2855,9 +2903,15 @@ window.clearEnemyMove = clearEnemyMove;
 
 // Open Enemy Picker for a specific slot
 function openEnemyPicker(slotIdx) {
-  activeEnemyPickerSlot = slotIdx;
+  if (typeof slotIdx !== 'number' || slotIdx < 0 || slotIdx > 5) {
+    const emptyIdx = enemySlots.findIndex(s => !s || !s.pokemon);
+    activeEnemyPickerSlot = (emptyIdx >= 0) ? emptyIdx : 0;
+  } else {
+    activeEnemyPickerSlot = slotIdx;
+  }
+
   const slotNumSpan = document.getElementById('picker-target-slot-num');
-  if (slotNumSpan) slotNumSpan.textContent = slotIdx + 1;
+  if (slotNumSpan) slotNumSpan.textContent = activeEnemyPickerSlot + 1;
 
   // Clear previous search and filter state
   pickerSearch = '';
@@ -2871,14 +2925,94 @@ function openEnemyPicker(slotIdx) {
     if (b.dataset.tier === 'ALL') b.classList.add('active');
     else b.classList.remove('active');
   });
+  syncTypePillsUI();
 
   const modal = document.getElementById('modal-enemy-picker');
   if (modal) {
     showModal(modal);
+    renderPickerProgress();
     renderPickerResults();
   }
 }
 window.openEnemyPicker = openEnemyPicker;
+
+function syncTypePillsUI() {
+  const container = document.getElementById('picker-type-pills');
+  if (!container) return;
+  const isFiltered = (pickerType !== 'ALL');
+  container.classList.toggle('has-selection', isFiltered);
+  container.querySelectorAll('.type-pill-btn').forEach(btn => {
+    if (btn.dataset.type === pickerType) {
+      btn.classList.add('active');
+    } else {
+      btn.classList.remove('active');
+    }
+  });
+}
+window.syncTypePillsUI = syncTypePillsUI;
+
+// 6-Slot Roster Tracker in the Picker Modal
+function renderPickerProgress() {
+  const tracker = document.getElementById('picker-roster-tracker');
+  if (!tracker) return;
+
+  const filledCount = enemySlots.filter(s => s && s.pokemon).length;
+  const slotHtml = enemySlots.map((slot, idx) => {
+    const isTarget = (idx === activeEnemyPickerSlot);
+    const isFilled = Boolean(slot && slot.pokemon);
+    const p = isFilled ? slot.pokemon : null;
+    const spriteUrl = p ? getSpriteUrl(p.name) : '';
+
+    return `
+      <div class="picker-roster-chip ${isFilled ? 'filled' : 'empty'} ${isTarget ? 'is-target' : ''}" 
+           onclick="setPickerTargetSlot(${idx})" 
+           title="${isFilled ? `Slot ${idx + 1}: ${p.name} (Click to re-target)` : `Slot ${idx + 1}: Empty (Click to select)`}">
+        <span class="picker-chip-num">${idx + 1}</span>
+        ${isFilled ? `
+          <img src="${spriteUrl}" alt="${p.name}" class="picker-chip-sprite">
+          <span class="picker-chip-name">${p.name}</span>
+          <span class="picker-chip-check">✓</span>
+        ` : `
+          <span class="picker-chip-plus">+</span>
+          <span class="picker-chip-empty-lbl">Empty</span>
+        `}
+      </div>
+    `;
+  }).join('');
+
+  const targetLabel = activeEnemyPickerSlot < 6 ? `Slot ${activeEnemyPickerSlot + 1}` : 'Team full';
+
+  tracker.innerHTML = `
+    <div class="picker-roster-header">
+      <div class="picker-roster-meta">
+        <span class="picker-roster-status">Opponent Roster: <strong>${filledCount}/6</strong> Selected</span>
+        <span class="picker-roster-hint">${filledCount === 6 ? 'All 6 slots complete!' : `Adding to <strong>${targetLabel}</strong> · click card below to assign`}</span>
+      </div>
+      <button class="picker-roster-done-btn" onclick="hideEnemyPickerModal()" title="Done adding / Close modal">
+        ${filledCount === 6 ? '✓ Done' : '✕ Close'}
+      </button>
+    </div>
+    <div class="picker-roster-chips-row">
+      ${slotHtml}
+    </div>
+  `;
+}
+
+function setPickerTargetSlot(slotIdx) {
+  if (typeof slotIdx !== 'number' || slotIdx < 0 || slotIdx > 5) return;
+  activeEnemyPickerSlot = slotIdx;
+  const slotNumSpan = document.getElementById('picker-target-slot-num');
+  if (slotNumSpan) slotNumSpan.textContent = slotIdx + 1;
+  renderPickerProgress();
+  renderPickerResults();
+}
+window.setPickerTargetSlot = setPickerTargetSlot;
+
+function hideEnemyPickerModal() {
+  const modal = document.getElementById('modal-enemy-picker');
+  if (modal) hideModal(modal);
+}
+window.hideEnemyPickerModal = hideEnemyPickerModal;
 
 function removeEnemySlot(slotIdx) {
   enemySlots[slotIdx] = null;
@@ -2904,19 +3038,38 @@ function renderPickerResults() {
     return true;
   });
 
-  container.innerHTML = filtered.slice(0, 60).map(p => {
+  if (filtered.length === 0) {
+    container.innerHTML = `
+      <div style="grid-column: 1 / -1; padding: 3rem 1rem; text-align: center; color: var(--text-dim);">
+        <p style="font-size: 1.05rem; font-weight: 700; margin-bottom: 0.35rem;">No Pokémon found</p>
+        <p style="font-size: 0.85rem;">Try choosing another elemental type or clearing your search filter.</p>
+      </div>
+    `;
+    return;
+  }
+
+  container.innerHTML = filtered.slice(0, 75).map(p => {
     const safeName = p.name.replace(/'/g, "\\'");
+    const bst = (p.base_stats?.hp || 0) + (p.base_stats?.atk || 0) + (p.base_stats?.def || 0) + 
+                (p.base_stats?.spa || 0) + (p.base_stats?.spd || 0) + (p.base_stats?.spe || 0);
+    const tierClass = `tier-${(p.tier || 'A').toLowerCase()}`;
     return `
-    <div class="picker-poke-card" onclick="selectEnemyPokemon('${safeName}')">
-      <img src="${getSpriteUrl(p.name)}" alt="${p.name}" class="picker-sprite">
+    <div class="picker-poke-card" onclick="selectEnemyPokemon('${safeName}')" title="Assign ${p.name} to Enemy Slot ${activeEnemyPickerSlot + 1}">
+      <div class="picker-sprite-wrapper">
+        <img src="${getSpriteUrl(p.name)}" alt="${p.name}" class="picker-sprite" loading="lazy">
+      </div>
       <div class="picker-poke-meta">
         <span class="picker-name">${p.name}</span>
-        <div style="display:flex; gap:0.25rem;">
+        <div class="picker-poke-types">
           ${(p.types || []).map(t =>
             `<span class="slot-type-badge" style="background:${TYPE_COLORS[t] || '#666'}">${t}</span>`
           ).join('')}
         </div>
-        <span style="font-size:0.72rem; color:var(--text-dim);">Tier ${p.tier || 'A'} · Spe ${p.base_stats?.spe || 0}</span>
+        <div class="picker-poke-stats-sub">
+          <span class="picker-tier-tag ${tierClass}">Tier ${p.tier || 'A'}</span>
+          <span class="picker-spe-tag">Spe <strong>${p.base_stats?.spe || 0}</strong></span>
+          <span style="font-size: 0.7rem; color: var(--text-dim);">BST ${bst}</span>
+        </div>
       </div>
     </div>
   `;
@@ -2925,13 +3078,42 @@ function renderPickerResults() {
 
 function selectEnemyPokemon(pokemonName) {
   const p = pokemonDB.find(x => x.name.toLowerCase() === pokemonName.toLowerCase());
-  if (p) {
-    enemySlots[activeEnemyPickerSlot] = populateDefaultBuild(p);
-    enemyHash = encodeTeam(enemySlots);
+  if (!p) return;
+
+  const currentSlot = activeEnemyPickerSlot;
+  enemySlots[currentSlot] = populateDefaultBuild(p);
+  enemyHash = encodeTeam(enemySlots);
+  recalculateBattle();
+
+  // If search query was active, clear it for the next pick so user sees available roster again
+  if (pickerSearch) {
+    pickerSearch = '';
+    const searchInput = document.getElementById('picker-search-input');
+    if (searchInput) searchInput.value = '';
+    renderPickerResults();
+  }
+
+  // Find remaining empty slots
+  const emptyIndices = [];
+  for (let i = 0; i < 6; i++) {
+    if (!enemySlots[i] || !enemySlots[i].pokemon) {
+      emptyIndices.push(i);
+    }
+  }
+
+  if (emptyIndices.length === 0) {
+    // All 6 slots are complete!
     const modal = document.getElementById('modal-enemy-picker');
     if (modal) hideModal(modal);
-    recalculateBattle();
-    showToast(`Added ${p.name} to Enemy Team (Slot ${activeEnemyPickerSlot + 1})`);
+    showToast(`✓ Enemy Team complete! Added ${p.name} (Slot ${currentSlot + 1}/6)`);
+  } else {
+    // Keep modal open, advance to next empty slot
+    const nextSlot = emptyIndices[0];
+    activeEnemyPickerSlot = nextSlot;
+    const slotNumSpan = document.getElementById('picker-target-slot-num');
+    if (slotNumSpan) slotNumSpan.textContent = nextSlot + 1;
+    renderPickerProgress();
+    showToast(`Added ${p.name} (Slot ${currentSlot + 1}/6) · Next: pick Slot ${nextSlot + 1}`);
   }
 }
 window.selectEnemyPokemon = selectEnemyPokemon;
