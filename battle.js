@@ -1226,6 +1226,8 @@ function renderRankingsTab(matrix) {
     const keyTargets = [];
     const threats = [];
 
+    const ourDefTypes = getDefenderTypes(ourBuild);
+
     for (let j = 0; j < enemySlots.length; j++) {
       const enemyBuild = enemySlots[j];
       if (!enemyBuild || !enemyBuild.pokemon) continue;
@@ -1237,18 +1239,64 @@ function renderRankingsTab(matrix) {
 
       if (duel.rating >= 1) {
         wins++;
-        if (duel.rating === 2) {
-          keyTargets.push(enemyBuild.pokemon);
-        }
       } else if (duel.rating <= -1) {
         losses++;
-        if (duel.rating === -2) {
-          threats.push(enemyBuild.pokemon);
-        }
       } else {
         evens++;
       }
+
+      // Check our counter moves against enemyBuild (all 4x and 2x attacking moves, STAB + coverage)
+      const ourCounterMoves = (duel.movesAvsB || [])
+        .filter(m => m.power > 0 && m.eff >= 1.9)
+        .sort((a, b) => (b.eff - a.eff) || (b.power - a.power));
+
+      // Key Target qualification: we counter them (rating >= 1) or have 2x/4x moves
+      if (duel.rating >= 1 || ourCounterMoves.length > 0) {
+        const priority = (duel.rating >= 2 ? 10 : 0) + (ourCounterMoves.some(m => m.eff >= 3.9) ? 8 : 0) + (ourCounterMoves.length * 2) + duel.scoreA;
+        keyTargets.push({
+          pokemon: enemyBuild.pokemon,
+          enemyBuild,
+          duel,
+          counterMoves: ourCounterMoves,
+          priority
+        });
+      }
+
+      // Check enemy counter moves against ourBuild (all 4x and 2x moves)
+      const enemyCounterMoves = (duel.movesBvsA || [])
+        .filter(m => m.power > 0 && m.eff >= 1.9)
+        .sort((a, b) => (b.eff - a.eff) || (b.power - a.power));
+
+      // Check our weaknesses exploited by this enemy
+      const exploitedWeaknesses = [];
+      for (const t of ALL_TYPES) {
+        const mult = getTypeEffectiveness(t, ourDefTypes);
+        if (mult >= 1.9) {
+          const isEnemySTAB = (enemyBuild.pokemon.types || []).includes(t);
+          const isEnemyMove = (enemyBuild.moves || []).some(mName => (movesDB[mName] || {}).type === t);
+          if (isEnemySTAB || isEnemyMove) {
+            exploitedWeaknesses.push({ type: t, mult });
+          }
+        }
+      }
+      exploitedWeaknesses.sort((a, b) => b.mult - a.mult);
+
+      // Threat qualification: unfavorable matchup or enemy has 2x/4x moves or exploits weakness
+      if (duel.rating <= -1 || enemyCounterMoves.length > 0 || (exploitedWeaknesses.length > 0 && duel.rating < 1)) {
+        const priority = (duel.rating <= -2 ? 10 : 0) + (enemyCounterMoves.some(m => m.eff >= 3.9) ? 8 : 0) + (enemyCounterMoves.length * 2) - duel.scoreA;
+        threats.push({
+          pokemon: enemyBuild.pokemon,
+          enemyBuild,
+          duel,
+          counterMoves: enemyCounterMoves,
+          exploitedWeaknesses: exploitedWeaknesses.length > 0 ? exploitedWeaknesses : ALL_TYPES.map(t => ({ type: t, mult: getTypeEffectiveness(t, ourDefTypes) })).filter(w => w.mult >= 1.9).slice(0, 2),
+          priority
+        });
+      }
     }
+
+    keyTargets.sort((a, b) => b.priority - a.priority);
+    threats.sort((a, b) => b.priority - a.priority);
 
     // High speed & meta-counter bonus
     const spe = getEffectiveSpeed(ourBuild);
@@ -1277,11 +1325,9 @@ function renderRankingsTab(matrix) {
     leadCallout.innerHTML = `
       <img src="${getSpriteUrl(bestLead.build.pokemon.name)}" alt="${bestLead.build.pokemon.name}" class="lead-sprite">
       <div class="lead-info-wrap">
-        <span class="lead-tag">⭐ Recommended Opening Lead</span>
+        <span class="lead-tag">⭐ Recommended Lead</span>
         <span class="lead-name">${bestLead.build.pokemon.name}</span>
-        <span class="lead-reason">
-          High matchup win equity (${bestLead.wins} wins vs enemy 6). Threatens instant offensive tempo and forces defensive pivots.
-        </span>
+        <span class="lead-reason">${bestLead.wins} Wins vs Enemy · High Tempo Advantage</span>
       </div>
     `;
   }
@@ -1296,22 +1342,22 @@ function renderRankingsTab(matrix) {
     if (rank === 1) {
       rankBadge = '<span class="rank-number-badge badge-gold">🏆 #1 MVP Carry</span>';
       cardClass = 'rank-1-mvp';
-      tacticalRole = 'Primary Win Condition: Dominate early/mid game and clean up opposing cores.';
+      tacticalRole = 'Primary Win Condition · Early/Mid Game Sweeper';
     } else if (rank === 2) {
       rankBadge = '<span class="rank-number-badge badge-silver">🥈 #2 Core Wallbreaker</span>';
       cardClass = 'rank-2-core';
-      tacticalRole = 'Secondary Carry: High offensive threat to dismantle enemy defensive pivots.';
+      tacticalRole = 'Core Wallbreaker · Dismantles Defensive Pivots';
     } else if (rank === 3) {
       rankBadge = '<span class="rank-number-badge badge-bronze">🥉 #3 Key Anchor</span>';
       cardClass = 'rank-3-utility';
-      tacticalRole = 'Defensive Anchor / Strategic Utility: Absorbs hits and sets up favorable switches.';
+      tacticalRole = 'Key Anchor · Defensive Switch-In & Utility';
     } else if (rank <= 5) {
       rankBadge = `<span class="rank-number-badge badge-neutral">#${rank} Positional Check</span>`;
-      tacticalRole = 'Positional Check: Useful against specific threats; avoid staying in on unfavorable matchups.';
+      tacticalRole = 'Positional Check · Situational Threat Coverage';
     } else {
       rankBadge = `<span class="rank-number-badge badge-caution">⚠️ #${rank} Matchup Liability</span>`;
       cardClass = 'rank-caution';
-      tacticalRole = 'Matchup Liability: Enemy carries multiple direct counters. Consider benching in 3v3 singles.';
+      tacticalRole = 'Matchup Liability · Consider Benching in 3v3';
     }
 
     const totalMatchups = data.wins + data.evens + data.losses;
@@ -1320,22 +1366,67 @@ function renderRankingsTab(matrix) {
     const losePct = totalMatchups > 0 ? (data.losses / totalMatchups) * 100 : 0;
 
     const targetsHtml = data.keyTargets.length > 0
-      ? data.keyTargets.slice(0, 3).map(p => `
-          <span class="target-mini-pill" title="Counters ${p.name}">
-            <img src="${getSpriteUrl(p.name)}" class="target-mini-sprite" alt="">
-            <span>${p.name}</span>
-          </span>
-        `).join('')
-      : '<span style="font-size:0.75rem; color:var(--text-dim);">No hard 2x counters</span>';
+      ? `<div class="target-entries-list">` + data.keyTargets.slice(0, 3).map(target => {
+          const movesHtml = target.counterMoves.length > 0
+            ? target.counterMoves.map(m => `
+                <span class="move-badge ${m.eff >= 3.9 ? 'eff-4x' : 'eff-2x'}" title="${m.name} (${m.type}) — ${m.eff}× Effective">
+                  ${m.name} <strong>${m.eff}×</strong>
+                </span>
+              `).join('')
+            : `<span class="move-badge eff-1x" title="Neutral damage advantage">Neutral STAB <strong>1×</strong></span>`;
+
+          return `
+            <div class="target-entry-card">
+              <div class="target-entry-poke">
+                <img src="${getSpriteUrl(target.pokemon.name)}" class="target-mini-sprite" alt="">
+                <span class="target-poke-name">${target.pokemon.name}</span>
+              </div>
+              <div class="target-entry-moves">
+                ${movesHtml}
+              </div>
+            </div>
+          `;
+        }).join('') + `</div>`
+      : '<span style="font-size:0.75rem; color:var(--text-dim);">No hard counters</span>';
 
     const threatsHtml = data.threats.length > 0
-      ? data.threats.slice(0, 3).map(p => `
-          <span class="target-mini-pill" title="Vulnerable to ${p.name}">
-            <img src="${getSpriteUrl(p.name)}" class="target-mini-sprite" alt="">
-            <span>${p.name}</span>
-          </span>
-        `).join('')
-      : '<span style="font-size:0.75rem; color:#6ee7b7;">Clean slate (No hard threats)</span>';
+      ? `<div class="threat-entries-list">` + data.threats.slice(0, 3).map(threat => {
+          const counterMovesHtml = threat.counterMoves.length > 0
+            ? threat.counterMoves.map(m => `
+                <span class="threat-move-badge ${m.eff >= 3.9 ? 'eff-4x' : 'eff-2x'}" title="${m.name} (${m.type}) — ${m.eff}× Threat">
+                  ${m.name} <strong>${m.eff}×</strong>
+                </span>
+              `).join('')
+            : `<span class="threat-move-badge eff-1x">Stat Advantage</span>`;
+
+          const weaknessHtml = (threat.exploitedWeaknesses || []).slice(0, 2).map(w => `
+            <span class="weakness-pill" style="background:${TYPE_COLORS[w.type] || '#666'}" title="Weak to ${w.type} (${w.mult}×)">
+              ${w.type} <strong>${w.mult}×</strong>
+            </span>
+          `).join('');
+
+          return `
+            <div class="threat-entry-card">
+              <div class="threat-entry-header">
+                <img src="${getSpriteUrl(threat.pokemon.name)}" class="target-mini-sprite" alt="">
+                <span class="threat-entry-name">${threat.pokemon.name}</span>
+              </div>
+              <div class="threat-entry-details">
+                <div class="threat-detail-line">
+                  <span class="threat-detail-label">Counter Moves:</span>
+                  <div class="threat-chips-wrap">${counterMovesHtml}</div>
+                </div>
+                ${weaknessHtml ? `
+                  <div class="threat-detail-line">
+                    <span class="threat-detail-label">Key Weakness:</span>
+                    <div class="threat-chips-wrap">${weaknessHtml}</div>
+                  </div>
+                ` : ''}
+              </div>
+            </div>
+          `;
+        }).join('') + `</div>`
+      : '<span style="font-size:0.75rem; color:#6ee7b7;">✓ Clean slate (No hard threats)</span>';
 
     const prof = getCombatProfile(data.build);
 
@@ -1376,16 +1467,16 @@ function renderRankingsTab(matrix) {
         <div class="ranking-targets-threats">
           <div class="matchup-target-group">
             <span class="target-group-label text-win">🎯 Key Targets:</span>
-            <div class="target-icons-strip">${targetsHtml}</div>
+            ${targetsHtml}
           </div>
           <div class="matchup-target-group">
             <span class="target-group-label text-threat">⚠️ Threats to Avoid:</span>
-            <div class="target-icons-strip">${threatsHtml}</div>
+            ${threatsHtml}
           </div>
         </div>
 
         <div class="ranking-tactics-box">
-          <strong>Tactical Recommendation:</strong> ${tacticalRole}
+          <strong>Role:</strong> ${tacticalRole}
         </div>
       </div>
     `;
@@ -1469,14 +1560,14 @@ function renderMatrixTab(matrix) {
 }
 
 // =====================================================================
-// TAB 3: Type Coverage & Vulnerability (Requirement #4)
+// Merged Type Coverage (Offensive Coverage & Defensive Vulnerabilities)
 // =====================================================================
 
 function renderCoverageTab() {
   const filledOur = ourSlots.filter(Boolean);
   const filledEnemy = enemySlots.filter(Boolean);
 
-  // 1. Offensive Coverage vs Opponent
+  // 1. Offensive Threat Coverage vs Opponent
   const covList = document.getElementById('enemy-coverage-list');
   const blindspotsBox = document.getElementById('blindspots-warning-box');
   const covScorePill = document.getElementById('coverage-score-pill');
@@ -1489,18 +1580,29 @@ function renderCoverageTab() {
       const defTypes = getDefenderTypes(enemy);
       const weakTypes = getWeaknesses(defTypes);
 
-      // Find our team moves that hit these weaknesses
-      const hittingPokemon = [];
+      // Find which of our Pokémon have move advantage against this enemy
+      const advTeamMembers = [];
+
       for (const our of filledOur) {
+        const advMoves = [];
         for (const mName of our.moves || []) {
           const md = movesDB[mName];
-          if (md && weakTypes.includes(md.type) && !STATUS_MOVE_NAMES.has(mName)) {
-            hittingPokemon.push({ pokeName: our.pokemon.name, move: mName, type: md.type });
+          if (!md || STATUS_MOVE_NAMES.has(mName)) continue;
+          const eff = getTypeEffectiveness(md.type, defTypes);
+          if (eff >= 1.9) {
+            advMoves.push({ name: mName, type: md.type, eff });
           }
+        }
+        if (advMoves.length > 0) {
+          advMoves.sort((a, b) => b.eff - a.eff);
+          advTeamMembers.push({
+            pokemon: our.pokemon,
+            moves: advMoves
+          });
         }
       }
 
-      const isCovered = hittingPokemon.length > 0;
+      const isCovered = advTeamMembers.length > 0;
       if (isCovered) coveredCount++;
       else blindspots.push(enemy.pokemon.name);
 
@@ -1508,29 +1610,40 @@ function renderCoverageTab() {
         `<span class="slot-type-badge" style="background:${TYPE_COLORS[t] || '#666'}">${t}</span>`
       ).join('');
 
+      const advListHtml = isCovered
+        ? `<div class="cov-adv-list">` + advTeamMembers.map(item => `
+            <div class="cov-adv-row">
+              <div class="cov-our-actor">
+                <img src="${getSpriteUrl(item.pokemon.name)}" class="cov-mini-sprite" alt="">
+                <span>${item.pokemon.name}</span>
+              </div>
+              <div class="cov-moves-strip">
+                ${item.moves.map(m => `
+                  <span class="move-badge ${m.eff >= 3.9 ? 'eff-4x' : 'eff-2x'}" title="${m.name} (${m.type}) — ${m.eff}× Effective">
+                    ${m.name} <strong>${m.eff}×</strong>
+                  </span>
+                `).join('')}
+              </div>
+            </div>
+          `).join('') + `</div>`
+        : `<div class="cov-uncovered-badge">⚠️ Uncovered — No super-effective coverage moves on team</div>`;
+
       return `
-        <div class="coverage-item-row">
-          <div class="cov-poke-cell">
-            <img src="${getSpriteUrl(enemy.pokemon.name)}" alt="" class="cov-sprite">
-            <div>
-              <span class="cov-name">${enemy.pokemon.name}</span>
-              <div style="font-size:0.7rem; color:var(--text-dim);">${(enemy.pokemon.types || []).join('/')}</div>
+        <div class="cov-enemy-card">
+          <div class="cov-enemy-header">
+            <div class="cov-poke-identity">
+              <img src="${getSpriteUrl(enemy.pokemon.name)}" alt="" class="cov-sprite">
+              <div>
+                <span class="cov-name">${enemy.pokemon.name}</span>
+                <div style="font-size:0.7rem; color:var(--text-dim);">${(enemy.pokemon.types || []).join('/')}</div>
+              </div>
+            </div>
+            <div class="cov-weaknesses-strip">
+              <span style="font-size:0.68rem; color:var(--text-dim); margin-right:2px;">Weaknesses:</span>
+              ${weakBadges}
             </div>
           </div>
-          <div class="cov-weaknesses-cell">
-            ${weakBadges}
-          </div>
-          <div>
-            ${isCovered ? `
-              <span class="cov-check-badge cov-covered" title="${hittingPokemon.map(h => `${h.pokeName} (${h.move})`).join(', ')}">
-                ✓ Covered (${hittingPokemon.length} moves)
-              </span>
-            ` : `
-              <span class="cov-check-badge cov-blindspot">
-                ⚠️ Blindspot (No 2× STAB)
-              </span>
-            `}
-          </div>
+          ${advListHtml}
         </div>
       `;
     }).join('');
@@ -1545,8 +1658,7 @@ function renderCoverageTab() {
       blindspotsBox.className = 'blindspots-box has-blindspot';
       blindspotsBox.innerHTML = `
         <strong>⚠️ Offensive Blindspot Alert:</strong> 
-        Your team has no super-effective damaging moves against <strong>${blindspots.join(', ')}</strong>. 
-        Consider adjusting your team's coverage moves or bringing neutral high-BP wallbreakers.
+        Your team has no super-effective damaging moves against <strong>${blindspots.join(', ')}</strong>.
       `;
     } else {
       blindspotsBox.className = 'blindspots-box all-covered';
@@ -1557,83 +1669,108 @@ function renderCoverageTab() {
     }
   }
 
-  // 2. Defensive Exposure vs Opponent STABs & Moves
-  const threatsGrid = document.getElementById('enemy-threats-grid');
+  // 2. Defensive Vulnerabilities (Our Pokémon Weaknesses vs Enemy Team)
+  const vulnList = document.getElementById('our-vulnerabilities-list');
   const sharedWeakBox = document.getElementById('shared-weakness-box');
 
-  // Collect opponent attacking types
-  const enemyAtkTypes = new Set();
-  for (const enemy of filledEnemy) {
-    (enemy.pokemon.types || []).forEach(t => enemyAtkTypes.add(t));
-    (enemy.moves || []).forEach(mName => {
-      const md = movesDB[mName];
-      if (md && !STATUS_MOVE_NAMES.has(mName) && md.type) enemyAtkTypes.add(md.type);
-    });
-  }
+  const sharedWeaknessMap = {};
 
-  const sharedWeaknesses = [];
+  if (vulnList) {
+    vulnList.innerHTML = filledOur.map(our => {
+      const ourDefTypes = getDefenderTypes(our);
+      const enemyThreats = [];
 
-  if (threatsGrid) {
-    threatsGrid.innerHTML = Array.from(enemyAtkTypes).slice(0, 8).map(atkType => {
-      let weakCount = 0;
-      let resistCount = 0;
+      for (const enemy of filledEnemy) {
+        const threatMoves = [];
+        for (const mName of enemy.moves || []) {
+          const md = movesDB[mName];
+          if (!md || STATUS_MOVE_NAMES.has(mName)) continue;
+          const eff = getTypeEffectiveness(md.type, ourDefTypes);
+          if (eff >= 1.9) {
+            threatMoves.push({ name: mName, type: md.type, eff });
+          }
+        }
 
-      for (const our of filledOur) {
-        const mult = getTypeEffectiveness(atkType, getDefenderTypes(our));
-        if (mult >= 1.9) weakCount++;
-        else if (mult <= 0.51) resistCount++;
+        const stabWeaknesses = (enemy.pokemon.types || []).filter(t => getTypeEffectiveness(t, ourDefTypes) >= 1.9);
+
+        if (threatMoves.length > 0 || stabWeaknesses.length > 0) {
+          threatMoves.sort((a, b) => b.eff - a.eff);
+          enemyThreats.push({
+            enemy,
+            moves: threatMoves,
+            stabWeaknesses
+          });
+        }
       }
 
-      if (weakCount >= 3) {
-        sharedWeaknesses.push({ type: atkType, count: weakCount });
+      for (const t of ALL_TYPES) {
+        if (getTypeEffectiveness(t, ourDefTypes) >= 1.9) {
+          sharedWeaknessMap[t] = (sharedWeaknessMap[t] || 0) + 1;
+        }
       }
+
+      const threatListHtml = enemyThreats.length > 0
+        ? `<div class="cov-threats-list">` + enemyThreats.map(item => `
+            <div class="cov-threat-row">
+              <div class="cov-enemy-actor">
+                <img src="${getSpriteUrl(item.enemy.pokemon.name)}" class="cov-mini-sprite" alt="">
+                <span>${item.enemy.pokemon.name}</span>
+              </div>
+              <div class="cov-moves-strip">
+                ${item.moves.length > 0 ? item.moves.map(m => `
+                  <span class="threat-move-badge ${m.eff >= 3.9 ? 'eff-4x' : 'eff-2x'}" title="${m.name} (${m.type}) — ${m.eff}× Threat">
+                    ${m.name} <strong>${m.eff}×</strong>
+                  </span>
+                `).join('') : item.stabWeaknesses.map(t => `
+                  <span class="weakness-pill" style="background:${TYPE_COLORS[t] || '#666'}">${t} STAB</span>
+                `).join('')}
+              </div>
+            </div>
+          `).join('') + `</div>`
+        : `<div class="cov-clean-badge">✓ Clean Slate — No super-effective threats from enemy team</div>`;
 
       return `
-        <div class="coverage-item-row">
-          <div style="display:flex; align-items:center; gap:0.5rem;">
-            <span class="slot-type-badge" style="background:${TYPE_COLORS[atkType] || '#666'}">${atkType}</span>
-            <span style="font-size:0.78rem; color:var(--text-muted);">Incoming Type</span>
+        <div class="cov-vuln-card">
+          <div class="cov-vuln-header">
+            <div class="cov-poke-identity">
+              <img src="${getSpriteUrl(our.pokemon.name)}" alt="" class="cov-sprite">
+              <div>
+                <span class="cov-name">${our.pokemon.name}</span>
+                <div style="font-size:0.7rem; color:var(--text-dim);">${(our.pokemon.types || []).join('/')}</div>
+              </div>
+            </div>
+            <div style="font-size:0.75rem; color: ${enemyThreats.length > 0 ? '#fca5a5' : '#6ee7b7'}; font-weight:700;">
+              ${enemyThreats.length > 0 ? `⚠️ ${enemyThreats.length} Enemy Threats` : '🛡️ Safe Profile'}
+            </div>
           </div>
-          <div style="display:flex; gap:0.6rem; font-size:0.78rem;">
-            <span style="color:#6ee7b7;">🛡️ ${resistCount} Resists</span>
-            <span style="color:${weakCount >= 3 ? '#f87171; font-weight:700;' : '#cbd5e1;'}">⚠️ ${weakCount} Weak</span>
-          </div>
+          ${threatListHtml}
         </div>
       `;
     }).join('');
   }
 
+  // Shared weakness alert
   if (sharedWeakBox) {
-    if (sharedWeaknesses.length > 0) {
+    const criticalShared = Object.entries(sharedWeaknessMap)
+      .filter(([type, count]) => count >= 3 && filledEnemy.some(e => (e.pokemon.types || []).includes(type) || (e.moves || []).some(m => (movesDB[m] || {}).type === type)))
+      .map(([type, count]) => `${type} (${count} weak)`);
+
+    if (criticalShared.length > 0) {
+      sharedWeakBox.style.display = 'block';
+      sharedWeakBox.className = 'shared-weakness-box';
       sharedWeakBox.innerHTML = `
         <strong>⚠️ Critical Shared Weakness Warning:</strong> 
-        Your team has 3 or more Pokémon vulnerable to <strong>${sharedWeaknesses.map(s => `${s.type} (${s.count} weak)`).join(', ')}</strong>! 
+        Your team has 3 or more Pokémon vulnerable to <strong>${criticalShared.join(', ')}</strong>! 
         Beware of enemy Pokémon carrying these STABs or coverage moves.
       `;
     } else {
+      sharedWeakBox.style.display = 'block';
+      sharedWeakBox.className = 'shared-weakness-box';
       sharedWeakBox.innerHTML = `
         <strong>🛡️ Balanced Defensive Profile:</strong> 
-        No severe shared weaknesses detected. Your team handles the opponent's incoming offensive types with solid resistance dispersion.
+        No severe shared weaknesses against the opponent's active attack arsenal.
       `;
     }
-  }
-
-  // 3. 18 Types Weakness Distribution
-  const pillsRow = document.getElementById('types-weakness-pills-row');
-  if (pillsRow) {
-    pillsRow.innerHTML = ALL_TYPES.map(type => {
-      let count = 0;
-      for (const enemy of filledEnemy) {
-        const eff = getTypeEffectiveness(type, getDefenderTypes(enemy));
-        if (eff >= 1.9) count++;
-      }
-      return `
-        <div class="type-weak-pill" style="background:${TYPE_COLORS[type] || '#666'}">
-          <span>${type}</span>
-          <span class="type-weak-count">${count}</span>
-        </div>
-      `;
-    }).join('');
   }
 }
 
@@ -2004,92 +2141,7 @@ function renderSpeedTierTab() {
 // =====================================================================
 
 function renderTacticsTab(matrix, avgScore) {
-  const filledOur = ourSlots.filter(Boolean);
-  const filledEnemy = enemySlots.filter(Boolean);
-
-  // 1. Bring-3 Core
-  const bring3Content = document.getElementById('tactics-bring3-content');
-  if (bring3Content) {
-    // Pick top 3 from ranking
-    const scores = filledOur.map((our, idx) => {
-      let score = 0;
-      for (let j = 0; j < filledEnemy.length; j++) {
-        if (matrix[idx] && matrix[idx][j]) score += matrix[idx][j].scoreA;
-      }
-      return { our, score };
-    }).sort((a, b) => b.score - a.score);
-
-    const top3 = scores.slice(0, 3);
-    bring3Content.innerHTML = `
-      <p style="margin-bottom:0.75rem;">For Regulation M-C 3v3 Singles, your optimal 3-member roster is:</p>
-      <div style="display:flex; gap:0.75rem; flex-wrap:wrap; margin-bottom:0.75rem;">
-        ${top3.map(item => `
-          <div class="target-mini-pill" style="padding:0.4rem 0.75rem; font-size:0.85rem;">
-            <img src="${getSpriteUrl(item.our.pokemon.name)}" class="target-mini-sprite" alt="">
-            <span><strong>${item.our.pokemon.name}</strong></span>
-          </div>
-        `).join('')}
-      </div>
-      <p style="font-size:0.78rem; color:var(--text-muted);">
-        This combination provides complete type coverage, dual physical/special breakers, and the highest collective win rate.
-      </p>
-    `;
-  }
-
-  // 2. Turn 1 Lead Strategy
-  const leadContent = document.getElementById('tactics-lead-content');
-  if (leadContent) {
-    const fastestOur = [...filledOur].sort((a, b) => getEffectiveSpeed(b) - getEffectiveSpeed(a))[0];
-    leadContent.innerHTML = fastestOur ? `
-      <p>
-        Lead with <strong>${fastestOur.pokemon.name}</strong> (Spe ${getEffectiveSpeed(fastestOur)}). 
-        You outspeed the majority of their roster to establish early tempo and force defensive switching.
-      </p>
-    ` : '<p>Select team members to calculate lead strategy.</p>';
-  }
-
-  // 3. Primary Win Condition
-  const winconContent = document.getElementById('tactics-wincon-content');
-  if (winconContent) {
-    winconContent.innerHTML = `
-      <p>
-        Keep your #1 MVP healthy for the late game. 
-        Pave the way by using your defensive anchors to eliminate their key speed checks, then Tera to sweep.
-      </p>
-    `;
-  }
-
-  // 4. Opponent Threat
-  const threatContent = document.getElementById('tactics-threat-content');
-  if (threatContent) {
-    // Find enemy with highest damage output against our team
-    let worstEnemy = null;
-    let worstScore = 999;
-    for (let j = 0; j < filledEnemy.length; j++) {
-      let teamScoreAgainstEnemy = 0;
-      for (let i = 0; i < filledOur.length; i++) {
-        if (matrix[i] && matrix[i][j]) teamScoreAgainstEnemy += matrix[i][j].scoreA;
-      }
-      if (teamScoreAgainstEnemy < worstScore) {
-        worstScore = teamScoreAgainstEnemy;
-        worstEnemy = filledEnemy[j];
-      }
-    }
-
-    if (worstEnemy) {
-      threatContent.innerHTML = `
-        <div style="display:flex; align-items:center; gap:0.6rem; margin-bottom:0.5rem;">
-          <img src="${getSpriteUrl(worstEnemy.pokemon.name)}" alt="" style="width:36px; height:36px;">
-          <span style="font-weight:800; color:#f87171;">${worstEnemy.pokemon.name}</span>
-        </div>
-        <p style="font-size:0.8rem; color:#fecaca;">
-          Poses the highest individual threat to your roster. Do not allow it free turns or setup opportunities!
-        </p>
-      `;
-    } else {
-      threatContent.innerHTML = '<p>No critical runaway threats detected.</p>';
-    }
-  }
+  // LLM Battle Plan is rendered statically in the DOM and ready for future LLM backend wiring
 }
 
 function renderEmptyState() {

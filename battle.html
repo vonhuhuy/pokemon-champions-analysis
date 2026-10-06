@@ -7,7 +7,7 @@
   <meta name="description" content="Simulate competitive Pokémon 6v6 team battles. Analyzes head-to-head advantage, offensive type coverage, defensive exposure, speed tier ladder across 12 Pokémon, and ranks team member usefulness.">
   <link rel="stylesheet" href="index.css?v=2.8">
   <link rel="stylesheet" href="teambuilder.css?v=2.7">
-  <link rel="stylesheet" href="battle.css?v=2.6">
+  <link rel="stylesheet" href="battle.css?v=2.9">
 </head>
 <body>
 
@@ -173,10 +173,6 @@
           <span class="tab-icon">⚔️</span>
           <span class="tab-title">Head-to-Head Matrix</span>
         </button>
-        <button class="analysis-tab-btn" data-tab="coverage">
-          <span class="tab-icon">📊</span>
-          <span class="tab-title">Type Coverage</span>
-        </button>
         <button class="analysis-tab-btn" data-tab="speed">
           <span class="tab-icon">⚡</span>
           <span class="tab-title">Speed Tiers</span>
@@ -196,11 +192,7 @@
         <div class="battle-pane active" id="pane-rankings">
           <div class="pane-hero-intro">
             <div>
-              <h3 class="pane-title">🏆 Team Member Usefulness & Tactical Ranking</h3>
-              <p class="pane-desc">
-                Ranks all 6 members of your team based on their calculated composite effectiveness against this specific opposing lineup.
-                Considers matchup win-rate, key threat elimination, speed dominance, and defensive liability.
-              </p>
+              <h3 class="pane-title">🏆 Member Selection</h3>
             </div>
             <div id="recommended-lead-callout" class="lead-callout-card">
               <!-- Dynamically populated with recommended lead -->
@@ -213,16 +205,12 @@
         </div>
 
         <!-- ========================================================= -->
-        <!-- TAB 2: Head-to-Head 6x6 Matrix -->
+        <!-- TAB 2: Head-to-Head Matrix & Merged Type Coverage -->
         <!-- ========================================================= -->
         <div class="battle-pane" id="pane-matrix">
           <div class="pane-hero-intro">
             <div>
-              <h3 class="pane-title">⚔️ Head-to-Head 6×6 Matchup Advantage Matrix</h3>
-              <p class="pane-desc">
-                Direct pairing of every Pokémon on your team against each member of the opposing squad.
-                Click on any cell to open the <strong>Detailed Duel Breakdown</strong> with speed calculations, move-by-move multipliers, and stat matchups.
-              </p>
+              <h3 class="pane-title">⚔️ Head-to-Head Matrix</h3>
             </div>
             <div class="matrix-legend">
               <span class="legend-badge lg-win-plus">+2 Decisive Win</span>
@@ -239,79 +227,64 @@
               <!-- Rendered via JS -->
             </table>
           </div>
-        </div>
 
-        <!-- ========================================================= -->
-        <!-- TAB 3: Type Coverage & Vulnerability -->
-        <!-- ========================================================= -->
-        <div class="battle-pane" id="pane-coverage">
-          <div class="pane-hero-intro">
-            <div>
-              <h3 class="pane-title">📊 Elemental Type Coverage & Team Vulnerabilities</h3>
-              <p class="pane-desc">
-                Examines how thoroughly your team's damaging moves cover the enemy roster, identifies unchecked defensive blindspots, and checks for dangerous shared weaknesses against their offensive arsenal.
-              </p>
-            </div>
-          </div>
+          <!-- Merged Type Coverage Section -->
+          <div class="coverage-merged-section">
+            <div class="coverage-split-layout">
+              <!-- Left: Offensive Coverage against their 6 -->
+              <div class="coverage-box">
+                <div class="coverage-box-header">
+                  <h4>🎯 Offensive Threat Coverage (Our Moves vs Their Pokémon)</h4>
+                  <span class="badge-accent" id="coverage-score-pill">Coverage: 0 / 6</span>
+                </div>
+                
+                <div class="enemy-coverage-list" id="enemy-coverage-list">
+                  <!-- Dynamically populated with which of our Pokémon counter each enemy -->
+                </div>
 
-          <div class="coverage-split-layout">
-            <!-- Left: Offensive Coverage against their 6 -->
-            <div class="coverage-box">
-              <div class="coverage-box-header">
-                <h4>🎯 Offensive Threat Coverage (Our Moves vs Their Pokémon)</h4>
-                <span class="badge-accent" id="coverage-score-pill">Coverage: 0 / 6</span>
-              </div>
-              <p class="box-sub">Super-effective (2× / 4×) move availability for each enemy target:</p>
-              
-              <div class="enemy-coverage-list" id="enemy-coverage-list">
-                <!-- Dynamically populated -->
+                <!-- Blindspots Warning Box -->
+                <div id="blindspots-warning-box" class="blindspots-box">
+                  <!-- Dynamically populated -->
+                </div>
               </div>
 
-              <!-- Blindspots Warning Box -->
-              <div id="blindspots-warning-box" class="blindspots-box">
-                <!-- Dynamically populated -->
-              </div>
-            </div>
+              <!-- Right: Defensive Vulnerabilities (Our Pokémon Weaknesses vs Enemy Team) -->
+              <div class="coverage-box">
+                <div class="coverage-box-header">
+                  <h4>🛡️ Defensive Vulnerabilities (Our Pokémon Weaknesses vs Enemy Team)</h4>
+                  <span class="badge-accent" id="defensive-integrity-pill">Team Defense</span>
+                </div>
 
-            <!-- Right: Defensive Exposure vs Enemy STABs & Moves -->
-            <div class="coverage-box">
-              <div class="coverage-box-header">
-                <h4>🛡️ Defensive Exposure (Enemy Threats vs Our Team)</h4>
-                <span class="badge-accent">Defensive Integrity</span>
-              </div>
-              <p class="box-sub">Elemental attacking types carried by the enemy and how our team withstands them:</p>
+                <div class="our-vulnerabilities-list" id="our-vulnerabilities-list">
+                  <!-- Dynamically populated with our Pokémon and enemy threats -->
+                </div>
 
-              <div class="enemy-threats-grid" id="enemy-threats-grid">
-                <!-- Dynamically populated with type breakdown -->
+                <!-- Shared Team Weakness Alert Box -->
+                <div id="shared-weakness-box" class="shared-weakness-box">
+                  <!-- Dynamically populated -->
+                </div>
               </div>
-
-              <!-- Shared Team Weakness Alert Box -->
-              <div id="shared-weakness-box" class="shared-weakness-box">
-                <!-- Dynamically populated -->
-              </div>
-            </div>
-          </div>
-
-          <!-- All 18 Types Matrix Row -->
-          <div class="all-types-coverage-section">
-            <h4 class="sub-heading">🌐 Comprehensive 18-Type Enemy Weakness Distribution</h4>
-            <p class="sub-desc">Count of enemy Pokémon vulnerable to each elemental type:</p>
-            <div class="types-weakness-pills-row" id="types-weakness-pills-row">
-              <!-- 18 type pills rendered with count of enemy weaknesses -->
             </div>
           </div>
         </div>
 
         <!-- ========================================================= -->
-        <!-- TAB 4: Speed Tier Analysis across 12 Pokémon -->
+        <!-- TAB 3: Speed Tier Analysis across 12 Pokémon -->
         <!-- ========================================================= -->
         <div class="battle-pane" id="pane-speed">
           <div class="pane-hero-intro">
             <div>
-              <h3 class="pane-title">⚡ Speed Tier Ladder & Turn-Order Control</h3>
-              <p class="pane-desc">
-                Comprehensive speed hierarchy across all 12 Pokémon on the field. Analyzes exact Level 50 Speed stats factoring in Mega Evolutions, Choice Scarf (1.5×), nature modifiers, and common EV spreads to identify turn-order control and speed-tie coinflips.
-              </p>
+              <h3 class="pane-title">⚡ Speed Tiers</h3>
+            </div>
+          </div>
+
+          <!-- Head-to-Head Speed Matchup Breakdown Grid (Moved to the Top!) -->
+          <div class="speed-h2h-section">
+            <div class="speed-h2h-header">
+              <h4 class="sub-heading">⚔️ Our Team Outspeed Matrix vs Opponent Roster</h4>
+            </div>
+            <div class="speed-h2h-grid" id="speed-h2h-cards-grid">
+              <!-- Rendered via JS -->
             </div>
           </div>
 
@@ -320,7 +293,7 @@
             <div class="speed-kpi-card" id="kpi-speed-control">
               <span class="speed-kpi-label">Field Speed Control</span>
               <div class="speed-kpi-val" id="val-speed-control">—</div>
-              <span class="speed-kpi-sub" id="sub-speed-control">Analyzing turn orders...</span>
+              <span class="speed-kpi-sub" id="sub-speed-control">Turn Order Ratio</span>
             </div>
 
             <div class="speed-kpi-card" id="kpi-speed-fastest">
@@ -347,9 +320,8 @@
             <div class="spreads-summary-header">
               <div class="spreads-summary-title">
                 <span class="icon">📊</span>
-                <h4>EV Spread & Speed-Affecting Items Distribution (12 Pokémon)</h4>
+                <h4>EV Spreads & Items (12 Pokémon)</h4>
               </div>
-              <span class="spreads-summary-note">Counts based on active builds & meta database profiles</span>
             </div>
             <div class="spreads-distribution-grid" id="speed-spreads-distribution">
               <!-- Rendered via JS -->
@@ -361,7 +333,6 @@
             <div class="speed-ladder-header">
               <div class="speed-ladder-title-col">
                 <h4 class="sub-heading">🏁 12-Pokémon Turn-Order Ladder</h4>
-                <p class="speed-ladder-sub">Sorted descending by active Level 50 Speed stat. Visualizes exact brackets and outspeed margins.</p>
               </div>
               <div class="speed-ladder-legend">
                 <span class="legend-pill our"><span class="dot"></span> Our Team</span>
@@ -372,74 +343,46 @@
               <!-- Rendered via JS -->
             </div>
           </div>
-
-          <!-- Head-to-Head Speed Matchup Breakdown Grid -->
-          <div class="speed-h2h-section">
-            <div class="speed-h2h-header">
-              <h4 class="sub-heading">⚔️ Our Team Outspeed Matrix vs Opponent Roster</h4>
-              <p class="speed-h2h-sub">Breakdown of which enemy Pokémon each of your team members outspeeds, ties with, or is outsped by.</p>
-            </div>
-            <div class="speed-h2h-grid" id="speed-h2h-cards-grid">
-              <!-- Rendered via JS -->
-            </div>
-          </div>
         </div>
 
         <!-- ========================================================= -->
-        <!-- TAB 5: Tactical Battle Plan -->
+        <!-- TAB 4: Tactical Battle Plan (Ready for LLM Integration) -->
         <!-- ========================================================= -->
         <div class="battle-pane" id="pane-tactics">
           <div class="pane-hero-intro">
             <div>
-              <h3 class="pane-title">🎯 Tactical Matchup Strategy & Execution Plan</h3>
-              <p class="pane-desc">
-                Comprehensive match strategy synthesized from head-to-head simulations, speed brackets, and defensive pivot routes.
-              </p>
+              <h3 class="pane-title">🎯 Battle Plan</h3>
             </div>
           </div>
 
-          <div class="tactics-cards-grid">
-            <!-- Card 1: 3v3 Singles Bring-3 Selection -->
-            <div class="tactics-card">
-              <div class="tactics-card-head">
-                <span class="t-icon">🥇</span>
-                <h4>Recommended 3-Pokémon Core (Bring-3 Ranked)</h4>
+          <div class="llm-battle-plan-container">
+            <div class="llm-plan-card">
+              <div class="llm-plan-header">
+                <div class="llm-badge-wrap">
+                  <span class="llm-ai-badge">🤖 AI Battle Coach</span>
+                  <span class="llm-status-pill">LLM Integration Ready</span>
+                </div>
+                <h4>Turn-by-Turn Competitive Gameplan</h4>
               </div>
-              <div id="tactics-bring3-content" class="tactics-card-body">
-                <!-- Populated via JS -->
-              </div>
-            </div>
-
-            <!-- Card 2: Turn 1 Lead Strategy -->
-            <div class="tactics-card">
-              <div class="tactics-card-head">
-                <span class="t-icon">⚡</span>
-                <h4>Opening Lead & Turn 1 Gameplan</h4>
-              </div>
-              <div id="tactics-lead-content" class="tactics-card-body">
-                <!-- Populated via JS -->
-              </div>
-            </div>
-
-            <!-- Card 3: Priority Win Condition -->
-            <div class="tactics-card">
-              <div class="tactics-card-head">
-                <span class="t-icon">👑</span>
-                <h4>Primary Win Condition & Late Game</h4>
-              </div>
-              <div id="tactics-wincon-content" class="tactics-card-body">
-                <!-- Populated via JS -->
-              </div>
-            </div>
-
-            <!-- Card 4: Most Dangerous Enemy Sweeper -->
-            <div class="tactics-card">
-              <div class="tactics-card-head">
-                <span class="t-icon">🚨</span>
-                <h4>Enemy's Most Dangerous Threat</h4>
-              </div>
-              <div id="tactics-threat-content" class="tactics-card-body">
-                <!-- Populated via JS -->
+              <p class="llm-plan-desc">
+                Comprehensive match strategy powered by LLM reasoning. Evaluates dynamic team matchups, predict enemy pivots, and generates an optimized 3v3 singles gameplan.
+              </p>
+              <div class="llm-preview-grid">
+                <div class="llm-feature-box">
+                  <span class="feat-icon">⚡</span>
+                  <strong>Turn-1 Lead Prediction</strong>
+                  <span>Recommends opening moves based on opponent lead probability.</span>
+                </div>
+                <div class="llm-feature-box">
+                  <span class="feat-icon">🛡️</span>
+                  <strong>Pivot & Switch Routing</strong>
+                  <span>Calculates safest switch-ins to absorb expected enemy attacks.</span>
+                </div>
+                <div class="llm-feature-box">
+                  <span class="feat-icon">👑</span>
+                  <strong>Late-Game Win Condition</strong>
+                  <span>Tera timing and clean-up sequences to close out the match.</span>
+                </div>
               </div>
             </div>
           </div>
@@ -634,6 +577,6 @@
 
   <!-- Scripts -->
   <script src="type-tooltip.js"></script>
-  <script src="battle.js?v=2.6"></script>
+  <script src="battle.js?v=2.9"></script>
 </body>
 </html>
