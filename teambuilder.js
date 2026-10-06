@@ -775,12 +775,44 @@ function renderDrawerTabBody(slot) {
   const p = slot.pokemon;
 
   if (drawerActiveTab === 'moves') {
-    const list = p.moves || [];
+    // Build complete move pool: top meta ladder moves first (with usage %), then all other learnable moves
+    const seenMoveNames = new Set();
+    const list = [];
+
+    // 1. Top Meta Moves (carry usage stats like 69.2%)
+    (p.moves || []).forEach(m => {
+      if (!seenMoveNames.has(m.name)) {
+        seenMoveNames.add(m.name);
+        list.push({
+          name: m.name,
+          type: m.type,
+          usage: m.usage,
+          power: m.power,
+          isTopMeta: true
+        });
+      }
+    });
+
+    // 2. All other learnable moves from Pokémon's full learnset
+    (p.learnable_moves || []).forEach(lm => {
+      if (!seenMoveNames.has(lm.name)) {
+        seenMoveNames.add(lm.name);
+        list.push({
+          name: lm.name,
+          type: lm.type,
+          category: lm.category,
+          power: lm.power,
+          accuracy: lm.accuracy,
+          isTopMeta: false
+        });
+      }
+    });
+
     const filtered = list.filter(m => {
       if (!drawerSearchQuery) return true;
       const q = drawerSearchQuery;
       const db = movesDB[m.name] || {};
-      const c = (db.category || '').toLowerCase();
+      const c = (db.category || m.category || '').toLowerCase();
       return m.name.toLowerCase().includes(q) || 
              (m.type && m.type.toLowerCase().includes(q)) ||
              c.includes(q);
@@ -795,16 +827,18 @@ function renderDrawerTabBody(slot) {
       const mType = m.type || getMoveType(m.name, p);
       const typeBg = TYPE_COLORS[mType] || '#64748b';
       const dbInfo = movesDB[m.name] || {};
-      const power = dbInfo.power !== undefined ? dbInfo.power : (m.power || '—');
+      const power = dbInfo.power !== undefined ? dbInfo.power : (m.power !== undefined ? m.power : '—');
 
       let acc = '—';
       if (dbInfo.accuracy !== undefined && dbInfo.accuracy !== '—' && dbInfo.accuracy !== null && dbInfo.accuracy !== true) {
         acc = `${dbInfo.accuracy}%`;
+      } else if (m.accuracy !== undefined && m.accuracy !== '—' && m.accuracy !== null && m.accuracy !== true) {
+        acc = `${m.accuracy}%`;
       }
 
-      const desc = dbInfo.desc || '';
+      const desc = dbInfo.desc || (m.desc || '');
 
-      const rawCat = (dbInfo.category || '').toLowerCase();
+      const rawCat = (dbInfo.category || m.category || '').toLowerCase();
       let cat = 'status';
       if (rawCat === 'physical') {
         cat = 'physical';
@@ -827,7 +861,7 @@ function renderDrawerTabBody(slot) {
               <span class="slot-move-type" style="background: ${typeBg};">${mType}</span>
               <span class="slot-move-cat cat-${cat}">${catIcon} ${catLabel}</span>
               <span class="drawer-item-name">${m.name}</span>
-              <span class="drawer-item-usage">${m.usage || ''}</span>
+              ${m.usage ? `<span class="drawer-item-usage">${m.usage}</span>` : ''}
             </div>
             ${isEquipped ?
               `<button class="btn-drawer-action remove" onclick="drawerToggleMove('${m.name}')">Remove ✕</button>` :
@@ -851,9 +885,9 @@ function renderDrawerTabBody(slot) {
               <span class="stat-pill-num">${acc}</span>
               <span class="stat-pill-label">Accuracy</span>
             </div>
-            ${dbInfo.priority && dbInfo.priority > 0 ? `
+            ${(dbInfo.priority || m.priority) && (dbInfo.priority > 0 || m.priority > 0) ? `
               <div class="drawer-stat-pill" style="color: #38bdf8; border-color: rgba(56, 189, 248, 0.45); background: rgba(56, 189, 248, 0.15);">
-                <span class="stat-pill-num">+${dbInfo.priority}</span>
+                <span class="stat-pill-num">+${dbInfo.priority || m.priority}</span>
                 <span class="stat-pill-label">Priority</span>
               </div>
             ` : ''}
@@ -1938,8 +1972,12 @@ function buildCompetitiveMovesIndex() {
   if (!pokemonDB || pokemonDB.length === 0) return;
   const moveMap = new Map();
   pokemonDB.forEach(p => {
-    (p.moves || []).forEach(m => {
+    const seenForPoke = new Set();
+    const allMoves = [...(p.moves || []), ...(p.learnable_moves || [])];
+    allMoves.forEach(m => {
       const mName = m.name;
+      if (!mName || seenForPoke.has(mName)) return;
+      seenForPoke.add(mName);
       if (!moveMap.has(mName)) {
         const mType = m.type || getMoveType(mName, p);
         moveMap.set(mName, {
@@ -2011,14 +2049,17 @@ function filterPickerData() {
     }
 
     if (pickerMove) {
-      const hasMove = (p.moves || []).some(m => m.name.toLowerCase() === pickerMove.toLowerCase());
+      const pMoveLower = pickerMove.toLowerCase();
+      const hasMove = (p.moves || []).some(m => m.name.toLowerCase() === pMoveLower) ||
+                      (p.learnable_moves || []).some(m => m.name.toLowerCase() === pMoveLower);
       if (!hasMove) return false;
     }
 
     if (pickerSearch) {
       const q = pickerSearch.toLowerCase().trim();
       const matchName = p.name.toLowerCase().includes(q);
-      const matchMove = (p.moves || []).some(m => m.name.toLowerCase().includes(q));
+      const matchMove = (p.moves || []).some(m => m.name.toLowerCase() === q) ||
+                        (p.learnable_moves || []).some(m => m.name.toLowerCase() === q);
       const matchItem = (p.items || []).some(i => i.name.toLowerCase().includes(q));
       const matchAbility = (p.abilities || []).some(a => a.name.toLowerCase().includes(q));
       if (!matchName && !matchMove && !matchItem && !matchAbility) return false;
