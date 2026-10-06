@@ -1051,6 +1051,11 @@ function updateOverviewMeters(totalDuels, ourWins, ourSpeedEdges, equityPct, ene
   }
 
   // VS Center bar
+  const pctOur = document.getElementById('pct-chance-our');
+  const pctEnemy = document.getElementById('pct-chance-enemy');
+  if (pctOur) pctOur.textContent = `${equityPct}%`;
+  if (pctEnemy) pctEnemy.textContent = `${enemyEquityPct}%`;
+
   const meterRatio = document.getElementById('meter-ratio-text');
   if (meterRatio) meterRatio.textContent = `${equityPct}% / ${enemyEquityPct}%`;
 
@@ -1262,34 +1267,55 @@ function renderRankingsTab(matrix) {
         });
       }
 
-      // Check enemy counter moves against ourBuild (all 4x and 2x moves)
-      const enemyCounterMoves = (duel.movesBvsA || [])
-        .filter(m => m.power > 0 && m.eff >= 1.9)
-        .sort((a, b) => (b.eff - a.eff) || (b.power - a.power));
+      // Check all possible enemy counter moves against ourBuild (all 4x and 2x moves)
+      const enemyCounterMoves = [];
+      const seenThreatMoves = new Set();
 
-      // Check our weaknesses exploited by this enemy
-      const exploitedWeaknesses = [];
-      for (const t of ALL_TYPES) {
-        const mult = getTypeEffectiveness(t, ourDefTypes);
-        if (mult >= 1.9) {
-          const isEnemySTAB = (enemyBuild.pokemon.types || []).includes(t);
-          const isEnemyMove = (enemyBuild.moves || []).some(mName => (movesDB[mName] || {}).type === t);
-          if (isEnemySTAB || isEnemyMove) {
-            exploitedWeaknesses.push({ type: t, mult });
+      // 1. All damaging moves in enemyBuild.moves (equipped)
+      for (const mName of enemyBuild.moves || []) {
+        if (seenThreatMoves.has(mName)) continue;
+        const md = movesDB[mName];
+        if (!md || STATUS_MOVE_NAMES.has(mName) || (md.power || 0) === 0) continue;
+        const eff = getTypeEffectiveness(md.type, ourDefTypes);
+        if (eff >= 1.9) {
+          enemyCounterMoves.push({ name: mName, type: md.type, eff, power: md.power || 75 });
+          seenThreatMoves.add(mName);
+        }
+      }
+
+      // 2. Also check learnset / meta moves for this Pokémon
+      for (const mObj of enemyBuild.pokemon.moves || []) {
+        const mName = mObj.name;
+        if (seenThreatMoves.has(mName)) continue;
+        const md = movesDB[mName];
+        if (!md || STATUS_MOVE_NAMES.has(mName) || (md.power || 0) === 0) continue;
+        const eff = getTypeEffectiveness(md.type, ourDefTypes);
+        if (eff >= 1.9) {
+          enemyCounterMoves.push({ name: mName, type: md.type, eff, power: md.power || 75 });
+          seenThreatMoves.add(mName);
+        }
+      }
+
+      enemyCounterMoves.sort((a, b) => (b.eff - a.eff) || (b.power - a.power));
+
+      // 3. Fallback: if no 2x/4x attacking move, check STAB type weaknesses
+      if (enemyCounterMoves.length === 0) {
+        for (const stabType of enemyBuild.pokemon.types || []) {
+          const mult = getTypeEffectiveness(stabType, ourDefTypes);
+          if (mult >= 1.9) {
+            enemyCounterMoves.push({ name: `${stabType} STAB`, type: stabType, eff: mult, power: 80 });
           }
         }
       }
-      exploitedWeaknesses.sort((a, b) => b.mult - a.mult);
 
-      // Threat qualification: unfavorable matchup or enemy has 2x/4x moves or exploits weakness
-      if (duel.rating <= -1 || enemyCounterMoves.length > 0 || (exploitedWeaknesses.length > 0 && duel.rating < 1)) {
+      // Threat qualification: unfavorable matchup or enemy has 2x/4x moves
+      if (duel.rating <= -1 || enemyCounterMoves.length > 0) {
         const priority = (duel.rating <= -2 ? 10 : 0) + (enemyCounterMoves.some(m => m.eff >= 3.9) ? 8 : 0) + (enemyCounterMoves.length * 2) - duel.scoreA;
         threats.push({
           pokemon: enemyBuild.pokemon,
           enemyBuild,
           duel,
           counterMoves: enemyCounterMoves,
-          exploitedWeaknesses: exploitedWeaknesses.length > 0 ? exploitedWeaknesses : ALL_TYPES.map(t => ({ type: t, mult: getTypeEffectiveness(t, ourDefTypes) })).filter(w => w.mult >= 1.9).slice(0, 2),
           priority
         });
       }
@@ -1391,19 +1417,21 @@ function renderRankingsTab(matrix) {
 
     const threatsHtml = data.threats.length > 0
       ? `<div class="threat-entries-list">` + data.threats.slice(0, 3).map(threat => {
-          const counterMovesHtml = threat.counterMoves.length > 0
+          const movesListHtml = threat.counterMoves.length > 0
             ? threat.counterMoves.map(m => `
-                <span class="threat-move-badge ${m.eff >= 3.9 ? 'eff-4x' : 'eff-2x'}" title="${m.name} (${m.type}) — ${m.eff}× Threat">
-                  ${m.name} <strong>${m.eff}×</strong>
-                </span>
+                <div class="threat-move-row">
+                  <span class="slot-type-badge move-type-badge" style="background:${TYPE_COLORS[m.type] || '#666'}">${m.type}</span>
+                  <span class="threat-move-name">${m.name}</span>
+                  <span class="threat-eff-badge ${m.eff >= 3.9 ? 'eff-4x' : (m.eff >= 1.9 ? 'eff-2x' : 'eff-1x')}">${m.eff}×</span>
+                </div>
               `).join('')
-            : `<span class="threat-move-badge eff-1x">Stat Advantage</span>`;
-
-          const weaknessHtml = (threat.exploitedWeaknesses || []).slice(0, 2).map(w => `
-            <span class="weakness-pill" style="background:${TYPE_COLORS[w.type] || '#666'}" title="Weak to ${w.type} (${w.mult}×)">
-              ${w.type} <strong>${w.mult}×</strong>
-            </span>
-          `).join('');
+            : `
+                <div class="threat-move-row">
+                  <span class="slot-type-badge move-type-badge" style="background:#64748b;">Stat</span>
+                  <span class="threat-move-name">Stat Advantage</span>
+                  <span class="threat-eff-badge eff-1x">1×</span>
+                </div>
+              `;
 
           return `
             <div class="threat-entry-card">
@@ -1411,17 +1439,8 @@ function renderRankingsTab(matrix) {
                 <img src="${getSpriteUrl(threat.pokemon.name)}" class="target-mini-sprite" alt="">
                 <span class="threat-entry-name">${threat.pokemon.name}</span>
               </div>
-              <div class="threat-entry-details">
-                <div class="threat-detail-line">
-                  <span class="threat-detail-label">Counter Moves:</span>
-                  <div class="threat-chips-wrap">${counterMovesHtml}</div>
-                </div>
-                ${weaknessHtml ? `
-                  <div class="threat-detail-line">
-                    <span class="threat-detail-label">Key Weakness:</span>
-                    <div class="threat-chips-wrap">${weaknessHtml}</div>
-                  </div>
-                ` : ''}
+              <div class="threat-moves-list">
+                ${movesListHtml}
               </div>
             </div>
           `;
@@ -1470,7 +1489,7 @@ function renderRankingsTab(matrix) {
             ${targetsHtml}
           </div>
           <div class="matchup-target-group">
-            <span class="target-group-label text-threat">⚠️ Threats to Avoid:</span>
+            <span class="target-group-label text-threat">⚠️ Threat Moves:</span>
             ${threatsHtml}
           </div>
         </div>
@@ -2137,11 +2156,659 @@ function renderSpeedTierTab() {
 }
 
 // =====================================================================
-// TAB 5: Tactical Battle Plan
+// TAB 4: Tactical Battle Plan & Execution Matrix (AI & Heuristic Engine)
 // =====================================================================
 
+const GEMINI_CONFIG = {
+  getKey: () => localStorage.getItem('pokechamp_gemini_key') || '',
+  setKey: (key) => localStorage.setItem('pokechamp_gemini_key', key.trim()),
+  clearKey: () => localStorage.removeItem('pokechamp_gemini_key'),
+  getModel: () => localStorage.getItem('pokechamp_gemini_model') || 'gemini-3.1-flash-lite',
+  setModel: (m) => localStorage.setItem('pokechamp_gemini_model', m)
+};
+
+let battlePlanCache = {};
+let lastCalculatedMatrix = null;
+let lastCalculatedAvgScore = 0;
+
+function updateTacticsStatusBadge() {
+  const badgeDot = document.querySelector('#tactics-status-badge .status-indicator-dot');
+  const badgeText = document.getElementById('tactics-status-text');
+  if (!badgeText) return;
+
+  const key = GEMINI_CONFIG.getKey();
+  const model = GEMINI_CONFIG.getModel();
+  if (key) {
+    if (badgeDot) {
+      badgeDot.className = 'status-indicator-dot dot-online';
+    }
+    const shortModel = model.replace('gemini-', 'Gemini ');
+    badgeText.textContent = `AI Coach (${shortModel})`;
+  } else {
+    if (badgeDot) {
+      badgeDot.className = 'status-indicator-dot dot-offline';
+    }
+    badgeText.textContent = 'Heuristic Mode (No API Key)';
+  }
+}
+
 function renderTacticsTab(matrix, avgScore) {
-  // LLM Battle Plan is rendered statically in the DOM and ready for future LLM backend wiring
+  lastCalculatedMatrix = matrix;
+  lastCalculatedAvgScore = avgScore;
+  updateTacticsStatusBadge();
+
+  const filledOur = ourSlots.filter(Boolean);
+  const filledEnemy = enemySlots.filter(Boolean);
+
+  const promptEl = document.getElementById('tactics-initial-prompt');
+  const resultsEl = document.getElementById('tactics-results-container');
+  const loadingEl = document.getElementById('tactics-loading');
+
+  if (filledOur.length === 0 || filledEnemy.length === 0) {
+    if (promptEl) promptEl.style.display = 'flex';
+    if (resultsEl) resultsEl.style.display = 'none';
+    if (loadingEl) loadingEl.style.display = 'none';
+    return;
+  }
+
+  const cacheKey = `${ourHash}_${enemyHash}`;
+  if (battlePlanCache[cacheKey]) {
+    renderBattlePlanResults(battlePlanCache[cacheKey].plan, battlePlanCache[cacheKey].isGemini);
+  } else {
+    if (promptEl) promptEl.style.display = 'flex';
+    if (resultsEl) resultsEl.style.display = 'none';
+    if (loadingEl) loadingEl.style.display = 'none';
+  }
+}
+
+async function executeBattlePlanGeneration() {
+  const filledOur = ourSlots.filter(Boolean);
+  const filledEnemy = enemySlots.filter(Boolean);
+
+  if (filledOur.length === 0 || filledEnemy.length === 0) {
+    showToast('Please add Pokémon to both teams first');
+    return;
+  }
+
+  const promptEl = document.getElementById('tactics-initial-prompt');
+  const resultsEl = document.getElementById('tactics-results-container');
+  const loadingEl = document.getElementById('tactics-loading');
+  const stageTitle = document.getElementById('loading-stage-title');
+  const stageDesc = document.getElementById('loading-stage-desc');
+
+  if (promptEl) promptEl.style.display = 'none';
+  if (resultsEl) resultsEl.style.display = 'none';
+  if (loadingEl) loadingEl.style.display = 'flex';
+
+  const cacheKey = `${ourHash}_${enemyHash}`;
+  const apiKey = GEMINI_CONFIG.getKey();
+  const model = GEMINI_CONFIG.getModel();
+
+  // If user has saved a Gemini API Key, try calling Gemini directly
+  if (apiKey) {
+    if (stageTitle) stageTitle.textContent = `Consulting Gemini AI Coach (${model})...`;
+    if (stageDesc) stageDesc.textContent = 'Simulating turn orders, pivot paths, and counterplay strategies';
+
+    try {
+      const promptText = buildBattlePlanPrompt(ourSlots, enemySlots, lastCalculatedMatrix);
+      const aiResponse = await fetchGeminiBattlePlan(apiKey, model, promptText);
+      battlePlanCache[cacheKey] = { plan: aiResponse, isGemini: true };
+      renderBattlePlanResults(aiResponse, true);
+      showToast('Tactical Battle Plan synthesized via Gemini AI!');
+      return;
+    } catch (err) {
+      console.warn('Gemini API call failed, falling back to Heuristic Engine:', err);
+      showToast(`Gemini error: ${err.message}. Using Heuristic Engine.`);
+    }
+  }
+
+  // Fallback / Default: Instant deterministic heuristic engine
+  if (stageTitle) stageTitle.textContent = 'Running Deep Heuristic Battle Analysis...';
+  if (stageDesc) stageDesc.textContent = 'Evaluating speed brackets, damage thresholds, and pivot routes';
+
+  await new Promise(r => setTimeout(r, 350));
+  const heuristicPlan = generateHeuristicBattlePlan(ourSlots, enemySlots, lastCalculatedMatrix);
+  battlePlanCache[cacheKey] = { plan: heuristicPlan, isGemini: false };
+  renderBattlePlanResults(heuristicPlan, false);
+  showToast('Battle Plan synthesized via Heuristic Matchup Engine');
+}
+
+function buildBattlePlanPrompt(ourSlots, enemySlots, matrix) {
+  const formatSlot = (s) => {
+    if (!s || !s.pokemon) return null;
+    return {
+      name: s.pokemon.name,
+      types: s.pokemon.types,
+      item: s.item || 'Default Item',
+      ability: s.ability || 'Default Ability',
+      teraType: s.teraType || 'Default',
+      effectiveSpeed: getEffectiveSpeed(s),
+      topMoves: (s.moves || []).length > 0 ? s.moves : (s.pokemon.moves || []).slice(0, 4).map(m => m.name),
+      baseStats: s.pokemon.stats
+    };
+  };
+
+  const ourTeam = ourSlots.filter(Boolean).map(formatSlot);
+  const enemyTeam = enemySlots.filter(Boolean).map(formatSlot);
+
+  return `You are an elite competitive Pokémon Singles coach for Regulation M-C (3v3 Singles Bring-6-Pick-3).
+Analyze this matchup between OUR TEAM and the OPPONENT TEAM.
+
+OUR 6-POKÉMON SQUAD:
+${JSON.stringify(ourTeam, null, 2)}
+
+OPPONENT 6-POKÉMON SQUAD:
+${JSON.stringify(enemyTeam, null, 2)}
+
+Respond with STRICT JSON matching this exact structure:
+{
+  "rosterSelection": {
+    "recommendedCore": [
+      { "name": "Pokemon1", "role": "Lead / Wallbreaker / Defensive Pivot / Cleaner", "reason": "Specific competitive rationale why this Pokémon is essential in the 3v3 core." },
+      { "name": "Pokemon2", "role": "Lead / Wallbreaker / Defensive Pivot / Cleaner", "reason": "Specific competitive rationale." },
+      { "name": "Pokemon3", "role": "Lead / Wallbreaker / Defensive Pivot / Cleaner", "reason": "Specific competitive rationale." }
+    ],
+    "flexOption": {
+      "name": "Pokemon4",
+      "replaces": "PokemonFromCore",
+      "condition": "Specific enemy team preview cue when you must sub this in instead.",
+      "strategicBenefit": "Why this swap neutralizes their gameplan."
+    },
+    "benchLiabilities": [
+      { "name": "BenchedPokemon1", "reasonNotToPick": "Exact liabilities (e.g. severe defensive weaknesses vs enemy sweepers, outsped, or completely walled)." },
+      { "name": "BenchedPokemon2", "reasonNotToPick": "Exact liabilities." }
+    ]
+  },
+  "turn1Lead": {
+    "recommendedLead": "PokemonName",
+    "turn1Branches": [
+      { "opponentPossibleLead": "EnemyPokemonA", "recommendedMoveOrAction": "Exact move or switch action" },
+      { "opponentPossibleLead": "EnemyPokemonB", "recommendedMoveOrAction": "Exact move or switch action" }
+    ]
+  },
+  "winCondition": {
+    "primarySweeper": "PokemonName",
+    "teraTarget": "PokemonName (Recommended Tera Type)",
+    "executionSequence": "Step 1, Step 2, and Step 3 endgame sequence to close the match."
+  },
+  "enemyCounterplayMatrix": [
+    {
+      "enemyName": "EnemyPokemonName",
+      "dangerousMovesVsUs": ["Move1", "Move2"],
+      "ourBestCounter": "OurPokemonName",
+      "counterReason": "Why it counters (immunities, bulk, or outspeed OHKO)",
+      "recommendedPlay": "Precise switch-in route or attack execution"
+    }
+  ]
+}`;
+}
+
+async function fetchGeminiBattlePlan(apiKey, preferredModel, promptText) {
+  const modelCandidates = [
+    preferredModel,
+    'gemini-3.1-flash-lite',
+    'gemini-3.5-flash',
+    'gemini-3.6-flash',
+    'gemini-3.8-flash'
+  ];
+  const modelsToTry = [...new Set(modelCandidates)];
+
+  let lastError = null;
+  for (const model of modelsToTry) {
+    try {
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent?key=${encodeURIComponent(apiKey)}`;
+      const resp = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: promptText }] }],
+          systemInstruction: {
+            parts: [{
+              text: "You are an elite competitive Pokémon Singles coach for Regulation M-C (3v3 Bring 6 Pick 3). Respond ONLY in valid, strictly formatted JSON matching the specified schema."
+            }]
+          },
+          generationConfig: {
+            responseMimeType: "application/json",
+            temperature: 0.3
+          }
+        })
+      });
+
+      if (!resp.ok) {
+        const errorBody = await resp.json().catch(() => ({}));
+        const msg = errorBody.error?.message || `HTTP ${resp.status} ${resp.statusText}`;
+        lastError = new Error(msg);
+        console.warn(`Model ${model} returned: ${msg}. Attempting failover...`);
+        continue;
+      }
+
+      const data = await resp.json();
+      const rawText = data.candidates?.[0]?.content?.parts?.[0]?.text;
+      if (!rawText) continue;
+
+      const cleanJson = rawText.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+      return JSON.parse(cleanJson);
+    } catch (err) {
+      lastError = err;
+      console.warn(`Model ${model} attempt failed:`, err);
+    }
+  }
+
+  throw lastError || new Error('All supported Gemini models failed to respond.');
+}
+
+function generateHeuristicBattlePlan(ourSlots, enemySlots, matrix) {
+  const filledOur = ourSlots.filter(Boolean);
+  const filledEnemy = enemySlots.filter(Boolean);
+
+  // 1. Calculate cumulative advantage score for each our Pokémon
+  const scoredOur = filledOur.map((our, ourIdx) => {
+    let scoreSum = 0;
+    let favorableMatches = 0;
+    let worstMatchScore = 999;
+    let worstEnemy = null;
+
+    for (let enemyIdx = 0; enemyIdx < filledEnemy.length; enemyIdx++) {
+      const duel = matrix?.[ourIdx]?.[enemyIdx];
+      if (duel) {
+        scoreSum += duel.scoreA;
+        if (duel.scoreA > 0.5) favorableMatches++;
+        if (duel.scoreA < worstMatchScore) {
+          worstMatchScore = duel.scoreA;
+          worstEnemy = filledEnemy[enemyIdx];
+        }
+      }
+    }
+
+    const effSpeed = getEffectiveSpeed(our);
+    const bulk = (our.pokemon.stats?.hp || 80) + (our.pokemon.stats?.def || 80) + (our.pokemon.stats?.spd || 80);
+    const offense = Math.max(our.pokemon.stats?.atk || 80, our.pokemon.stats?.spa || 80);
+
+    return {
+      our,
+      ourIdx,
+      scoreSum,
+      favorableMatches,
+      worstMatchScore,
+      worstEnemy,
+      effSpeed,
+      bulk,
+      offense
+    };
+  }).sort((a, b) => b.scoreSum - a.scoreSum);
+
+  // Pick top 3 for core
+  const topCoreItems = scoredOur.slice(0, 3);
+  const corePokes = topCoreItems.map(item => item.our.pokemon.name);
+
+  // Assign roles
+  const coreSortedBySpeed = [...topCoreItems].sort((a, b) => b.effSpeed - a.effSpeed);
+  const coreLead = coreSortedBySpeed[0];
+  const remainingCore = topCoreItems.filter(x => x !== coreLead);
+  const corePivot = remainingCore.sort((a, b) => b.bulk - a.bulk)[0] || remainingCore[0];
+  const coreCleaner = topCoreItems.find(x => x !== coreLead && x !== corePivot) || topCoreItems[1] || topCoreItems[0];
+
+  const recommendedCore = [
+    {
+      name: coreLead.our.pokemon.name,
+      role: 'Lead / Tempo Setter',
+      reason: `Effective Speed ${coreLead.effSpeed} outpaces early threats to seize Turn 1 initiative and dictate match momentum.`
+    },
+    {
+      name: corePivot.our.pokemon.name,
+      role: 'Defensive Pivot',
+      reason: `Superior defensive bulk and resistances provide safe switch-ins to absorb opponent wallbreakers.`
+    },
+    {
+      name: coreCleaner.our.pokemon.name,
+      role: 'Win-Con Cleaner',
+      reason: `High offensive pressure (${coreCleaner.offense} peak stat) enables decisive late-game sweeping once checks are weakened.`
+    }
+  ];
+
+  // 4th Flex Option (4th highest score on team)
+  let flexOption = null;
+  if (scoredOur.length >= 4) {
+    const flexItem = scoredOur[3];
+    // Find enemy Pokémon that poses the biggest risk to our core
+    let threatToCore = null;
+    let worstCoreScore = 999;
+    filledEnemy.forEach((enm, enmIdx) => {
+      let coreSum = 0;
+      topCoreItems.forEach(ci => {
+        coreSum += (matrix?.[ci.ourIdx]?.[enmIdx]?.scoreA || 0);
+      });
+      if (coreSum < worstCoreScore) {
+        worstCoreScore = coreSum;
+        threatToCore = enm;
+      }
+    });
+
+    const replacesPoke = topCoreItems[2] ? topCoreItems[2].our.pokemon.name : topCoreItems[0].our.pokemon.name;
+    const enemyName = threatToCore ? threatToCore.pokemon.name : (filledEnemy[0]?.pokemon?.name || 'an opponent sweeper');
+
+    flexOption = {
+      name: flexItem.our.pokemon.name,
+      replaces: replacesPoke,
+      condition: `If opponent shows ${enemyName} or heavy physical setup in Team Preview.`,
+      strategicBenefit: `Provides targeted typing coverage and a dedicated counter to neutralize ${enemyName} without compromising team balance.`
+    };
+  }
+
+  // Bench Liabilities (5th and 6th members)
+  const benchLiabilities = scoredOur.slice(3 + (flexOption ? 1 : 0)).map(bItem => {
+    const worstEnmName = bItem.worstEnemy ? bItem.worstEnemy.pokemon.name : 'the opposing core';
+    return {
+      name: bItem.our.pokemon.name,
+      reasonNotToPick: `Severe defensive exposure against ${worstEnmName} (${bItem.worstMatchScore.toFixed(1)} duel score) and unfavorable speed tiering leaves it vulnerable to being trapped or KO'd.`
+    };
+  });
+
+  // Turn 1 Lead Strategy
+  const fastestEnemy = [...filledEnemy].sort((a, b) => getEffectiveSpeed(b) - getEffectiveSpeed(a))[0];
+  const secondFastestEnemy = filledEnemy.length > 1 ? [...filledEnemy].sort((a, b) => getEffectiveSpeed(b) - getEffectiveSpeed(a))[1] : null;
+
+  const leadName = coreLead.our.pokemon.name;
+  const turn1Branches = [];
+
+  if (fastestEnemy) {
+    const leadFaster = coreLead.effSpeed >= getEffectiveSpeed(fastestEnemy);
+    turn1Branches.push({
+      opponentPossibleLead: fastestEnemy.pokemon.name,
+      recommendedMoveOrAction: leadFaster
+        ? `Outspeeds (${coreLead.effSpeed} vs ${getEffectiveSpeed(fastestEnemy)}). Fire off immediate STAB attack to force early Terastallization or an emergency switch.`
+        : `Outsped by ${fastestEnemy.pokemon.name}. Hard switch into ${corePivot.our.pokemon.name} to absorb their opening attack safely.`
+    });
+  }
+
+  if (secondFastestEnemy) {
+    turn1Branches.push({
+      opponentPossibleLead: secondFastestEnemy.pokemon.name,
+      recommendedMoveOrAction: `Deploy STAB coverage or hazard control; preserve ${leadName}'s HP for late-game pivot duties.`
+    });
+  }
+
+  // Primary Win Condition
+  const sweeperItem = coreCleaner;
+  const winCondition = {
+    primarySweeper: sweeperItem.our.pokemon.name,
+    teraTarget: `${sweeperItem.our.pokemon.name} (${sweeperItem.our.teraType || 'Tera ' + sweeperItem.our.pokemon.types[0]})`,
+    executionSequence: `1. Lead with ${leadName} to scout opponent sets. 2. Pivot through ${corePivot.our.pokemon.name} to chip down their primary speed check. 3. Bring in ${sweeperItem.our.pokemon.name}, Terastallize to flip defensive matchups, and clean up the final 2 Pokémon.`
+  };
+
+  // Enemy Counterplay Matrix for each enemy Pokémon
+  const enemyCounterplayMatrix = filledEnemy.map((enemy, enmIdx) => {
+    const eName = enemy.pokemon.name;
+    const eTypes = enemy.pokemon.types || [];
+    const eMoves = (enemy.moves && enemy.moves.length > 0)
+      ? enemy.moves
+      : (enemy.pokemon.moves || []).slice(0, 4).map(m => m.name);
+
+    // Filter dangerous moves that hit our team super effectively
+    const dangerousMoves = [];
+    eMoves.forEach(mName => {
+      const md = movesDB[mName];
+      if (md && md.type) {
+        const hitsHard = filledOur.some(our => {
+          const mult = (TYPE_CHART[md.type] && TYPE_CHART[md.type][our.pokemon.types[0]]) || 1;
+          return mult >= 2;
+        });
+        if (hitsHard || md.power >= 90) dangerousMoves.push(mName);
+      }
+    });
+
+    const displayDangerous = dangerousMoves.length > 0 ? dangerousMoves.slice(0, 3) : eMoves.slice(0, 2);
+
+    // Find our best counter via matrix
+    let bestOurItem = null;
+    let bestScore = -999;
+    filledOur.forEach((our, ourIdx) => {
+      const duel = matrix?.[ourIdx]?.[enmIdx];
+      if (duel && duel.scoreA > bestScore) {
+        bestScore = duel.scoreA;
+        bestOurItem = our;
+      }
+    });
+
+    const counterName = bestOurItem ? bestOurItem.pokemon.name : coreLead.our.pokemon.name;
+    const duelDetails = bestOurItem ? matrix?.[filledOur.indexOf(bestOurItem)]?.[enmIdx] : null;
+
+    let counterReason = 'Favorable type resistances and higher damage output';
+    if (duelDetails) {
+      if (duelDetails.fasterA) counterReason = `Outspeeds (${duelDetails.speA} vs ${duelDetails.speB}) with super-effective coverage`;
+      else if (duelDetails.scoreA >= 2) counterReason = `Hard walls ${eName}'s STABs with complete defensive immunity/resistance`;
+      else counterReason = `Absorbs offensive hits and hits ${eName} for substantial return damage`;
+    }
+
+    return {
+      enemyName: eName,
+      dangerousMovesVsUs: displayDangerous,
+      ourBestCounter: counterName,
+      counterReason,
+      recommendedPlay: `Safe switch into ${counterName} on predicted offensive move, then punish with STAB attacks.`
+    };
+  });
+
+  return {
+    rosterSelection: {
+      recommendedCore,
+      flexOption,
+      benchLiabilities
+    },
+    turn1Lead: {
+      recommendedLead: leadName,
+      turn1Branches
+    },
+    winCondition,
+    enemyCounterplayMatrix
+  };
+}
+
+function renderBattlePlanResults(plan, isGemini) {
+  const promptEl = document.getElementById('tactics-initial-prompt');
+  const loadingEl = document.getElementById('tactics-loading');
+  const resultsEl = document.getElementById('tactics-results-container');
+
+  if (promptEl) promptEl.style.display = 'none';
+  if (loadingEl) loadingEl.style.display = 'none';
+  if (!resultsEl) return;
+
+  resultsEl.style.display = 'flex';
+
+  const roleClassMap = {
+    'Lead / Tempo Setter': 'role-lead',
+    'Defensive Pivot': 'role-pivot',
+    'Win-Con Cleaner': 'role-cleaner',
+    'Wallbreaker': 'role-breaker'
+  };
+
+  const getRoleBadge = (role) => {
+    let cls = 'role-pivot';
+    if (role.toLowerCase().includes('lead')) cls = 'role-lead';
+    else if (role.toLowerCase().includes('cleaner') || role.toLowerCase().includes('sweeper')) cls = 'role-cleaner';
+    else if (role.toLowerCase().includes('breaker')) cls = 'role-breaker';
+    return `<span class="core-role-tag ${cls}">${role}</span>`;
+  };
+
+  const coreList = plan.rosterSelection?.recommendedCore || [];
+  const flexOpt = plan.rosterSelection?.flexOption;
+  const benchList = plan.rosterSelection?.benchLiabilities || [];
+  const turn1 = plan.turn1Lead || {};
+  const wincon = plan.winCondition || {};
+  const threats = plan.enemyCounterplayMatrix || [];
+
+  resultsEl.innerHTML = `
+    <!-- SECTION 1: 3v3 LINEUP SELECTION -->
+    <div class="tactics-section-block">
+      <div class="tactics-section-title">
+        <span>🥇 3v3 Lineup Selection & Roster Directives</span>
+        <span class="sec-badge">${isGemini ? '🤖 Gemini Reasoned' : '⚡ Heuristic Evaluated'}</span>
+      </div>
+
+      <!-- Recommended 3-Pokémon Core -->
+      <div class="core-roster-grid">
+        ${coreList.map((item, idx) => `
+          <div class="core-poke-card">
+            <span class="core-card-rank-badge">Core Slot #${idx + 1}</span>
+            <div class="core-card-header">
+              <img src="${getSpriteUrl(item.name)}" alt="${item.name}" class="core-poke-sprite" onerror="this.style.opacity='0.4'">
+              <div class="core-poke-info">
+                <span class="core-poke-name">${item.name}</span>
+                ${getRoleBadge(item.role || 'Battler')}
+              </div>
+            </div>
+            <div class="core-poke-reason">${item.reason}</div>
+          </div>
+        `).join('')}
+      </div>
+
+      <!-- 4th Compelling Option (Flex Pick) -->
+      ${flexOpt ? `
+        <div class="tactics-flex-card">
+          <div class="flex-card-head">
+            <div class="flex-title-group">
+              <span class="flex-pill-badge">🔄 4th Compelling Option (Flex Pick)</span>
+              <span class="flex-replace-target">Sub in to replace <strong>${flexOpt.replaces}</strong></span>
+            </div>
+          </div>
+          <div class="flex-card-body">
+            <div class="flex-poke-preview">
+              <img src="${getSpriteUrl(flexOpt.name)}" alt="${flexOpt.name}" onerror="this.style.opacity='0.4'">
+              <span>${flexOpt.name}</span>
+            </div>
+            <div class="flex-text-details">
+              <div class="flex-condition-box">
+                <strong>Enemy Team Preview Cue:</strong> ${flexOpt.condition}
+              </div>
+              <p style="font-size:0.84rem; color:#cbd5e1; margin:0; line-height:1.45;">
+                <strong>Strategic Upside:</strong> ${flexOpt.strategicBenefit}
+              </p>
+            </div>
+          </div>
+        </div>
+      ` : ''}
+
+      <!-- Bench Liabilities -->
+      ${benchList.length > 0 ? `
+        <div>
+          <h5 style="font-size:0.86rem; color:#fb7185; margin:0.5rem 0 0.5rem 0; font-weight:800;">
+            ⛔ Bench Liabilities (Why NOT to bring remaining team members)
+          </h5>
+          <div class="bench-grid">
+            ${benchList.map(item => `
+              <div class="bench-card">
+                <img src="${getSpriteUrl(item.name)}" alt="${item.name}" class="bench-poke-sprite" onerror="this.style.opacity='0.4'">
+                <div class="bench-content">
+                  <div class="bench-header-line">
+                    <span class="bench-poke-name">${item.name}</span>
+                    <span class="bench-warning-pill">Do Not Pick</span>
+                  </div>
+                  <p class="bench-reason">${item.reasonNotToPick}</p>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      ` : ''}
+    </div>
+
+    <!-- SECTION 2: TACTICAL EXECUTION & TURN 1 GAMEPLAN -->
+    <div class="tactics-section-block">
+      <div class="tactics-section-title">
+        <span>⚡ Tactical Execution & Gameplan</span>
+      </div>
+
+      <div class="tactics-exec-grid">
+        <!-- Turn 1 Opening Lead Tree -->
+        <div class="exec-card">
+          <div class="exec-card-head">
+            <span>⚡ Opening Lead & Turn 1 Decision Tree</span>
+          </div>
+          <div class="lead-poke-callout">
+            <img src="${getSpriteUrl(turn1.recommendedLead)}" alt="${turn1.recommendedLead}" class="lead-poke-sprite" onerror="this.style.opacity='0.4'">
+            <div class="lead-poke-info">
+              <strong>Recommended Lead: ${turn1.recommendedLead}</strong>
+              <span>Establish early tempo and scout opponent strategy</span>
+            </div>
+          </div>
+          <div class="lead-branches-list">
+            ${(turn1.turn1Branches || []).map(b => `
+              <div class="lead-branch-item">
+                <span>If opponent leads <strong>${b.opponentPossibleLead}</strong>:</span>
+                <p style="margin:0.25rem 0 0 0; color:#e2e8f0;">${b.recommendedMoveOrAction}</p>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+
+        <!-- Primary Win Condition -->
+        <div class="exec-card">
+          <div class="exec-card-head">
+            <span>👑 Primary Win Condition & Late Game</span>
+          </div>
+          <div class="wincon-box">
+            <div class="wincon-sweeper-row">
+              <span class="wincon-sweeper-name">Ace Sweeper: ${wincon.primarySweeper}</span>
+              <span class="wincon-tera-badge">✨ ${wincon.teraTarget}</span>
+            </div>
+            <p class="wincon-sequence-text">${wincon.executionSequence}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION 3: ENEMY THREAT & COUNTERPLAY MATRIX -->
+    <div class="tactics-section-block">
+      <div class="tactics-section-title">
+        <span>🥊 Enemy Threat & Targeted Counterplay Matrix</span>
+        <span class="sec-badge">${threats.length} Opponent Matchups</span>
+      </div>
+
+      <div class="enemy-threats-grid">
+        ${threats.map(t => {
+          const enemyObj = enemySlots.filter(Boolean).find(s => s.pokemon.name === t.enemyName);
+          const enemyTypes = enemyObj ? enemyObj.pokemon.types : [];
+          const enemySpeed = enemyObj ? getEffectiveSpeed(enemyObj) : '—';
+
+          return `
+            <div class="threat-card">
+              <div class="threat-card-head">
+                <div class="threat-poke-main">
+                  <img src="${getSpriteUrl(t.enemyName)}" alt="${t.enemyName}" class="threat-poke-sprite" onerror="this.style.opacity='0.4'">
+                  <div class="threat-poke-meta">
+                    <span class="threat-poke-name">${t.enemyName}</span>
+                    <div class="threat-poke-types">
+                      ${enemyTypes.map(typ => `<span class="slot-type-badge" style="background:${TYPE_COLORS[typ] || '#666'}; font-size:0.68rem; padding:0.1rem 0.4rem;">${typ}</span>`).join('')}
+                    </div>
+                  </div>
+                </div>
+                <span class="threat-speed-chip">Spe ${enemySpeed}</span>
+              </div>
+
+              <div class="threat-moves-block">
+                <span class="threat-block-label">⚠️ Dangerous Moves vs Our Squad:</span>
+                <div class="threat-moves-chips">
+                  ${(t.dangerousMovesVsUs || []).map(m => `<span class="threat-move-chip">${m}</span>`).join('')}
+                </div>
+              </div>
+
+              <div class="threat-counter-block">
+                <div class="counter-header-row">
+                  <div class="counter-poke-target">
+                    <img src="${getSpriteUrl(t.ourBestCounter)}" alt="${t.ourBestCounter}" onerror="this.style.opacity='0.4'">
+                    <span>Our Counter: <strong>${t.ourBestCounter}</strong></span>
+                  </div>
+                  <span class="counter-badge-pill">Hard Check</span>
+                </div>
+                <p style="font-size:0.78rem; color:#93c5fd; margin:0;">${t.counterReason}</p>
+                <p class="counter-play-text"><strong>Tactical Play:</strong> ${t.recommendedPlay}</p>
+              </div>
+            </div>
+          `;
+        }).join('')}
+      </div>
+    </div>
+  `;
 }
 
 function renderEmptyState() {
@@ -2156,14 +2823,16 @@ function renderEmptyState() {
   const navEquity = document.getElementById('nav-matchup-equity');
   if (navEquity) navEquity.textContent = 'Awaiting Enemy';
 
-  const ourBar = document.getElementById('meter-our-equity');
-  const enemyBar = document.getElementById('meter-enemy-equity');
-  if (ourBar) ourBar.style.width = '50%';
-  if (enemyBar) enemyBar.style.width = '50%';
-  const ourPct = document.getElementById('pct-our-equity');
-  const enemyPct = document.getElementById('pct-enemy-equity');
-  if (ourPct) ourPct.textContent = '50%';
-  if (enemyPct) enemyPct.textContent = '50%';
+  const pctOur = document.getElementById('pct-chance-our');
+  const pctEnemy = document.getElementById('pct-chance-enemy');
+  if (pctOur) pctOur.textContent = '50%';
+  if (pctEnemy) pctEnemy.textContent = '50%';
+  const meterRatio = document.getElementById('meter-ratio-text');
+  if (meterRatio) meterRatio.textContent = '50% / 50%';
+  const barOur = document.getElementById('meter-bar-fill-our');
+  const barEnemy = document.getElementById('meter-bar-fill-enemy');
+  if (barOur) barOur.style.width = '50%';
+  if (barEnemy) barEnemy.style.width = '50%';
 
   const verdictPill = document.getElementById('matchup-verdict-pill');
   if (verdictPill) {
@@ -2222,14 +2891,13 @@ function renderEmptyState() {
   const h2hGrid = document.getElementById('speed-h2h-cards-grid');
   if (h2hGrid) h2hGrid.innerHTML = '<p style="color:var(--text-dim); padding:1rem; grid-column: 1/-1; text-align:center;">Add enemy Pokémon to evaluate turn-order advantages.</p>';
 
-  const bring3 = document.getElementById('tactics-bring3-content');
-  if (bring3) bring3.innerHTML = '<p style="color:var(--text-dim);">Awaiting enemy team selection.</p>';
-  const lead = document.getElementById('tactics-lead-content');
-  if (lead) lead.innerHTML = '<p style="color:var(--text-dim);">Awaiting enemy team selection.</p>';
-  const wincon = document.getElementById('tactics-wincon-content');
-  if (wincon) wincon.innerHTML = '<p style="color:var(--text-dim);">Awaiting enemy team selection.</p>';
-  const threat = document.getElementById('tactics-threat-content');
-  if (threat) threat.innerHTML = '<p style="color:var(--text-dim);">Awaiting enemy team selection.</p>';
+  // Reset Battle Plan tab
+  const promptEl = document.getElementById('tactics-initial-prompt');
+  const resultsEl = document.getElementById('tactics-results-container');
+  const loadingEl = document.getElementById('tactics-loading');
+  if (promptEl) promptEl.style.display = 'flex';
+  if (resultsEl) resultsEl.style.display = 'none';
+  if (loadingEl) loadingEl.style.display = 'none';
 }
 
 // =====================================================================
@@ -2503,6 +3171,142 @@ function setupUI() {
       });
     }
   });
+
+  // -------------------------------------------------------------
+  // Tactical Battle Plan & Gemini Modal Listeners
+  // -------------------------------------------------------------
+  setupTacticsUI();
+}
+
+function setupTacticsUI() {
+  updateTacticsStatusBadge();
+
+  const modalGemini = document.getElementById('modal-gemini-key');
+  const btnOpenModal = document.getElementById('btn-open-gemini-modal');
+  const btnCloseModal = document.getElementById('btn-close-gemini-modal');
+  const btnPromptSetupKey = document.getElementById('btn-prompt-setup-key');
+  const btnSaveKey = document.getElementById('btn-save-gemini-key');
+  const btnClearKey = document.getElementById('btn-clear-gemini-key');
+  const btnTestKey = document.getElementById('btn-test-gemini-key');
+  const btnToggleEye = document.getElementById('btn-toggle-key-eye');
+  const inputKey = document.getElementById('input-gemini-key');
+  const selectModel = document.getElementById('select-gemini-model');
+  const feedbackEl = document.getElementById('key-test-feedback');
+
+  const btnGenerateMain = document.getElementById('btn-generate-battle-plan');
+  const btnPromptGenerate = document.getElementById('btn-prompt-generate');
+
+  const openKeyModal = () => {
+    if (inputKey) inputKey.value = GEMINI_CONFIG.getKey();
+    if (selectModel) selectModel.value = GEMINI_CONFIG.getModel();
+    if (feedbackEl) {
+      feedbackEl.style.display = 'none';
+      feedbackEl.textContent = '';
+    }
+    showModal(modalGemini);
+  };
+
+  if (btnOpenModal) btnOpenModal.addEventListener('click', openKeyModal);
+  if (btnPromptSetupKey) btnPromptSetupKey.addEventListener('click', openKeyModal);
+  if (btnCloseModal) btnCloseModal.addEventListener('click', () => hideModal(modalGemini));
+
+  if (btnToggleEye && inputKey) {
+    btnToggleEye.addEventListener('click', () => {
+      if (inputKey.type === 'password') {
+        inputKey.type = 'text';
+        btnToggleEye.textContent = '🔒';
+      } else {
+        inputKey.type = 'password';
+        btnToggleEye.textContent = '👁️';
+      }
+    });
+  }
+
+  if (btnSaveKey && inputKey && selectModel) {
+    btnSaveKey.addEventListener('click', () => {
+      const keyVal = inputKey.value.trim();
+      if (!keyVal) {
+        showToast('Please enter a valid API key');
+        return;
+      }
+      GEMINI_CONFIG.setKey(keyVal);
+      GEMINI_CONFIG.setModel(selectModel.value);
+      updateTacticsStatusBadge();
+      hideModal(modalGemini);
+      showToast('Gemini API key saved successfully!');
+    });
+  }
+
+  if (btnClearKey) {
+    btnClearKey.addEventListener('click', () => {
+      GEMINI_CONFIG.clearKey();
+      if (inputKey) inputKey.value = '';
+      updateTacticsStatusBadge();
+      hideModal(modalGemini);
+      showToast('Gemini API key removed. Switched to Heuristic mode.');
+    });
+  }
+
+  if (btnTestKey && inputKey && selectModel) {
+    btnTestKey.addEventListener('click', async () => {
+      const keyVal = inputKey.value.trim();
+      if (!keyVal) {
+        if (feedbackEl) {
+          feedbackEl.style.display = 'block';
+          feedbackEl.className = 'key-test-feedback error';
+          feedbackEl.textContent = 'Please enter an API key to test';
+        }
+        return;
+      }
+      btnTestKey.disabled = true;
+      btnTestKey.textContent = 'Testing...';
+      await testGeminiConnection(keyVal, selectModel.value);
+      btnTestKey.disabled = false;
+      btnTestKey.textContent = '🧪 Test Connection';
+    });
+  }
+
+  if (btnGenerateMain) btnGenerateMain.addEventListener('click', executeBattlePlanGeneration);
+  if (btnPromptGenerate) btnPromptGenerate.addEventListener('click', executeBattlePlanGeneration);
+}
+
+async function testGeminiConnection(apiKey, model) {
+  const feedback = document.getElementById('key-test-feedback');
+  if (!feedback) return;
+  feedback.style.display = 'block';
+  feedback.className = 'key-test-feedback';
+  feedback.textContent = `Testing connection with ${model}...`;
+
+  const candidates = [...new Set([model, 'gemini-3.1-flash-lite', 'gemini-3.5-flash', 'gemini-3.6-flash', 'gemini-3.8-flash'])];
+  let lastErr = null;
+
+  for (const m of candidates) {
+    try {
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(m)}:generateContent?key=${encodeURIComponent(apiKey)}`;
+      const resp = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: "Respond with the word: READY" }] }],
+          generationConfig: { maxOutputTokens: 5 }
+        })
+      });
+
+      if (resp.ok) {
+        feedback.className = 'key-test-feedback success';
+        feedback.textContent = `✓ Connection verified! Active Model: ${m}`;
+        return;
+      } else {
+        const err = await resp.json().catch(() => ({}));
+        lastErr = new Error(err.error?.message || `HTTP ${resp.status}`);
+      }
+    } catch (err) {
+      lastErr = err;
+    }
+  }
+
+  feedback.className = 'key-test-feedback error';
+  feedback.textContent = `✕ Connection failed: ${lastErr ? lastErr.message : 'Unknown error'}`;
 }
 
 // =====================================================================

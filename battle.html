@@ -7,7 +7,7 @@
   <meta name="description" content="Simulate competitive Pokémon 6v6 team battles. Analyzes head-to-head advantage, offensive type coverage, defensive exposure, speed tier ladder across 12 Pokémon, and ranks team member usefulness.">
   <link rel="stylesheet" href="index.css?v=2.8">
   <link rel="stylesheet" href="teambuilder.css?v=2.7">
-  <link rel="stylesheet" href="battle.css?v=2.9">
+  <link rel="stylesheet" href="battle.css?v=3.0">
 </head>
 <body>
 
@@ -105,17 +105,22 @@
             <span class="vs-text">VS</span>
           </div>
           <div class="matchup-meter-wrap">
-            <div class="meter-labels">
-              <span class="our-side-label">Our Edge</span>
-              <span id="meter-ratio-text" class="meter-ratio">50% / 50%</span>
-              <span class="enemy-side-label">Enemy Edge</span>
+            <div class="meter-topline">
+              <span class="topline-our">Our</span>
+              <span class="topline-slash">/</span>
+              <span class="topline-enemy">Enemy</span>
+            </div>
+            <div class="meter-win-chances">
+              <span class="win-chance-title">Chance to Win</span>
+              <div class="win-chance-values">
+                <span id="pct-chance-our" class="pct-val-our">50%</span>
+                <span class="pct-val-vs">vs</span>
+                <span id="pct-chance-enemy" class="pct-val-enemy">50%</span>
+              </div>
             </div>
             <div class="meter-bar-track">
               <div id="meter-bar-fill-our" class="meter-fill-our" style="width: 50%;"></div>
               <div id="meter-bar-fill-enemy" class="meter-fill-enemy" style="width: 50%;"></div>
-            </div>
-            <div id="matchup-verdict-pill" class="matchup-verdict-pill verdict-even">
-              Balanced Matchup
             </div>
           </div>
         </div>
@@ -171,7 +176,7 @@
         </button>
         <button class="analysis-tab-btn" data-tab="matrix">
           <span class="tab-icon">⚔️</span>
-          <span class="tab-title">Head-to-Head Matrix</span>
+          <span class="tab-title">Head-to-Head</span>
         </button>
         <button class="analysis-tab-btn" data-tab="speed">
           <span class="tab-icon">⚡</span>
@@ -205,12 +210,12 @@
         </div>
 
         <!-- ========================================================= -->
-        <!-- TAB 2: Head-to-Head Matrix & Merged Type Coverage -->
+        <!-- TAB 2: Head-to-Head & Merged Type Coverage -->
         <!-- ========================================================= -->
         <div class="battle-pane" id="pane-matrix">
           <div class="pane-hero-intro">
             <div>
-              <h3 class="pane-title">⚔️ Head-to-Head Matrix</h3>
+              <h3 class="pane-title">⚔️ Head-to-Head</h3>
             </div>
             <div class="matrix-legend">
               <span class="legend-badge lg-win-plus">+2 Decisive Win</span>
@@ -234,7 +239,7 @@
               <!-- Left: Offensive Coverage against their 6 -->
               <div class="coverage-box">
                 <div class="coverage-box-header">
-                  <h4>🎯 Offensive Threat Coverage (Our Moves vs Their Pokémon)</h4>
+                  <h4>🎯 Move Coverage</h4>
                   <span class="badge-accent" id="coverage-score-pill">Coverage: 0 / 6</span>
                 </div>
                 
@@ -251,7 +256,7 @@
               <!-- Right: Defensive Vulnerabilities (Our Pokémon Weaknesses vs Enemy Team) -->
               <div class="coverage-box">
                 <div class="coverage-box-header">
-                  <h4>🛡️ Defensive Vulnerabilities (Our Pokémon Weaknesses vs Enemy Team)</h4>
+                  <h4>🛡️ Defense Weakness</h4>
                   <span class="badge-accent" id="defensive-integrity-pill">Team Defense</span>
                 </div>
 
@@ -346,44 +351,54 @@
         </div>
 
         <!-- ========================================================= -->
-        <!-- TAB 4: Tactical Battle Plan (Ready for LLM Integration) -->
+        <!-- TAB 4: Tactical Battle Plan & Execution Matrix -->
         <!-- ========================================================= -->
         <div class="battle-pane" id="pane-tactics">
-          <div class="pane-hero-intro">
+          <div class="pane-hero-intro tactics-hero-bar">
             <div>
-              <h3 class="pane-title">🎯 Battle Plan</h3>
+              <h3 class="pane-title">🎯 AI assisted Battle Plan</h3>
+            </div>
+            <div class="tactics-header-controls">
+              <div class="tactics-status-pill" id="tactics-status-badge">
+                <span class="status-indicator-dot dot-offline"></span>
+                <span id="tactics-status-text">Heuristic Mode (No API Key)</span>
+              </div>
+              <button class="btn-battle-pill" id="btn-open-gemini-modal" title="Configure Gemini API Key">
+                🔑 API Key Settings
+              </button>
+              <button class="btn-battle-pill btn-accent-glow" id="btn-generate-battle-plan">
+                ⚡ Generate Battle Plan
+              </button>
             </div>
           </div>
 
-          <div class="llm-battle-plan-container">
-            <div class="llm-plan-card">
-              <div class="llm-plan-header">
-                <div class="llm-badge-wrap">
-                  <span class="llm-ai-badge">🤖 AI Battle Coach</span>
-                  <span class="llm-status-pill">LLM Integration Ready</span>
-                </div>
-                <h4>Turn-by-Turn Competitive Gameplan</h4>
-              </div>
-              <p class="llm-plan-desc">
-                Comprehensive match strategy powered by LLM reasoning. Evaluates dynamic team matchups, predict enemy pivots, and generates an optimized 3v3 singles gameplan.
+          <!-- Battle Plan Main Output Area -->
+          <div class="tactics-main-wrapper" id="tactics-main-wrapper">
+            <!-- Initial Prompt / Call to action -->
+            <div class="tactics-empty-prompt" id="tactics-initial-prompt">
+              <div class="empty-prompt-icon">⚔️</div>
+              <h4>Ready to Synthesize 3v3 Battle Plan</h4>
+              <p>
+                Click <strong>"⚡ Generate Battle Plan"</strong> to analyze both rosters, calculate optimal Bring-3 cores, designate your 4th flex sub, expose bench liabilities, and build complete counter strategies for each enemy Pokémon.
               </p>
-              <div class="llm-preview-grid">
-                <div class="llm-feature-box">
-                  <span class="feat-icon">⚡</span>
-                  <strong>Turn-1 Lead Prediction</strong>
-                  <span>Recommends opening moves based on opponent lead probability.</span>
-                </div>
-                <div class="llm-feature-box">
-                  <span class="feat-icon">🛡️</span>
-                  <strong>Pivot & Switch Routing</strong>
-                  <span>Calculates safest switch-ins to absorb expected enemy attacks.</span>
-                </div>
-                <div class="llm-feature-box">
-                  <span class="feat-icon">👑</span>
-                  <strong>Late-Game Win Condition</strong>
-                  <span>Tera timing and clean-up sequences to close out the match.</span>
-                </div>
+              <div class="empty-prompt-actions">
+                <button class="btn-battle-pill btn-accent-glow" id="btn-prompt-generate">⚡ Generate Battle Plan</button>
+                <button class="btn-battle-pill" id="btn-prompt-setup-key">🔑 Connect Gemini AI Key</button>
               </div>
+            </div>
+
+            <!-- Loading State -->
+            <div class="tactics-loading-container" id="tactics-loading" style="display:none;">
+              <div class="tactics-spinner"></div>
+              <div class="tactics-loading-text">
+                <h4 id="loading-stage-title">Synthesizing Competitive Gameplan...</h4>
+                <p id="loading-stage-desc">Evaluating speed brackets, damage thresholds, and pivot routes</p>
+              </div>
+            </div>
+
+            <!-- Results Container -->
+            <div class="tactics-results-container" id="tactics-results-container" style="display:none;">
+              <!-- Populated dynamically via JS -->
             </div>
           </div>
         </div>
@@ -572,11 +587,74 @@
     </div>
   </div>
 
+  <!-- ========================================================= -->
+  <!-- MODAL 6: Gemini API Key Settings Modal -->
+  <!-- ========================================================= -->
+  <div class="modal-overlay" id="modal-gemini-key">
+    <div class="modal-card modal-key-card">
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <span class="modal-icon">🤖</span>
+          <div class="modal-title-text-group">
+            <h3>Gemini AI Coach Settings</h3>
+            <p class="picker-modal-subtitle">Power Battle Plan with Google Gemini reasoning</p>
+          </div>
+        </div>
+        <button class="modal-close-btn" id="btn-close-gemini-modal">✕</button>
+      </div>
+
+      <div class="modal-body-content key-modal-body">
+        <div class="key-security-note">
+          <span class="sec-icon">🔒</span>
+          <div>
+            <strong>Client-Side & Zero-Logging:</strong>
+            <span>Your key is stored strictly in your browser's <code>localStorage</code>. Requests are sent directly from your browser to Google's official Gemini API. PokéChamp never stores or sees your key.</span>
+          </div>
+        </div>
+
+        <div class="key-form-group">
+          <label for="input-gemini-key">Google Gemini API Key</label>
+          <div class="key-input-wrapper">
+            <input type="password" id="input-gemini-key" class="hash-input" placeholder="AIzaSy..." autocomplete="off" spellcheck="false">
+            <button type="button" class="btn-toggle-key-visibility" id="btn-toggle-key-eye" title="Toggle visibility">👁️</button>
+          </div>
+        </div>
+
+        <div class="key-form-group">
+          <label for="select-gemini-model">Gemini Model</label>
+          <select id="select-gemini-model" class="key-model-select">
+            <option value="gemini-3.1-flash-lite" selected>Gemini 3.1 Flash-Lite (Recommended · Fast & Active)</option>
+            <option value="gemini-3.5-flash">Gemini 3.5 Flash (Deep reasoning)</option>
+            <option value="gemini-3.6-flash">Gemini 3.6 Flash (Advanced tactical analysis)</option>
+            <option value="gemini-3.8-flash">Gemini 3.8 Flash (Latest Flagship)</option>
+          </select>
+        </div>
+
+        <div class="key-help-box">
+          <div class="help-title">💡 How to get your API key from Google:</div>
+          <ol class="help-steps">
+            <li>Open <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer" class="help-link">Google AI Studio (aistudio.google.com) ↗</a>.</li>
+            <li>Sign in with your Google Account and click <strong>"Create API key"</strong>.</li>
+            <li>Copy the generated key and paste it above. (The free tier gives 15 requests per minute at $0 cost).</li>
+          </ol>
+        </div>
+
+        <div class="key-test-feedback" id="key-test-feedback" style="display:none;"></div>
+      </div>
+
+      <div class="editor-modal-footer">
+        <button class="btn-battle-pill btn-danger" id="btn-clear-gemini-key">Remove Key</button>
+        <button class="btn-battle-pill" id="btn-test-gemini-key">🧪 Test Connection</button>
+        <button class="btn-modal-action" id="btn-save-gemini-key">Save & Connect</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Toast Notification Container -->
   <div id="battle-toast" class="battle-toast"></div>
 
   <!-- Scripts -->
   <script src="type-tooltip.js"></script>
-  <script src="battle.js?v=2.9"></script>
+  <script src="battle.js?v=3.0"></script>
 </body>
 </html>
