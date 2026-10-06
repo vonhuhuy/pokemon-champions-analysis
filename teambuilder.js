@@ -561,10 +561,21 @@ function renderTeamSlots() {
       if (moveName) {
         const mType = getMoveType(moveName, p);
         const typeBg = TYPE_COLORS[mType] || '#64748b';
+        const md = movesDB[moveName] || {};
+        const mRawCat = (md.category || '').toLowerCase();
+        let mCat = 'status';
+        if (mRawCat === 'physical') mCat = 'physical';
+        else if (mRawCat === 'special') mCat = 'special';
+        else if (mRawCat === 'status') mCat = 'status';
+        else if (md.power && md.power > 0) mCat = 'physical';
+        const mCatIcon = mCat === 'physical' ? '⚔️' : (mCat === 'special' ? '✨' : '🛡️');
+        const mCatLabel = mCat === 'physical' ? 'Physical' : (mCat === 'special' ? 'Special' : 'Status');
+
         moveRowsHtml += `
           <div class="slot-move-row" onclick="openDrawer(${idx}, 'moves')">
             <span class="slot-move-remove-btn" onclick="event.stopPropagation(); removeSlotMove(${idx}, ${mIdx})" title="Remove move">⊗</span>
             <span class="slot-move-type" style="background: ${typeBg};">${mType}</span>
+            <span class="slot-move-cat-mini cat-${mCat}" title="${mCatLabel}">${mCatIcon}</span>
             <span class="slot-move-name">${moveName}</span>
           </div>
         `;
@@ -767,7 +778,12 @@ function renderDrawerTabBody(slot) {
     const list = p.moves || [];
     const filtered = list.filter(m => {
       if (!drawerSearchQuery) return true;
-      return m.name.toLowerCase().includes(drawerSearchQuery) || (m.type && m.type.toLowerCase().includes(drawerSearchQuery));
+      const q = drawerSearchQuery;
+      const db = movesDB[m.name] || {};
+      const c = (db.category || '').toLowerCase();
+      return m.name.toLowerCase().includes(q) || 
+             (m.type && m.type.toLowerCase().includes(q)) ||
+             c.includes(q);
     });
 
     if (filtered.length === 0) {
@@ -780,14 +796,36 @@ function renderDrawerTabBody(slot) {
       const typeBg = TYPE_COLORS[mType] || '#64748b';
       const dbInfo = movesDB[m.name] || {};
       const power = dbInfo.power !== undefined ? dbInfo.power : (m.power || '—');
-      const acc = dbInfo.accuracy !== undefined ? (dbInfo.accuracy === true || dbInfo.accuracy === null ? '—' : `${dbInfo.accuracy}%`) : '—';
+
+      let acc = '—';
+      if (dbInfo.accuracy !== undefined && dbInfo.accuracy !== '—' && dbInfo.accuracy !== null && dbInfo.accuracy !== true) {
+        acc = `${dbInfo.accuracy}%`;
+      }
+
       const desc = dbInfo.desc || '';
+
+      const rawCat = (dbInfo.category || '').toLowerCase();
+      let cat = 'status';
+      if (rawCat === 'physical') {
+        cat = 'physical';
+      } else if (rawCat === 'special') {
+        cat = 'special';
+      } else if (rawCat === 'status') {
+        cat = 'status';
+      } else {
+        if (power !== '—' && power > 0) cat = 'physical';
+        else cat = 'status';
+      }
+
+      const catLabel = cat === 'physical' ? 'Physical' : (cat === 'special' ? 'Special' : 'Status');
+      const catIcon = cat === 'physical' ? '⚔️' : (cat === 'special' ? '✨' : '🛡️');
 
       return `
         <div class="drawer-list-item">
           <div class="drawer-item-top">
             <div class="drawer-item-title-wrap">
               <span class="slot-move-type" style="background: ${typeBg};">${mType}</span>
+              <span class="slot-move-cat cat-${cat}">${catIcon} ${catLabel}</span>
               <span class="drawer-item-name">${m.name}</span>
               <span class="drawer-item-usage">${m.usage || ''}</span>
             </div>
@@ -796,9 +834,32 @@ function renderDrawerTabBody(slot) {
               `<button class="btn-drawer-action add" onclick="drawerToggleMove('${m.name}')">⊕ Add</button>`
             }
           </div>
+
+          <div class="drawer-move-stats-strip">
+            ${power !== '—' && power !== 0 ? `
+              <div class="drawer-stat-pill" style="color: ${typeBg}; border-color: ${typeBg}55; background: ${typeBg}18;">
+                <span class="stat-pill-num">${power}</span>
+                <span class="stat-pill-label">Power</span>
+              </div>
+            ` : `
+              <div class="drawer-stat-pill stat-pill-neutral">
+                <span class="stat-pill-num">—</span>
+                <span class="stat-pill-label">Power</span>
+              </div>
+            `}
+            <div class="drawer-stat-pill ${acc === '—' ? 'stat-pill-neutral' : ''}" style="${acc !== '—' ? `color: ${typeBg}; border-color: ${typeBg}55; background: ${typeBg}18;` : ''}">
+              <span class="stat-pill-num">${acc}</span>
+              <span class="stat-pill-label">Accuracy</span>
+            </div>
+            ${dbInfo.priority && dbInfo.priority > 0 ? `
+              <div class="drawer-stat-pill" style="color: #38bdf8; border-color: rgba(56, 189, 248, 0.45); background: rgba(56, 189, 248, 0.15);">
+                <span class="stat-pill-num">+${dbInfo.priority}</span>
+                <span class="stat-pill-label">Priority</span>
+              </div>
+            ` : ''}
+          </div>
+
           <div class="drawer-item-desc">
-            ${power !== '—' && power !== 0 ? `<strong>${power} Power</strong> • ` : ''}
-            ${acc !== '—' ? `${acc} Accuracy • ` : ''}
             ${desc ? desc : 'Competitive standard selection.'}
           </div>
         </div>

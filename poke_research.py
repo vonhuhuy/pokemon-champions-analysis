@@ -59,6 +59,12 @@ def cmd_pokemon(args, db):
             type_str = f"[{m['type']}]" if m['type'] else ""
             print(f"  • {m['name']:<20} {type_str:<10} {m['usage']}")
             
+        learnable = p.get('learnable_moves', [])
+        if learnable:
+            print(f"\n📖 FULL LEARNABLE MOVE-LIST ({len(learnable)} moves total):")
+            sample_moves = [f"{lm['name']} [{lm['type']}]" for lm in learnable[:12]]
+            print("  • " + ", ".join(sample_moves) + (f" ... and {len(learnable) - 12} more" if len(learnable) > 12 else ""))
+            
         # Abilities
         print("\n⚡ ABILITIES:")
         for a in p['abilities']:

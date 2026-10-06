@@ -1032,9 +1032,14 @@ function openModal(rank) {
     </div>
 
     <div class="detail-grid">
-      <!-- Moves (Simplified Heading + Tooltip Details + Clickable) -->
+      <!-- Moves (Top Ladder Moves + Complete Learnable Moveset) -->
       <div class="detail-section">
-        <h3>⚔️ Moves</h3>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.75rem;">
+          <h3 style="margin-bottom:0;">⚔️ Ladder Moves (${p.moves ? p.moves.length : 0})</h3>
+          ${p.learnable_moves && p.learnable_moves.length > 0 ? `
+            <span style="font-size:0.75rem; color:#94a3b8;">${p.learnable_moves.length} Total Learnable Moves</span>
+          ` : ''}
+        </div>
         <div class="breakdown-cards-list">
           ${p.moves.map(m => {
             const mType = m.type || getMoveType(m.name, p);
@@ -1051,6 +1056,24 @@ function openModal(rank) {
             `;
           }).join('')}
         </div>
+        ${p.learnable_moves && p.learnable_moves.length > 0 ? `
+          <details style="margin-top:0.75rem; font-size:0.8rem; background:rgba(255,255,255,0.03); border-radius:0.5rem; padding:0.5rem 0.75rem; border:1px solid rgba(255,255,255,0.07);">
+            <summary style="cursor:pointer; font-weight:600; color:#38bdf8;">Browse All ${p.learnable_moves.length} Learnable Moves</summary>
+            <div style="display:flex; flex-wrap:wrap; gap:0.35rem; margin-top:0.5rem; max-height:220px; overflow-y:auto; padding-right:0.25rem;">
+              ${p.learnable_moves.map(lm => {
+                const lBg = TYPE_COLORS[lm.type] || '#64748b';
+                const catSym = (lm.category || '').toLowerCase() === 'physical' ? '⚔️' : ((lm.category || '').toLowerCase() === 'special' ? '✨' : '🛡️');
+                return `
+                  <span class="slot-type-badge move-clickable" data-tooltip-type="move" data-tooltip-name="${lm.name}" data-tooltip-extratype="${lm.type}" onclick="filterByMoveFromList('${lm.name}')" style="background:${lBg}; padding:0.2rem 0.45rem; font-size:0.72rem; cursor:pointer; display:inline-flex; align-items:center; gap:0.25rem; border-radius:0.35rem;" title="${lm.name} (${lm.type}) - ${lm.category} BP ${lm.power || '—'}">
+                    <span>${catSym}</span>
+                    <strong>${lm.name}</strong>
+                    ${lm.power ? `<span style="opacity:0.85; font-size:0.65rem;">(${lm.power})</span>` : ''}
+                  </span>
+                `;
+              }).join('')}
+            </div>
+          </details>
+        ` : ''}
       </div>
 
       <!-- Abilities & Items (Simplified Heading + Item Icons) -->

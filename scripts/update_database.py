@@ -2,10 +2,15 @@
 """
 PokéChamp — Automated Competitive Database Updater
 =================================================
-Scrapes Pokémon Champions Singles ranked ladder tier list and detailed usage
-statistics from Pokémon Zone (Regulation M-C / Season 6), enriches species base stats,
-calculates elemental type effectiveness, updates moves metadata from PokeAPI,
-and updates both JSON and SQLite schemas.
+Scrapes Pokémon Champions Singles ranked ladder:
+1. Initial tier assessment from:
+   https://www.pokemon-zone.com/champions/ranked-seasons/singles/tier-list/
+2. Complete ranked ladder list and detailed usage stats (paginated) from:
+   https://www.pokemon-zone.com/champions/ranked-seasons/singles/?page=1
+3. Full learnable move-list and species base stats for every Pokémon from:
+   https://www.pokemon-zone.com/champions/pokemon/{slug}/
+4. Generates elemental type matchups, enriches move mechanics via PokeAPI,
+   and atomically saves both JSON and SQLite schemas.
 """
 
 import argparse
@@ -27,8 +32,8 @@ DB_SQLITE_PATH = os.path.join(DATA_DIR, "pokemon_singles_db.sqlite")
 MOVES_JSON_PATH = os.path.join(DATA_DIR, "moves_database.json")
 
 URL_TIER_LIST = "https://www.pokemon-zone.com/champions/ranked-seasons/singles/tier-list/"
-URL_SINGLES_SEARCH = "https://www.pokemon-zone.com/champions/ranked-seasons/singles/?q={query}"
-URL_SPECIES_BASE = "https://www.pokemon-zone.com/champions/pokemon/{slug}/"
+URL_SINGLES_PAGE = "https://www.pokemon-zone.com/champions/ranked-seasons/singles/?page={page}"
+URL_SPECIES_PAGE = "https://www.pokemon-zone.com/champions/pokemon/{slug}/"
 
 # Gen 9 Elemental Type Effectiveness Chart: AttackingType -> {DefendingType: Multiplier}
 TYPE_CHART = {
@@ -111,238 +116,334 @@ def get_possible_slugs(name):
     return list(dict.fromkeys(slugs))
 
 
-def fetch_tier_list():
-    """Extract list of all ranked Pokémon, current rank, query names, and tier labels."""
-    print("🌐 [Step 1/5] Fetching competitive tier list...")
-    r = requests.get(URL_TIER_LIST, impersonate="chrome124", timeout=15)
-    if r.status_code != 200:
-        raise RuntimeError(f"Failed to fetch tier list (HTTP {r.status_code})")
-        
-    soup = BeautifulSoup(r.text, "html.parser")
-    links = soup.find_all("a", href=True)
-    pokemon_list = []
-    
-    for a in links:
-        href = a['href']
-        if "#poke-" in href and "?q=" in href:
-            text = a.get_text(" ", strip=True)
-            q_name = href.split("?q=")[1].split("#")[0]
-            poke_id = href.split("#poke-")[1] if "#poke-" in href else ""
-            rank_num = int(poke_id) if poke_id.isdigit() else len(pokemon_list) + 1
-            
-            if rank_num <= 13:
-                tier = "S"
-                tier_label = "S - Ubiquitous"
-            elif rank_num <= 52:
-                tier = "A"
-                tier_label = "A - Common"
-            elif rank_num <= 117:
-                tier = "B"
-                tier_label = "B - Played"
-            elif rank_num <= 183:
-                tier = "C"
-                tier_label = "C - Niche"
-            else:
-                tier = "D"
-                tier_label = "D - Rare"
-                
-            img = a.find("img", alt=True)
-            display_name = img["alt"] if img else text.split("#")[0].strip()
-            
-            pokemon_list.append({
-                "rank": rank_num,
-                "name": display_name,
-                "query": q_name,
-                "tier": tier,
-                "tier_label": tier_label
-            })
-            
-    # Remove duplicates preserving order
-    unique_list = []
-    seen_ranks = set()
-    for p in pokemon_list:
-        if p["rank"] not in seen_ranks:
-            seen_ranks.add(p["rank"])
-            unique_list.append(p)
-            
-    unique_list.sort(key=lambda x: x["rank"])
-    print(f"   ↳ Successfully identified {len(unique_list)} ranked Pokémon in Tier List.")
-    if len(unique_list) < 150:
-        raise ValueError(f"Extracted only {len(unique_list)} Pokémon, which is below expected threshold (150+). Aborting to prevent data corruption.")
-    return unique_list
+DEFAULT_HEADERS = {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8",
+    "Accept-Language": "en-US,en;q=0.9",
+    "Sec-Ch-Ua": '"Chromium";v="124", "Google Chrome";v="124", "Not-A.Brand";v="99"',
+    "Sec-Ch-Ua-Mobile": "?0",
+    "Sec-Ch-Ua-Platform": '"Windows"',
+    "Sec-Fetch-Dest": "document",
+    "Sec-Fetch-Mode": "navigate",
+    "Sec-Fetch-Site": "none",
+    "Sec-Fetch-User": "?1",
+    "Upgrade-Insecure-Requests": "1",
+}
+
+IMPERSONATE_PROFILES = ["chrome124", "safari17_0", "chrome120"]
 
 
-def fetch_pokemon_detail(item, timeout=12, max_retries=3):
-    """Fetch usage stats, moves, abilities, items, EV spreads, and teammates for a Pokémon."""
-    query = item['query']
-    url = URL_SINGLES_SEARCH.format(query=query)
-    
+def robust_get(url, timeout=12, max_retries=3):
+    """Make resilient HTTP GET requests with rotating browser profiles and headers."""
     for attempt in range(max_retries):
+        profile = IMPERSONATE_PROFILES[attempt % len(IMPERSONATE_PROFILES)]
         try:
-            r = requests.get(url, impersonate="chrome124", timeout=timeout)
+            r = requests.get(url, impersonate=profile, headers=DEFAULT_HEADERS, timeout=timeout)
             if r.status_code == 200:
-                soup = BeautifulSoup(r.text, "html.parser")
-                blocks = soup.find_all("details", class_=lambda c: c and "ranked-poke" in c)
-                if not blocks:
-                    time.sleep(0.5)
-                    continue
-                block = blocks[0]
-                
-                # Extract clean types strictly from summary header
-                summary_elem = block.find("summary")
-                if summary_elem:
-                    type_spans = summary_elem.find_all("span", class_=lambda c: c and "type-badge" in c)
-                else:
-                    type_spans = block.find_all("span", class_=lambda c: c and "type-badge" in c)
-                
-                raw_types = [t.get_text(strip=True) for t in type_spans]
-                cleaned_types = []
-                for t in raw_types:
-                    if t in ALL_TYPES and t not in cleaned_types:
-                        cleaned_types.append(t)
-                        if len(cleaned_types) == 2:
-                            break
-                if not cleaned_types:
-                    cleaned_types = ["Normal"]
-                    
-                moves = []
-                abilities = []
-                items = []
-                stat_alignments = []
-                stat_points = []
-                teammates = []
-                
-                body = block.find("div", class_="ranked-poke__body")
-                if body:
-                    tiles = body.find_all("div", class_="champ-stat-grid__tile")
-                    for tile in tiles:
-                        h = tile.find("h4")
-                        heading = h.get_text(" ", strip=True) if h else ""
-                        
-                        if "Moves" in heading:
-                            for r_item in tile.find_all("div", class_="ranked-row"):
-                                m_name_elem = r_item.find("span", class_="ranked-row__name")
-                                m_name = m_name_elem.find("a").get_text(strip=True) if m_name_elem and m_name_elem.find("a") else (m_name_elem.get_text(strip=True) if m_name_elem else "")
-                                m_type_elem = r_item.find("span", class_=lambda c: c and "type-badge" in c)
-                                m_type = m_type_elem.get_text(strip=True) if m_type_elem else ""
-                                pct_elem = r_item.find("span", class_="usage-bar__label")
-                                pct = pct_elem.get_text(strip=True) if pct_elem else ""
-                                if m_name:
-                                    moves.append({"name": m_name, "type": m_type, "usage": pct})
-                                    
-                        elif "Abilities" in heading:
-                            for r_item in tile.find_all("div", class_="ranked-row"):
-                                a_name_elem = r_item.find("span", class_="ranked-row__name")
-                                a_name = a_name_elem.get_text(strip=True) if a_name_elem else ""
-                                pct_elem = r_item.find("span", class_="usage-bar__label")
-                                pct = pct_elem.get_text(strip=True) if pct_elem else ""
-                                if a_name:
-                                    abilities.append({"name": a_name, "usage": pct})
-                                    
-                        elif "Held Items" in heading or "Items" in heading:
-                            for r_item in tile.find_all("div", class_="ranked-row"):
-                                i_name_elem = r_item.find("span", class_="ranked-row__name")
-                                i_name = i_name_elem.get_text(strip=True) if i_name_elem else ""
-                                pct_elem = r_item.find("span", class_="usage-bar__label")
-                                pct = pct_elem.get_text(strip=True) if pct_elem else ""
-                                if i_name:
-                                    items.append({"name": i_name, "usage": pct})
-                                    
-                        elif "Stat Alignment" in heading:
-                            for r_item in tile.find_all("div", class_="ranked-row"):
-                                s_name_elem = r_item.find("span", class_="ranked-row__name")
-                                pct_elem = r_item.find("span", class_="usage-bar__label")
-                                if s_name_elem:
-                                    stat_alignments.append({
-                                        "alignment": s_name_elem.get_text(" ", strip=True),
-                                        "usage": pct_elem.get_text(strip=True) if pct_elem else ""
-                                    })
-                                    
-                        elif "Top Teammates" in heading:
-                            for chip in tile.find_all("a", class_="ranked-chip"):
-                                t_name = chip.get("title") or chip.get_text(strip=True)
-                                if t_name and t_name not in teammates:
-                                    teammates.append(t_name)
-                                    
-                        elif "Stat Points" in heading:
-                            table = tile.find("table")
-                            if table:
-                                for tr in table.find_all("tr")[1:]:
-                                    tds = tr.find_all(["td", "th"])
-                                    if len(tds) >= 7:
-                                        stat_points.append({
-                                            "usage": tds[0].get_text(strip=True),
-                                            "hp": tds[1].get_text(strip=True),
-                                            "atk": tds[2].get_text(strip=True),
-                                            "def": tds[3].get_text(strip=True),
-                                            "spa": tds[4].get_text(strip=True),
-                                            "spd": tds[5].get_text(strip=True),
-                                            "spe": tds[6].get_text(strip=True)
-                                        })
-                                        
-                return {
-                    "rank": item["rank"],
-                    "name": item["name"],
-                    "tier": item["tier"],
-                    "tier_label": item["tier_label"],
-                    "types": cleaned_types,
-                    "moves": moves,
-                    "abilities": abilities,
-                    "items": items,
-                    "stat_alignments": stat_alignments,
-                    "stat_points": stat_points,
-                    "teammates": teammates
-                }
+                return r
+            elif r.status_code == 403:
+                time.sleep(1.0 + attempt * 0.5)
         except Exception:
             time.sleep(1.0 + attempt * 0.5)
+    return None
+
+
+def fetch_tier_list_assessment(timeout=15):
+    """Extract tier mapping from the Singles Tier List as the initial assessment."""
+    print("🌐 [Step 1/5] Fetching initial tier assessment...")
+    tier_map = {}
+    try:
+        r = robust_get(URL_TIER_LIST, timeout=timeout)
+        if r and r.status_code == 200:
+            soup = BeautifulSoup(r.text, "html.parser")
+            rows = soup.find_all("div", class_=lambda c: c and "tier-row" in c)
+            for row in rows:
+                label = row.find(class_=lambda c: c and "tier-row__label" in c)
+                tier_letter = label.get_text(strip=True) if label else ""
+                sub = row.find("span", class_="font-bold")
+                tier_label = f"{tier_letter} - {sub.get_text(strip=True)}" if sub and tier_letter else tier_letter
+                
+                grid = row.find_next_sibling("div", class_=lambda c: c and "grid" in c)
+                if grid:
+                    for a in grid.find_all("a", href=True):
+                        img = a.find("img", alt=True)
+                        poke_name = img["alt"] if img else a.get_text(" ", strip=True).split("#")[0].strip()
+                        if poke_name:
+                            tier_map[poke_name.lower()] = {
+                                "tier": tier_letter,
+                                "tier_label": tier_label
+                            }
+            print(f"   ↳ Identified tier assignments for {len(tier_map)} Pokémon from Tier List assessment.")
+        else:
+            print("   ↳ ⚠️ Note: Tier list assessment endpoint returned non-200. Proceeding with ladder rank thresholds.")
+    except Exception as e:
+        print(f"   ⚠️ Warning: Could not fetch initial tier assessment ({e}). Will use rank-based thresholds.")
+    return tier_map
+
+
+def parse_poke_details_block(block, rank_counter, tier_map):
+    """Parse a single details.ranked-poke element from the paginated singles ladder page."""
+    # Rank
+    rank_elem = block.find("span", class_="ranked-poke__rank")
+    rank_str = rank_elem.get_text(" ", strip=True).split()[0] if rank_elem else ""
+    rank_clean = re.sub(r'[^0-9]', '', rank_str)
+    rank_num = int(rank_clean) if rank_clean.isdigit() else rank_counter
+    
+    # Name
+    name_elem = block.find("span", class_="ranked-poke__name")
+    data_name = block.get("data-name", "")
+    name = name_elem.get_text(strip=True) if name_elem else data_name.capitalize()
+    
+    # Query string for species detail
+    summary = block.find("summary")
+    a_link = summary.find("a", href=True) if summary else None
+    query_slug = data_name
+    if a_link and "?q=" in a_link['href']:
+        query_slug = a_link['href'].split("?q=")[1].split("#")[0]
+        
+    # Types strictly from summary header
+    summary_elem = block.find("summary")
+    type_spans = summary_elem.find_all("span", class_=lambda c: c and "type-badge" in c) if summary_elem else block.find_all("span", class_=lambda c: c and "type-badge" in c)
+    raw_types = [t.get_text(strip=True) for t in type_spans]
+    cleaned_types = []
+    for t in raw_types:
+        if t in ALL_TYPES and t not in cleaned_types:
+            cleaned_types.append(t)
+            if len(cleaned_types) == 2:
+                break
+    if not cleaned_types:
+        cleaned_types = ["Normal"]
+        
+    # Tier from assessment map or rank fallback
+    tier_info = tier_map.get(name.lower(), tier_map.get(data_name.lower()))
+    if tier_info:
+        tier = tier_info["tier"]
+        tier_label = tier_info["tier_label"]
+    else:
+        if rank_num <= 13:
+            tier, tier_label = "S", "S - Ubiquitous"
+        elif rank_num <= 52:
+            tier, tier_label = "A", "A - Common"
+        elif rank_num <= 117:
+            tier, tier_label = "B", "B - Played"
+        elif rank_num <= 183:
+            tier, tier_label = "C", "C - Niche"
+        else:
+            tier, tier_label = "D", "D - Rare"
             
-    return None
+    moves = []
+    abilities = []
+    items = []
+    stat_alignments = []
+    stat_points = []
+    teammates = []
+    
+    body = block.find("div", class_="ranked-poke__body")
+    if body:
+        tiles = body.find_all("div", class_="champ-stat-grid__tile")
+        for tile in tiles:
+            h = tile.find("h4")
+            heading = h.get_text(" ", strip=True) if h else ""
+            
+            if "Moves" in heading:
+                for r_item in tile.find_all("div", class_="ranked-row"):
+                    m_name_elem = r_item.find("span", class_="ranked-row__name")
+                    m_name = m_name_elem.find("a").get_text(strip=True) if m_name_elem and m_name_elem.find("a") else (m_name_elem.get_text(strip=True) if m_name_elem else "")
+                    m_type_elem = r_item.find("span", class_=lambda c: c and "type-badge" in c)
+                    m_type = m_type_elem.get_text(strip=True) if m_type_elem else ""
+                    pct_elem = r_item.find("span", class_="usage-bar__label")
+                    pct = pct_elem.get_text(strip=True) if pct_elem else ""
+                    if m_name:
+                        moves.append({"name": m_name, "type": m_type, "usage": pct})
+                        
+            elif "Abilities" in heading:
+                for r_item in tile.find_all("div", class_="ranked-row"):
+                    a_name_elem = r_item.find("span", class_="ranked-row__name")
+                    a_name = a_name_elem.get_text(strip=True) if a_name_elem else ""
+                    pct_elem = r_item.find("span", class_="usage-bar__label")
+                    pct = pct_elem.get_text(strip=True) if pct_elem else ""
+                    if a_name:
+                        abilities.append({"name": a_name, "usage": pct})
+                        
+            elif "Held Items" in heading or "Items" in heading:
+                for r_item in tile.find_all("div", class_="ranked-row"):
+                    i_name_elem = r_item.find("span", class_="ranked-row__name")
+                    i_name = i_name_elem.get_text(strip=True) if i_name_elem else ""
+                    pct_elem = r_item.find("span", class_="usage-bar__label")
+                    pct = pct_elem.get_text(strip=True) if pct_elem else ""
+                    if i_name:
+                        items.append({"name": i_name, "usage": pct})
+                        
+            elif "Stat Alignment" in heading:
+                for r_item in tile.find_all("div", class_="ranked-row"):
+                    s_name_elem = r_item.find("span", class_="ranked-row__name")
+                    pct_elem = r_item.find("span", class_="usage-bar__label")
+                    if s_name_elem:
+                        stat_alignments.append({
+                            "alignment": s_name_elem.get_text(" ", strip=True),
+                            "usage": pct_elem.get_text(strip=True) if pct_elem else ""
+                        })
+                        
+            elif "Top Teammates" in heading:
+                for chip in tile.find_all("a", class_="ranked-chip"):
+                    t_name = chip.get("title") or chip.get_text(strip=True)
+                    if t_name and t_name not in teammates:
+                        teammates.append(t_name)
+                        
+            elif "Stat Points" in heading:
+                table = tile.find("table")
+                if table:
+                    for tr in table.find_all("tr")[1:]:
+                        tds = tr.find_all(["td", "th"])
+                        if len(tds) >= 7:
+                            stat_points.append({
+                                "usage": tds[0].get_text(strip=True),
+                                "hp": tds[1].get_text(strip=True),
+                                "atk": tds[2].get_text(strip=True),
+                                "def": tds[3].get_text(strip=True),
+                                "spa": tds[4].get_text(strip=True),
+                                "spd": tds[5].get_text(strip=True),
+                                "spe": tds[6].get_text(strip=True)
+                            })
+                            
+    return {
+        "rank": rank_num,
+        "name": name,
+        "query": query_slug,
+        "tier": tier,
+        "tier_label": tier_label,
+        "types": cleaned_types,
+        "moves": moves,
+        "abilities": abilities,
+        "items": items,
+        "stat_alignments": stat_alignments,
+        "stat_points": stat_points,
+        "teammates": teammates
+    }
 
 
-def fetch_base_stats_for_pokemon(name, timeout=6):
-    """Fetch species base stats from Pokémon Zone."""
-    slugs = get_possible_slugs(name)
+def fetch_complete_singles_ladder(tier_map, timeout=12):
+    """Scrape complete ranked singles list across all pages: ?page=1, ?page=2..."""
+    print("\n🌐 [Step 2/5] Fetching complete ranked ladder list from singles pages (?page=1)...")
+    all_pokemon = []
+    seen_names = set()
+    page = 1
+    
+    while page <= 30:
+        url = URL_SINGLES_PAGE.format(page=page)
+        r = robust_get(url, timeout=timeout, max_retries=4)
+        if not r or r.status_code != 200:
+            print(f"   ↳ ❌ Could not fetch page {page}, stopping pagination.")
+            break
+            
+        soup = BeautifulSoup(r.text, "html.parser")
+        blocks = soup.find_all("details", class_=lambda c: c and "ranked-poke" in c)
+        if not blocks:
+            break
+            
+        page_records = []
+        for b in blocks:
+            rec = parse_poke_details_block(b, len(all_pokemon) + len(page_records) + 1, tier_map)
+            # Check for pagination looping
+            if rec["name"] in seen_names:
+                break
+            seen_names.add(rec["name"])
+            page_records.append(rec)
+            
+        if not page_records:
+            break
+            
+        all_pokemon.extend(page_records)
+        print(f"   ↳ Page {page:2d}: Scraped {len(page_records)} Pokémon (Total so far: {len(all_pokemon)})")
+        page += 1
+
+    all_pokemon.sort(key=lambda x: x["rank"])
+    print(f"   ↳ Finished scraping complete list: {len(all_pokemon)} Pokémon total.")
+    if len(all_pokemon) < 150:
+        raise ValueError(f"Extracted only {len(all_pokemon)} Pokémon, below expected threshold (150+). Aborting.")
+    return all_pokemon
+
+
+def fetch_species_data(p, timeout=8):
+    """
+    Fetch species base stats AND full learnable move-list from:
+    https://www.pokemon-zone.com/champions/pokemon/{slug}/
+    """
+    slugs = get_possible_slugs(p["name"])
     for slug in slugs:
-        url = URL_SPECIES_BASE.format(slug=slug)
-        try:
-            r = requests.get(url, impersonate="chrome124", timeout=timeout)
-            if r.status_code == 200:
-                soup = BeautifulSoup(r.text, "html.parser")
-                grid_stats = soup.find(id="stats") or soup.find(class_="pokemon-overview-grid__stats")
-                if grid_stats:
-                    stat_vals = {}
-                    rows = grid_stats.find_all("div", class_=lambda c: c and "flex" in c)
-                    for row in rows:
-                        spans = row.find_all("span")
-                        if len(spans) >= 2:
-                            lbl = spans[0].get_text(strip=True)
-                            val = spans[1].get_text(strip=True)
-                            if val.isdigit():
-                                stat_vals[lbl] = int(val)
-                    if "HP" in stat_vals and "Atk" in stat_vals and "Speed" in stat_vals:
-                        return {
-                            "hp": stat_vals.get("HP", 0),
-                            "atk": stat_vals.get("Atk", 0),
-                            "def": stat_vals.get("Def", 0),
-                            "spa": stat_vals.get("Sp.Atk", 0),
-                            "spd": stat_vals.get("Sp.Def", 0),
-                            "spe": stat_vals.get("Speed", 0),
-                            "bst": stat_vals.get("Total", sum(stat_vals.values()))
-                        }
-        except Exception:
-            pass
-    return None
+        url = URL_SPECIES_PAGE.format(slug=slug)
+        r = robust_get(url, timeout=timeout, max_retries=3)
+        if r and r.status_code == 200:
+            soup = BeautifulSoup(r.text, "html.parser")
+            
+            # 1. Base Stats
+            stats = None
+            grid_stats = soup.find(id="stats") or soup.find(class_="pokemon-overview-grid__stats")
+            if grid_stats:
+                stat_vals = {}
+                for row in grid_stats.find_all("div", class_=lambda c: c and "flex" in c):
+                    spans = row.find_all("span")
+                    if len(spans) >= 2:
+                        lbl = spans[0].get_text(strip=True)
+                        val = spans[1].get_text(strip=True)
+                        if val.isdigit():
+                            stat_vals[lbl] = int(val)
+                if "HP" in stat_vals and "Atk" in stat_vals and "Speed" in stat_vals:
+                    stats = {
+                        "hp": stat_vals.get("HP", 0),
+                        "atk": stat_vals.get("Atk", 0),
+                        "def": stat_vals.get("Def", 0),
+                        "spa": stat_vals.get("Sp.Atk", 0),
+                        "spd": stat_vals.get("Sp.Def", 0),
+                        "spe": stat_vals.get("Speed", 0),
+                        "bst": stat_vals.get("Total", sum(stat_vals.values()))
+                    }
+                    
+            # 2. Learnable Moves (Complete move-list)
+            learnable_moves = []
+            seen_moves = set()
+            learnable_tables = [
+                t for t in soup.find_all("table")
+                if t.find_previous(["h2", "h3", "h4", "h5", "h6"])
+                and "Learnable Moves" in t.find_previous(["h2", "h3", "h4", "h5", "h6"]).get_text()
+            ]
+            
+            for t in learnable_tables:
+                for row in t.find_all("tr")[1:]:
+                    cols = [c.get_text(" ", strip=True) for c in row.find_all(["td", "th"])]
+                    if len(cols) >= 6:
+                        m_name = cols[0]
+                        if m_name in seen_moves:
+                            continue
+                        seen_moves.add(m_name)
+                        m_type = cols[1]
+                        m_cat = cols[2]
+                        pow_raw = cols[3]
+                        acc_raw = cols[4]
+                        pp_raw = cols[5]
+                        
+                        learnable_moves.append({
+                            "name": m_name,
+                            "type": m_type,
+                            "category": m_cat,
+                            "power": int(pow_raw) if pow_raw.isdigit() else 0,
+                            "accuracy": int(acc_raw) if acc_raw.isdigit() else acc_raw,
+                            "pp": int(pp_raw) if pp_raw.isdigit() else (int(pp_raw.split()[0]) if pp_raw.split() and pp_raw.split()[0].isdigit() else 10)
+                        })
+                        
+            return stats, learnable_moves
+    return None, []
 
 
-def fetch_pokeapi_move(name, default_type="Normal"):
-    """Fetch move details from PokeAPI with smart fallbacks."""
+def fetch_pokeapi_move_metadata(name, default_type="Normal", default_cat="Physical", default_power=0, default_acc=100, default_pp=10):
+    """Fetch move description and details from PokeAPI with table fallbacks."""
     clean_slug = name.lower().replace(" ", "-").replace("'", "").replace(".", "").replace("[", "").replace("]", "")
     url = f"https://pokeapi.co/api/v2/move/{clean_slug}/"
+    desc = ""
     try:
         r = requests.get(url, timeout=5)
         if r.status_code == 200:
             data = r.json()
-            desc = ""
             for entry in reversed(data.get("flavor_text_entries", [])):
                 if entry.get("language", {}).get("name") == "en":
                     desc = entry["flavor_text"].replace("\n", " ").replace("\f", " ").strip()
@@ -352,10 +453,10 @@ def fetch_pokeapi_move(name, default_type="Normal"):
             return {
                 "name": name,
                 "type": default_type or data.get("type", {}).get("name", "Normal").capitalize(),
-                "category": cat_name,
-                "power": data.get("power") or 0,
-                "accuracy": raw_acc if raw_acc is not None else "—",
-                "pp": data.get("pp") or 10,
+                "category": cat_name or default_cat,
+                "power": data.get("power") if data.get("power") is not None else default_power,
+                "accuracy": raw_acc if raw_acc is not None else default_acc,
+                "pp": data.get("pp") or default_pp,
                 "priority": data.get("priority", 0),
                 "contact": False,
                 "desc": desc
@@ -366,13 +467,13 @@ def fetch_pokeapi_move(name, default_type="Normal"):
     return {
         "name": name,
         "type": default_type or "Normal",
-        "category": "Physical",
-        "power": 80,
-        "accuracy": 100,
-        "pp": 15,
+        "category": default_cat or "Physical",
+        "power": default_power,
+        "accuracy": default_acc,
+        "pp": default_pp,
         "priority": 0,
         "contact": False,
-        "desc": ""
+        "desc": desc
     }
 
 
@@ -387,7 +488,7 @@ def save_atomic_json(filepath, data):
 
 
 def build_sqlite_db(records, sqlite_path):
-    """Rebuild SQLite database in a clean transaction."""
+    """Rebuild SQLite database in a clean transaction with learnable_moves support."""
     dirname = os.path.dirname(sqlite_path)
     os.makedirs(dirname, exist_ok=True)
     
@@ -407,6 +508,7 @@ def build_sqlite_db(records, sqlite_path):
         base_stats_json TEXT,
         type_effectiveness_json TEXT,
         moves_json TEXT,
+        learnable_moves_json TEXT,
         abilities_json TEXT,
         items_json TEXT,
         stat_alignments_json TEXT,
@@ -416,7 +518,7 @@ def build_sqlite_db(records, sqlite_path):
     """)
     for r in records:
         cur.execute("""
-        INSERT INTO pokemon VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        INSERT INTO pokemon VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """, (
             r['rank'],
             r['name'],
@@ -425,12 +527,13 @@ def build_sqlite_db(records, sqlite_path):
             ", ".join(r['types']),
             json.dumps(r.get('base_stats', {}), ensure_ascii=False),
             json.dumps(r.get('type_effectiveness', {}), ensure_ascii=False),
-            json.dumps(r['moves'], ensure_ascii=False),
-            json.dumps(r['abilities'], ensure_ascii=False),
-            json.dumps(r['items'], ensure_ascii=False),
-            json.dumps(r['stat_alignments'], ensure_ascii=False),
-            json.dumps(r['stat_points'], ensure_ascii=False),
-            json.dumps(r['teammates'], ensure_ascii=False)
+            json.dumps(r.get('moves', []), ensure_ascii=False),
+            json.dumps(r.get('learnable_moves', []), ensure_ascii=False),
+            json.dumps(r.get('abilities', []), ensure_ascii=False),
+            json.dumps(r.get('items', []), ensure_ascii=False),
+            json.dumps(r.get('stat_alignments', []), ensure_ascii=False),
+            json.dumps(r.get('stat_points', []), ensure_ascii=False),
+            json.dumps(r.get('teammates', []), ensure_ascii=False)
         ))
     conn.commit()
     conn.close()
@@ -439,138 +542,100 @@ def build_sqlite_db(records, sqlite_path):
 
 def main():
     parser = argparse.ArgumentParser(description="Update PokéChamp competitive databases")
-    parser.add_argument("--workers", type=int, default=6, help="Concurrent workers for scraping (default: 6)")
-    parser.add_argument("--force-stats", action="store_true", help="Force refetch of all species base stats from web")
+    parser.add_argument("--workers", type=int, default=8, help="Concurrent workers for species scrape (default: 8)")
     parser.add_argument("--dry-run", action="store_true", help="Perform scrape without overwriting database files")
     args = parser.parse_args()
 
     start_time = time.time()
     print("=" * 70)
-    print("⚡ PokéChamp Competitive Database Automation Pipeline")
+    print("⚡ PokéChamp Complete Competitive Database Updater")
     print(f"Time: {time.strftime('%Y-%m-%d %H:%M:%S UTC', time.gmtime())}")
     print("=" * 70)
 
-    # Load existing cache for base stats and moves
-    existing_stats_cache = {}
-    old_rank_map = {}
-    if os.path.exists(DB_JSON_PATH):
-        try:
-            with open(DB_JSON_PATH, "r", encoding="utf-8") as f:
-                old_db = json.load(f)
-                for p in old_db:
-                    old_rank_map[p["name"]] = p["rank"]
-                    if p.get("base_stats") and p["base_stats"].get("bst", 0) > 0:
-                        existing_stats_cache[p["name"]] = p["base_stats"]
-            print(f"📦 Loaded existing cache for {len(existing_stats_cache)} Pokémon species base stats.")
-        except Exception as e:
-            print(f"⚠️ Warning loading existing database: {e}")
+    # 1. Tier list initial assessment
+    tier_map = fetch_tier_list_assessment()
 
+    # 2. Complete paginated singles ladder scrape
+    records = fetch_complete_singles_ladder(tier_map)
+
+    # 3. Species base stats & FULL learnable move-list
+    print(f"\n🧬 [Step 3/5] Scraping full learnable move-list and base stats ({len(records)} Pokémon, {args.workers} workers)...")
+    total_learnable_moves_count = 0
+    with ThreadPoolExecutor(max_workers=args.workers) as executor:
+        future_to_rec = {executor.submit(fetch_species_data, r): r for r in records}
+        done = 0
+        for future in as_completed(future_to_rec):
+            r = future_to_rec[future]
+            done += 1
+            stats, learnable_moves = future.result()
+            
+            # Type effectiveness
+            r["type_effectiveness"] = calculate_type_effectiveness(r["types"])
+            
+            if stats:
+                r["base_stats"] = stats
+            else:
+                r["base_stats"] = {"hp": 80, "atk": 80, "def": 80, "spa": 80, "spd": 80, "spe": 80, "bst": 480}
+                
+            r["learnable_moves"] = learnable_moves
+            total_learnable_moves_count += len(learnable_moves)
+            
+            if done % 25 == 0 or done == len(records):
+                print(f"   ↳ Progress: [{done}/{len(records)}] #{r['rank']} {r['name']}: {len(learnable_moves)} learnable moves, BST {r['base_stats']['bst']}")
+
+    print(f"   ↳ Extracted a cumulative total of {total_learnable_moves_count} learnable move entries.")
+
+    # 4. Moves Database Enrichment
+    print("\n⚔️ [Step 4/5] Syncing global moves database (moves_database.json)...")
     existing_moves = {}
     if os.path.exists(MOVES_JSON_PATH):
         try:
             with open(MOVES_JSON_PATH, "r", encoding="utf-8") as f:
                 existing_moves = json.load(f)
-            print(f"📖 Loaded existing moves database with {len(existing_moves)} entries.")
-        except Exception as e:
-            print(f"⚠️ Warning loading moves database: {e}")
+            print(f"   ↳ Loaded {len(existing_moves)} existing moves.")
+        except Exception:
+            pass
 
-    # 1. Fetch Tier List
-    tier_list = fetch_tier_list()
-
-    # 2. Fetch Detailed Usage Data
-    print(f"\n🌐 [Step 2/5] Fetching detailed ladder profiles ({len(tier_list)} Pokémon, {args.workers} workers)...")
-    records = []
-    failed_items = []
-    with ThreadPoolExecutor(max_workers=args.workers) as executor:
-        future_to_item = {executor.submit(fetch_pokemon_detail, item): item for item in tier_list}
-        done_count = 0
-        for future in as_completed(future_to_item):
-            item = future_to_item[future]
-            done_count += 1
-            res = future.result()
-            if res:
-                records.append(res)
-                if done_count % 25 == 0 or done_count == len(tier_list):
-                    print(f"   ↳ Progress: [{done_count}/{len(tier_list)}] scraped (Rank #{res['rank']} {res['name']})")
-            else:
-                failed_items.append(item)
-                print(f"   ↳ ❌ Failed to fetch #{item['rank']} {item['name']}")
-
-    if failed_items:
-        print(f"\n🔄 Retrying {len(failed_items)} failed Pokémon sequentially...")
-        for item in failed_items:
-            res = fetch_pokemon_detail(item, timeout=18, max_retries=4)
-            if res:
-                records.append(res)
-                print(f"   ↳ Recovered #{res['rank']} {res['name']}")
-            else:
-                print(f"   ↳ Still failed #{item['rank']} {item['name']}, using fallback structure")
-                records.append({
-                    "rank": item["rank"],
-                    "name": item["name"],
-                    "tier": item["tier"],
-                    "tier_label": item["tier_label"],
-                    "types": ["Normal"],
-                    "moves": [],
-                    "abilities": [],
-                    "items": [],
-                    "stat_alignments": [],
-                    "stat_points": [],
-                    "teammates": []
-                })
-
-    records.sort(key=lambda x: x["rank"])
-
-    # 3. Base Stats Enrichment & Type Effectiveness
-    print(f"\n🧬 [Step 3/5] Enriching species base stats & calculating type effectiveness...")
-    stats_to_fetch = []
+    new_moves = {}
     for r in records:
-        # Calculate mathematical type effectiveness
-        r["type_effectiveness"] = calculate_type_effectiveness(r["types"])
-        
-        # Check base stats cache
-        p_name = r["name"]
-        if not args.force_stats and p_name in existing_stats_cache:
-            r["base_stats"] = existing_stats_cache[p_name]
-        else:
-            stats_to_fetch.append(r)
-
-    if stats_to_fetch:
-        print(f"   ↳ Fetching fresh species base stats for {len(stats_to_fetch)} entries...")
-        with ThreadPoolExecutor(max_workers=min(8, len(stats_to_fetch))) as executor:
-            future_to_rec = {executor.submit(fetch_base_stats_for_pokemon, r["name"]): r for r in stats_to_fetch}
-            for future in as_completed(future_to_rec):
-                rec = future_to_rec[future]
-                stats = future.result()
-                if stats:
-                    rec["base_stats"] = stats
-                    existing_stats_cache[rec["name"]] = stats
-                else:
-                    # Species fallback default stats if page doesn't exist
-                    rec["base_stats"] = existing_stats_cache.get(rec["name"], {
-                        "hp": 80, "atk": 80, "def": 80, "spa": 80, "spd": 80, "spe": 80, "bst": 480
-                    })
-    else:
-        print("   ↳ Reused existing base stats cache for all Pokémon.")
-
-    # 4. Moves Database Enrichment
-    print("\n⚔️ [Step 4/5] Checking moves database for new competitive moves...")
-    new_moves_found = {}
-    for r in records:
+        # Check ladder top moves
         for m in r.get("moves", []):
             m_name = m["name"]
-            if m_name and m_name not in existing_moves and m_name not in new_moves_found:
-                new_moves_found[m_name] = m.get("type", "Normal")
+            if m_name and m_name not in existing_moves and m_name not in new_moves:
+                new_moves[m_name] = {
+                    "name": m_name,
+                    "type": m.get("type", "Normal"),
+                    "category": "Physical",
+                    "power": 0,
+                    "accuracy": 100,
+                    "pp": 10
+                }
+        # Check all learnable moves
+        for lm in r.get("learnable_moves", []):
+            lm_name = lm["name"]
+            if lm_name and lm_name not in existing_moves and lm_name not in new_moves:
+                new_moves[lm_name] = lm
 
-    if new_moves_found:
-        print(f"   ↳ Found {len(new_moves_found)} new move(s) to catalog: {', '.join(new_moves_found.keys())}")
-        with ThreadPoolExecutor(max_workers=5) as executor:
-            future_to_m = {executor.submit(fetch_pokeapi_move, name, mtype): name for name, mtype in new_moves_found.items()}
-            for future in as_completed(future_to_m):
-                m_data = future.result()
-                existing_moves[m_data["name"]] = m_data
+    if new_moves:
+        print(f"   ↳ Discovered {len(new_moves)} new moves across species learnsets. Fetching PokeAPI descriptions...")
+        with ThreadPoolExecutor(max_workers=6) as executor:
+            future_to_name = {
+                executor.submit(
+                    fetch_pokeapi_move_metadata,
+                    m_data["name"],
+                    m_data.get("type", "Normal"),
+                    m_data.get("category", "Physical"),
+                    m_data.get("power", 0),
+                    m_data.get("accuracy", 100),
+                    m_data.get("pp", 10)
+                ): m_name for m_name, m_data in new_moves.items()
+            }
+            for future in as_completed(future_to_name):
+                m_res = future.result()
+                existing_moves[m_res["name"]] = m_res
+        print(f"   ↳ Total moves database expanded to {len(existing_moves)} entries.")
     else:
-        print("   ↳ All moves already fully cataloged in moves_database.json.")
+        print("   ↳ All moves already cataloged.")
 
     # 5. Persist updates
     print(f"\n💾 [Step 5/5] Saving database updates...")
@@ -586,32 +651,23 @@ def main():
         build_sqlite_db(records, DB_SQLITE_PATH)
         print(f"   ↳ Saved SQLite database to {DB_SQLITE_PATH}")
 
-    # Summary and Diff
     elapsed = time.time() - start_time
     print("\n" + "=" * 70)
     print(f"✅ Update Pipeline Finished in {elapsed:.1f}s")
     print("=" * 70)
     
+    # Tier breakdown
     tier_counts = {}
     for r in records:
         tier_counts[r["tier"]] = tier_counts.get(r["tier"], 0) + 1
     print(f"Total Pokémon: {len(records)} ({', '.join(f'{k}: {v}' for k, v in sorted(tier_counts.items()))})")
     
-    # Highlight ladder movements in Top 10
-    print("\n🏆 Top 10 Meta Standings:")
+    # Top 10 sample preview with learnable moves count
+    print("\n🏆 Top 10 Meta Standings with Full Move-List Counts:")
     for r in records[:10]:
-        old_rank = old_rank_map.get(r["name"])
-        diff_str = ""
-        if old_rank is not None:
-            if old_rank > r["rank"]:
-                diff_str = f" (▲ +{old_rank - r['rank']} from #{old_rank})"
-            elif old_rank < r["rank"]:
-                diff_str = f" (▼ -{r['rank'] - old_rank} from #{old_rank})"
-            else:
-                diff_str = " (Unchanged)"
-        else:
-            diff_str = " (NEW)"
-        print(f"  #{r['rank']:<2} {r['name']:<18} [{'/'.join(r['types']):<16}] Top Move: {r['moves'][0]['name'] if r['moves'] else 'N/A'}{diff_str}")
+        top_move = r["moves"][0]["name"] if r["moves"] else "N/A"
+        learnable_cnt = len(r.get("learnable_moves", []))
+        print(f"  #{r['rank']:<2} {r['name']:<18} [{'/'.join(r['types']):<16}] Top Move: {top_move:<14} | Total Learnable Moves: {learnable_cnt}")
     print("=" * 70)
 
 
