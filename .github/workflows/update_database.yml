@@ -12,6 +12,12 @@ on:
         required: false
         type: boolean
         default: false
+  push:
+    branches:
+      - main
+    paths:
+      - 'scripts/**'
+      - '.github/workflows/**'
 
 concurrency:
   group: update-database
