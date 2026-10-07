@@ -1372,47 +1372,11 @@ function renderRankingsTab(matrix) {
   // Sort descending by utilityScore
   membersData.sort((a, b) => b.utilityScore - a.utilityScore);
 
-  // Recommended Lead (highest early-game pressure & minimal turn 1 weakness)
-  const bestLead = membersData[0];
-  const leadCallout = document.getElementById('recommended-lead-callout');
-  if (leadCallout && bestLead) {
-    leadCallout.innerHTML = `
-      <img src="${getSpriteUrl(bestLead.build.pokemon.name)}" alt="${bestLead.build.pokemon.name}" class="lead-sprite">
-      <div class="lead-info-wrap">
-        <span class="lead-tag">⭐ Recommended Lead</span>
-        <span class="lead-name">${bestLead.build.pokemon.name}</span>
-        <span class="lead-reason">${bestLead.wins} Wins vs Enemy · High Tempo Advantage</span>
-      </div>
-    `;
-  }
-
   // Render Ranked Cards
   grid.innerHTML = membersData.map((data, rankIdx) => {
     const rank = rankIdx + 1;
-    let rankBadge = '';
-    let cardClass = '';
-    let tacticalRole = '';
-
-    if (rank === 1) {
-      rankBadge = '<span class="rank-number-badge badge-gold">🏆 #1 MVP Carry</span>';
-      cardClass = 'rank-1-mvp';
-      tacticalRole = 'Primary Win Condition · Early/Mid Game Sweeper';
-    } else if (rank === 2) {
-      rankBadge = '<span class="rank-number-badge badge-silver">🥈 #2 Core Wallbreaker</span>';
-      cardClass = 'rank-2-core';
-      tacticalRole = 'Core Wallbreaker · Dismantles Defensive Pivots';
-    } else if (rank === 3) {
-      rankBadge = '<span class="rank-number-badge badge-bronze">🥉 #3 Key Anchor</span>';
-      cardClass = 'rank-3-utility';
-      tacticalRole = 'Key Anchor · Defensive Switch-In & Utility';
-    } else if (rank <= 5) {
-      rankBadge = `<span class="rank-number-badge badge-neutral">#${rank} Positional Check</span>`;
-      tacticalRole = 'Positional Check · Situational Threat Coverage';
-    } else {
-      rankBadge = `<span class="rank-number-badge badge-caution">⚠️ #${rank} Matchup Liability</span>`;
-      cardClass = 'rank-caution';
-      tacticalRole = 'Matchup Liability · Consider Benching in 3v3';
-    }
+    const rankBadge = `<span class="rank-number-badge badge-neutral">#${rank}</span>`;
+    const cardClass = '';
 
     const totalMatchups = data.wins + data.evens + data.losses;
     const winPct = totalMatchups > 0 ? (data.wins / totalMatchups) * 100 : 0;
@@ -1520,10 +1484,6 @@ function renderRankingsTab(matrix) {
             <span class="target-group-label text-threat">⚠️ Threat Moves:</span>
             ${threatsHtml}
           </div>
-        </div>
-
-        <div class="ranking-tactics-box">
-          <strong>Role:</strong> ${tacticalRole}
         </div>
       </div>
     `;

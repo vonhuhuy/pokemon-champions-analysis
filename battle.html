@@ -7,7 +7,7 @@
   <meta name="description" content="Simulate competitive Pokémon 6v6 team battles. Analyzes head-to-head advantage, offensive type coverage, defensive exposure, speed tier ladder across 12 Pokémon, and ranks team member usefulness.">
   <link rel="stylesheet" href="index.css?v=2.8">
   <link rel="stylesheet" href="teambuilder.css?v=2.7">
-  <link rel="stylesheet" href="battle.css?v=3.1">
+  <link rel="stylesheet" href="battle.css?v=3.2">
 </head>
 <body>
 
@@ -160,16 +160,12 @@
     <section class="analysis-tabs-card">
       <div class="tabs-nav-bar">
         <button class="analysis-tab-btn active" data-tab="rankings">
-          <span class="tab-icon">🏆</span>
-          <span class="tab-title">Member Selection</span>
+          <span class="tab-icon">📊</span>
+          <span class="tab-title">Analysis</span>
         </button>
         <button class="analysis-tab-btn" data-tab="matrix">
           <span class="tab-icon">⚔️</span>
           <span class="tab-title">Head-to-Head</span>
-        </button>
-        <button class="analysis-tab-btn" data-tab="speed">
-          <span class="tab-icon">⚡</span>
-          <span class="tab-title">Speed Tiers</span>
         </button>
         <button class="analysis-tab-btn" data-tab="tactics">
           <span class="tab-icon">🎯</span>
@@ -181,20 +177,98 @@
       <div class="tab-pane-container">
 
         <!-- ========================================================= -->
-        <!-- TAB 1: Member Usefulness & Ranking -->
+        <!-- TAB 1: Analysis (Squad Matchups & Speed Tiers) -->
         <!-- ========================================================= -->
         <div class="battle-pane active" id="pane-rankings">
           <div class="pane-hero-intro">
             <div>
-              <h3 class="pane-title">🏆 Member Selection</h3>
-            </div>
-            <div id="recommended-lead-callout" class="lead-callout-card">
-              <!-- Dynamically populated with recommended lead -->
+              <h3 class="pane-title">📊 Squad Matchup Analysis</h3>
+              <p class="pane-subtitle" style="font-size:0.84rem; color:var(--text-muted); margin-top:0.25rem;">
+                Individual matchup records, key targets, and incoming threats against the opposing team.
+              </p>
             </div>
           </div>
 
           <div class="member-rankings-grid" id="member-rankings-grid">
             <!-- Dynamically rendered ranking cards #1 to #6 -->
+          </div>
+
+          <!-- Merged Speed Tiers Section -->
+          <div class="merged-speed-section" style="margin-top: 2.75rem; padding-top: 1.5rem; border-top: 1px solid rgba(255, 255, 255, 0.08);">
+            <div class="pane-hero-intro" style="margin-bottom: 1.25rem;">
+              <div>
+                <h3 class="pane-title">⚡ Speed Tiers</h3>
+                <p class="pane-subtitle" style="font-size:0.84rem; color:var(--text-muted); margin-top:0.25rem;">
+                  Turn-order ladder, outspeed advantages, EV spreads, and item analysis across all 12 Pokémon.
+                </p>
+              </div>
+            </div>
+
+            <!-- Head-to-Head Speed Matchup Breakdown Grid -->
+            <div class="speed-h2h-section">
+              <div class="speed-h2h-header">
+                <h4 class="sub-heading">⚔️ Our Team Outspeed Matrix vs Opponent Roster</h4>
+              </div>
+              <div class="speed-h2h-grid" id="speed-h2h-cards-grid">
+                <!-- Rendered via JS -->
+              </div>
+            </div>
+
+            <!-- Speed KPIs Overview -->
+            <div class="speed-kpis-grid">
+              <div class="speed-kpi-card" id="kpi-speed-control">
+                <span class="speed-kpi-label">Field Speed Control</span>
+                <div class="speed-kpi-val" id="val-speed-control">—</div>
+                <span class="speed-kpi-sub" id="sub-speed-control">Turn Order Ratio</span>
+              </div>
+
+              <div class="speed-kpi-card" id="kpi-speed-fastest">
+                <span class="speed-kpi-label">Fastest on Field</span>
+                <div class="speed-kpi-val" id="val-speed-fastest">—</div>
+                <span class="speed-kpi-sub" id="sub-speed-fastest">—</span>
+              </div>
+
+              <div class="speed-kpi-card" id="kpi-speed-averages">
+                <span class="speed-kpi-label">Average Team Speed</span>
+                <div class="speed-kpi-val" id="val-speed-averages">—</div>
+                <span class="speed-kpi-sub" id="sub-speed-averages">Our Team vs Enemy Team</span>
+              </div>
+
+              <div class="speed-kpi-card" id="kpi-speed-ties">
+                <span class="speed-kpi-label">Speed Ties & Clashes</span>
+                <div class="speed-kpi-val" id="val-speed-ties">0</div>
+                <span class="speed-kpi-sub" id="sub-speed-ties">50/50 turn-order coinflips</span>
+              </div>
+            </div>
+
+            <!-- Common EV Spreads & Item Multiplier Distribution Breakdown -->
+            <div class="speed-spreads-summary-card">
+              <div class="spreads-summary-header">
+                <div class="spreads-summary-title">
+                  <span class="icon">📊</span>
+                  <h4>EV Spreads & Items (12 Pokémon)</h4>
+                </div>
+              </div>
+              <div class="spreads-distribution-grid" id="speed-spreads-distribution">
+                <!-- Rendered via JS -->
+              </div>
+            </div>
+
+            <!-- The Complete 12-Pokémon Speed Ladder -->
+            <div class="speed-ladder-card">
+              <div class="speed-ladder-header">
+                <div class="speed-ladder-title-col">
+                  <h4 class="sub-heading">🏁 12-Pokémon Turn-Order Ladder</h4>
+                </div>
+                <div class="speed-ladder-legend">
+                  <span class="legend-pill our"><span class="dot"></span> Our Team</span>
+                  <span class="legend-pill enemy"><span class="dot"></span> Enemy Team</span>
+                </div>
+              </div>
+              <div class="speed-ladder-rows-wrap" id="battle-speed-ladder">
+                <!-- Rendered via JS -->
+              </div>
+            </div>
           </div>
         </div>
 
@@ -262,82 +336,7 @@
           </div>
         </div>
 
-        <!-- ========================================================= -->
-        <!-- TAB 3: Speed Tier Analysis across 12 Pokémon -->
-        <!-- ========================================================= -->
-        <div class="battle-pane" id="pane-speed">
-          <div class="pane-hero-intro">
-            <div>
-              <h3 class="pane-title">⚡ Speed Tiers</h3>
-            </div>
-          </div>
 
-          <!-- Head-to-Head Speed Matchup Breakdown Grid (Moved to the Top!) -->
-          <div class="speed-h2h-section">
-            <div class="speed-h2h-header">
-              <h4 class="sub-heading">⚔️ Our Team Outspeed Matrix vs Opponent Roster</h4>
-            </div>
-            <div class="speed-h2h-grid" id="speed-h2h-cards-grid">
-              <!-- Rendered via JS -->
-            </div>
-          </div>
-
-          <!-- Speed KPIs Overview -->
-          <div class="speed-kpis-grid">
-            <div class="speed-kpi-card" id="kpi-speed-control">
-              <span class="speed-kpi-label">Field Speed Control</span>
-              <div class="speed-kpi-val" id="val-speed-control">—</div>
-              <span class="speed-kpi-sub" id="sub-speed-control">Turn Order Ratio</span>
-            </div>
-
-            <div class="speed-kpi-card" id="kpi-speed-fastest">
-              <span class="speed-kpi-label">Fastest on Field</span>
-              <div class="speed-kpi-val" id="val-speed-fastest">—</div>
-              <span class="speed-kpi-sub" id="sub-speed-fastest">—</span>
-            </div>
-
-            <div class="speed-kpi-card" id="kpi-speed-averages">
-              <span class="speed-kpi-label">Average Team Speed</span>
-              <div class="speed-kpi-val" id="val-speed-averages">—</div>
-              <span class="speed-kpi-sub" id="sub-speed-averages">Our Team vs Enemy Team</span>
-            </div>
-
-            <div class="speed-kpi-card" id="kpi-speed-ties">
-              <span class="speed-kpi-label">Speed Ties & Clashes</span>
-              <div class="speed-kpi-val" id="val-speed-ties">0</div>
-              <span class="speed-kpi-sub" id="sub-speed-ties">50/50 turn-order coinflips</span>
-            </div>
-          </div>
-
-          <!-- Common EV Spreads & Item Multiplier Distribution Breakdown -->
-          <div class="speed-spreads-summary-card">
-            <div class="spreads-summary-header">
-              <div class="spreads-summary-title">
-                <span class="icon">📊</span>
-                <h4>EV Spreads & Items (12 Pokémon)</h4>
-              </div>
-            </div>
-            <div class="spreads-distribution-grid" id="speed-spreads-distribution">
-              <!-- Rendered via JS -->
-            </div>
-          </div>
-
-          <!-- The Complete 12-Pokémon Speed Ladder -->
-          <div class="speed-ladder-card">
-            <div class="speed-ladder-header">
-              <div class="speed-ladder-title-col">
-                <h4 class="sub-heading">🏁 12-Pokémon Turn-Order Ladder</h4>
-              </div>
-              <div class="speed-ladder-legend">
-                <span class="legend-pill our"><span class="dot"></span> Our Team</span>
-                <span class="legend-pill enemy"><span class="dot"></span> Enemy Team</span>
-              </div>
-            </div>
-            <div class="speed-ladder-rows-wrap" id="battle-speed-ladder">
-              <!-- Rendered via JS -->
-            </div>
-          </div>
-        </div>
 
         <!-- ========================================================= -->
         <!-- TAB 4: Tactical Battle Plan & Execution Matrix -->
@@ -645,6 +644,6 @@
   <!-- Scripts -->
   <script src="proto/team_serializer.js?v=3.0"></script>
   <script src="type-tooltip.js"></script>
-  <script src="battle.js?v=3.5"></script>
+  <script src="battle.js?v=3.6"></script>
 </body>
 </html>

@@ -33,6 +33,9 @@ POKEDEX_JSON_PATH = os.path.join(DATA_DIR, "pokedex_database.json")
 MOVES_JSON_PATH = os.path.join(DATA_DIR, "moves_database.json")
 ITEMS_JSON_PATH = os.path.join(DATA_DIR, "items_database.json")
 ABILITIES_JSON_PATH = os.path.join(DATA_DIR, "abilities_database.json")
+MOVES_USAGE_JSON_PATH = os.path.join(DATA_DIR, "moves_usage.json")
+ITEMS_USAGE_JSON_PATH = os.path.join(DATA_DIR, "items_usage.json")
+ABILITIES_USAGE_JSON_PATH = os.path.join(DATA_DIR, "abilities_usage.json")
 
 URL_TIER_LIST = "https://www.pokemon-zone.com/champions/ranked-seasons/singles/tier-list/"
 URL_SINGLES_PAGE = "https://www.pokemon-zone.com/champions/ranked-seasons/singles/?page={page}"
@@ -565,7 +568,7 @@ def build_sqlite_db(records, sqlite_path):
         except Exception as e:
             print(f"   ⚠️ Could not load {POKEDEX_JSON_PATH}: {e}")
 
-    # 3. Moves Table (479 moves)
+    # 3. Moves Table (479 moves, ordered alphabetically by name)
     cur.execute("""
     CREATE TABLE moves (
         id INTEGER PRIMARY KEY,
@@ -579,93 +582,155 @@ def build_sqlite_db(records, sqlite_path):
         priority INTEGER DEFAULT 0,
         contact INTEGER DEFAULT 0,
         description TEXT,
-        usage_count INTEGER DEFAULT 0,
         regulation TEXT DEFAULT 'M-C'
     );
     """)
+
+    cur.execute("""
+    CREATE TABLE moves_usage (
+        rank INTEGER PRIMARY KEY,
+        move_id INTEGER NOT NULL REFERENCES moves(id),
+        move_name TEXT NOT NULL,
+        usage_count INTEGER NOT NULL,
+        regulation TEXT DEFAULT 'M-C'
+    );
+    """)
+
     moves_count = 0
     if os.path.exists(MOVES_JSON_PATH):
         try:
             with open(MOVES_JSON_PATH, "r", encoding="utf-8") as f:
                 moves_db = json.load(f)
+            # Sort alphabetically by move name
+            sorted_moves = sorted(moves_db.items(), key=lambda kv: kv[0].lower())
             m_id = 1
-            for m_name, m_data in moves_db.items():
+            move_id_map = {}
+            for m_name, m_data in sorted_moves:
                 m_slug = m_name.lower().replace(" ", "-").replace("'", "").replace(".", "")
                 cur.execute("""
-                INSERT INTO moves VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                INSERT INTO moves VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """, (
                     m_id, m_name, m_slug, m_data.get('type', 'Normal'),
                     m_data.get('category', 'Physical'), m_data.get('power', 0),
                     m_data.get('accuracy', 100), m_data.get('pp', 10),
                     m_data.get('priority', 0), 1 if m_data.get('contact') else 0,
-                    m_data.get('desc', m_data.get('description', '')),
-                    m_data.get('usage_count', 0), 'M-C'
+                    m_data.get('desc', m_data.get('description', '')), 'M-C'
                 ))
+                move_id_map[m_name] = (m_id, m_data.get('usage_count', 0))
                 m_id += 1
-            moves_count = len(moves_db)
+            moves_count = len(sorted_moves)
+
+            # Populate moves_usage ordered by usage_count DESC
+            sorted_by_usage = sorted(move_id_map.items(), key=lambda kv: kv[1][1], reverse=True)
+            for u_rank, (m_name, (mid, u_count)) in enumerate(sorted_by_usage, start=1):
+                cur.execute("""
+                INSERT INTO moves_usage VALUES (?, ?, ?, ?, ?)
+                """, (u_rank, mid, m_name, u_count, 'M-C'))
         except Exception as e:
             print(f"   ⚠️ Could not load {MOVES_JSON_PATH}: {e}")
 
-    # 4. Items Table (159 items)
+    # 4. Items Table (159 items, ordered alphabetically by name)
     cur.execute("""
     CREATE TABLE items (
         id INTEGER PRIMARY KEY,
         name TEXT NOT NULL,
         slug TEXT UNIQUE NOT NULL,
         description TEXT,
-        usage_count INTEGER DEFAULT 0,
         icon_url TEXT,
         regulation TEXT DEFAULT 'M-C'
     );
     """)
+
+    cur.execute("""
+    CREATE TABLE items_usage (
+        rank INTEGER PRIMARY KEY,
+        item_id INTEGER NOT NULL REFERENCES items(id),
+        item_name TEXT NOT NULL,
+        usage_count INTEGER NOT NULL,
+        regulation TEXT DEFAULT 'M-C'
+    );
+    """)
+
     items_count = 0
     if os.path.exists(ITEMS_JSON_PATH):
         try:
             with open(ITEMS_JSON_PATH, "r", encoding="utf-8") as f:
                 items_db = json.load(f)
+            # Sort alphabetically by item name
+            sorted_items = sorted(items_db.items(), key=lambda kv: kv[0].lower())
             it_id = 1
-            for it_name, it_data in items_db.items():
+            item_id_map = {}
+            for it_name, it_data in sorted_items:
                 it_slug = it_name.lower().replace(" ", "-").replace("'", "").replace(".", "")
                 cur.execute("""
-                INSERT INTO items VALUES (?, ?, ?, ?, ?, ?, ?)
+                INSERT INTO items VALUES (?, ?, ?, ?, ?, ?)
                 """, (
                     it_id, it_name, it_slug, it_data.get('description', ''),
-                    it_data.get('usage_count', 0), it_data.get('icon_url', ''), 'M-C'
+                    it_data.get('icon_url', ''), 'M-C'
                 ))
+                item_id_map[it_name] = (it_id, it_data.get('usage_count', 0))
                 it_id += 1
-            items_count = len(items_db)
+            items_count = len(sorted_items)
+
+            # Populate items_usage ordered by usage_count DESC
+            sorted_by_usage = sorted(item_id_map.items(), key=lambda kv: kv[1][1], reverse=True)
+            for u_rank, (it_name, (itid, u_count)) in enumerate(sorted_by_usage, start=1):
+                cur.execute("""
+                INSERT INTO items_usage VALUES (?, ?, ?, ?, ?)
+                """, (u_rank, itid, it_name, u_count, 'M-C'))
         except Exception as e:
             print(f"   ⚠️ Could not load {ITEMS_JSON_PATH}: {e}")
 
-    # 5. Abilities Table (139 core + catalog)
+    # 5. Abilities Table (139 core + catalog, ordered alphabetically by name)
     cur.execute("""
     CREATE TABLE abilities (
         id INTEGER PRIMARY KEY,
         name TEXT NOT NULL,
         slug TEXT UNIQUE NOT NULL,
         description TEXT,
-        usage_count INTEGER DEFAULT 0,
         is_vgc_ranked INTEGER DEFAULT 0,
         regulation TEXT DEFAULT 'M-C'
     );
     """)
+
+    cur.execute("""
+    CREATE TABLE abilities_usage (
+        rank INTEGER PRIMARY KEY,
+        ability_id INTEGER NOT NULL REFERENCES abilities(id),
+        ability_name TEXT NOT NULL,
+        usage_count INTEGER NOT NULL,
+        regulation TEXT DEFAULT 'M-C'
+    );
+    """)
+
     abilities_count = 0
     if os.path.exists(ABILITIES_JSON_PATH):
         try:
             with open(ABILITIES_JSON_PATH, "r", encoding="utf-8") as f:
                 ab_db = json.load(f)
+            # Sort alphabetically by ability name
+            sorted_ab = sorted(ab_db.items(), key=lambda kv: kv[0].lower())
             ab_id = 1
-            for ab_name, ab_data in ab_db.items():
+            ab_id_map = {}
+            for ab_name, ab_data in sorted_ab:
                 ab_slug = ab_name.lower().replace(" ", "-").replace("'", "").replace(".", "")
                 is_vgc = 1 if ab_data.get('is_vgc_ranked') else 0
                 cur.execute("""
-                INSERT INTO abilities VALUES (?, ?, ?, ?, ?, ?, ?)
+                INSERT INTO abilities VALUES (?, ?, ?, ?, ?, ?)
                 """, (
                     ab_id, ab_name, ab_slug, ab_data.get('description', ''),
-                    ab_data.get('usage_count', 0), is_vgc, 'M-C'
+                    is_vgc, 'M-C'
                 ))
+                ab_id_map[ab_name] = (ab_id, ab_data.get('usage_count', 0))
                 ab_id += 1
-            abilities_count = len(ab_db)
+            abilities_count = len(sorted_ab)
+
+            # Populate abilities_usage ordered by usage_count DESC
+            sorted_by_usage = sorted(ab_id_map.items(), key=lambda kv: kv[1][1], reverse=True)
+            for u_rank, (ab_name, (abid, u_count)) in enumerate(sorted_by_usage, start=1):
+                cur.execute("""
+                INSERT INTO abilities_usage VALUES (?, ?, ?, ?, ?)
+                """, (u_rank, abid, ab_name, u_count, 'M-C'))
         except Exception as e:
             print(f"   ⚠️ Could not load {ABILITIES_JSON_PATH}: {e}")
 
@@ -855,8 +920,8 @@ def export_json_from_sqlite(sqlite_path):
     save_atomic_json(DB_JSON_PATH, rankings_rows)
     print(f"   ↳ Exported {len(rankings_rows)} entries to {DB_JSON_PATH}")
 
-    # 3. Moves Export
-    cur.execute("SELECT * FROM moves ORDER BY name")
+    # 3. Moves Export (Canonical base catalog, ordered alphabetically, no usage_count)
+    cur.execute("SELECT * FROM moves ORDER BY LOWER(name)")
     moves_export = {}
     for r in cur.fetchall():
         d = r['description'] or ''
@@ -872,14 +937,13 @@ def export_json_from_sqlite(sqlite_path):
             'priority': prio,
             'contact': contact,
             'desc': d,
-            'description': d,
-            'usage_count': r['usage_count']
+            'description': d
         }
     save_atomic_json(MOVES_JSON_PATH, moves_export)
     print(f"   ↳ Exported {len(moves_export)} entries to {MOVES_JSON_PATH}")
 
-    # 4. Items Export
-    cur.execute("SELECT * FROM items ORDER BY name")
+    # 4. Items Export (Canonical base catalog, ordered alphabetically, no usage_count)
+    cur.execute("SELECT * FROM items ORDER BY LOWER(name)")
     items_export = {}
     for r in cur.fetchall():
         d = r['description'] or ''
@@ -887,14 +951,13 @@ def export_json_from_sqlite(sqlite_path):
             'name': r['name'],
             'desc': d,
             'description': d,
-            'usage_count': r['usage_count'],
             'icon_url': r['icon_url']
         }
     save_atomic_json(ITEMS_JSON_PATH, items_export)
     print(f"   ↳ Exported {len(items_export)} entries to {ITEMS_JSON_PATH}")
 
-    # 5. Abilities Export
-    cur.execute("SELECT * FROM abilities ORDER BY name")
+    # 5. Abilities Export (Canonical base catalog, ordered alphabetically, no usage_count)
+    cur.execute("SELECT * FROM abilities ORDER BY LOWER(name)")
     ab_export = {}
     for r in cur.fetchall():
         d = r['description'] or ''
@@ -902,11 +965,55 @@ def export_json_from_sqlite(sqlite_path):
             'name': r['name'],
             'desc': d,
             'description': d,
-            'usage_count': r['usage_count'],
             'is_vgc_ranked': bool(r['is_vgc_ranked'])
         }
     save_atomic_json(ABILITIES_JSON_PATH, ab_export)
     print(f"   ↳ Exported {len(ab_export)} entries to {ABILITIES_JSON_PATH}")
+
+    # 6. Moves Usage Export
+    cur.execute("SELECT * FROM moves_usage ORDER BY rank")
+    moves_usage_export = [
+        {
+            'rank': r['rank'],
+            'move_id': r['move_id'],
+            'name': r['move_name'],
+            'usage_count': r['usage_count'],
+            'regulation': r['regulation']
+        }
+        for r in cur.fetchall()
+    ]
+    save_atomic_json(MOVES_USAGE_JSON_PATH, moves_usage_export)
+    print(f"   ↳ Exported {len(moves_usage_export)} entries to {MOVES_USAGE_JSON_PATH}")
+
+    # 7. Items Usage Export
+    cur.execute("SELECT * FROM items_usage ORDER BY rank")
+    items_usage_export = [
+        {
+            'rank': r['rank'],
+            'item_id': r['item_id'],
+            'name': r['item_name'],
+            'usage_count': r['usage_count'],
+            'regulation': r['regulation']
+        }
+        for r in cur.fetchall()
+    ]
+    save_atomic_json(ITEMS_USAGE_JSON_PATH, items_usage_export)
+    print(f"   ↳ Exported {len(items_usage_export)} entries to {ITEMS_USAGE_JSON_PATH}")
+
+    # 8. Abilities Usage Export
+    cur.execute("SELECT * FROM abilities_usage ORDER BY rank")
+    ab_usage_export = [
+        {
+            'rank': r['rank'],
+            'ability_id': r['ability_id'],
+            'name': r['ability_name'],
+            'usage_count': r['usage_count'],
+            'regulation': r['regulation']
+        }
+        for r in cur.fetchall()
+    ]
+    save_atomic_json(ABILITIES_USAGE_JSON_PATH, ab_usage_export)
+    print(f"   ↳ Exported {len(ab_usage_export)} entries to {ABILITIES_USAGE_JSON_PATH}")
 
     conn.close()
 

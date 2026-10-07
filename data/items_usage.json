@@ -1,0 +1,1115 @@
+[
+  {
+    "rank": 1,
+    "item_id": 56,
+    "name": "Focus Sash",
+    "usage_count": 8220,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 2,
+    "item_id": 138,
+    "name": "Sitrus Berry",
+    "usage_count": 8065,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 3,
+    "item_id": 85,
+    "name": "Life Orb",
+    "usage_count": 7898,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 4,
+    "item_id": 103,
+    "name": "Miracle Seed",
+    "usage_count": 4864,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 5,
+    "item_id": 83,
+    "name": "Leftovers",
+    "usage_count": 4154,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 6,
+    "item_id": 124,
+    "name": "Salamencite",
+    "usage_count": 3772,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 7,
+    "item_id": 67,
+    "name": "Grassy Seed",
+    "usage_count": 3365,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 8,
+    "item_id": 33,
+    "name": "Choice Scarf",
+    "usage_count": 3163,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 9,
+    "item_id": 118,
+    "name": "Raichunite Y",
+    "usage_count": 2446,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 10,
+    "item_id": 114,
+    "name": "Psychic Seed",
+    "usage_count": 2241,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 11,
+    "item_id": 65,
+    "name": "Golisopite",
+    "usage_count": 1863,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 12,
+    "item_id": 34,
+    "name": "Chople Berry",
+    "usage_count": 1836,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 13,
+    "item_id": 121,
+    "name": "Rocky Helmet",
+    "usage_count": 1744,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 14,
+    "item_id": 155,
+    "name": "White Herb",
+    "usage_count": 1712,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 15,
+    "item_id": 54,
+    "name": "Floettite",
+    "usage_count": 1618,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 16,
+    "item_id": 37,
+    "name": "Colbur Berry",
+    "usage_count": 1570,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 17,
+    "item_id": 60,
+    "name": "Garchompite Z",
+    "usage_count": 1530,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 18,
+    "item_id": 51,
+    "name": "Fairy Feather",
+    "usage_count": 1495,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 19,
+    "item_id": 27,
+    "name": "Charizardite Y",
+    "usage_count": 1384,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 20,
+    "item_id": 144,
+    "name": "Staraptite",
+    "usage_count": 1096,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 21,
+    "item_id": 87,
+    "name": "Light Clay",
+    "usage_count": 1055,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 22,
+    "item_id": 61,
+    "name": "Gardevoirite",
+    "usage_count": 983,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 23,
+    "item_id": 151,
+    "name": "Tyranitarite",
+    "usage_count": 921,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 24,
+    "item_id": 57,
+    "name": "Froslassite",
+    "usage_count": 758,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 25,
+    "item_id": 25,
+    "name": "Charcoal",
+    "usage_count": 728,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 26,
+    "item_id": 62,
+    "name": "Gengarite",
+    "usage_count": 640,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 27,
+    "item_id": 90,
+    "name": "Lucarionite Z",
+    "usage_count": 632,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 28,
+    "item_id": 100,
+    "name": "Metagrossite",
+    "usage_count": 628,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 29,
+    "item_id": 106,
+    "name": "Mystic Water",
+    "usage_count": 573,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 30,
+    "item_id": 109,
+    "name": "Occa Berry",
+    "usage_count": 562,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 31,
+    "item_id": 19,
+    "name": "Black Glasses",
+    "usage_count": 556,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 32,
+    "item_id": 40,
+    "name": "Delphoxite",
+    "usage_count": 532,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 33,
+    "item_id": 147,
+    "name": "Swampertite",
+    "usage_count": 524,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 34,
+    "item_id": 46,
+    "name": "Eject Button",
+    "usage_count": 494,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 35,
+    "item_id": 43,
+    "name": "Dragoninite",
+    "usage_count": 441,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 36,
+    "item_id": 14,
+    "name": "Baxcalibrite",
+    "usage_count": 377,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 37,
+    "item_id": 110,
+    "name": "Passho Berry",
+    "usage_count": 372,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 38,
+    "item_id": 20,
+    "name": "Blastoisinite",
+    "usage_count": 315,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 39,
+    "item_id": 64,
+    "name": "Glimmoranite",
+    "usage_count": 300,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 40,
+    "item_id": 23,
+    "name": "Cameruptite",
+    "usage_count": 282,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 41,
+    "item_id": 4,
+    "name": "Aerodactylite",
+    "usage_count": 261,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 42,
+    "item_id": 156,
+    "name": "Wide Lens",
+    "usage_count": 256,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 43,
+    "item_id": 50,
+    "name": "Expert Belt",
+    "usage_count": 218,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 44,
+    "item_id": 3,
+    "name": "Absolite Z",
+    "usage_count": 217,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 45,
+    "item_id": 95,
+    "name": "Mawilite",
+    "usage_count": 205,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 46,
+    "item_id": 21,
+    "name": "Blazikenite",
+    "usage_count": 167,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 47,
+    "item_id": 36,
+    "name": "Coba Berry",
+    "usage_count": 158,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 48,
+    "item_id": 122,
+    "name": "Roseli Berry",
+    "usage_count": 141,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 49,
+    "item_id": 79,
+    "name": "Kasib Berry",
+    "usage_count": 136,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 50,
+    "item_id": 98,
+    "name": "Mental Herb",
+    "usage_count": 124,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 51,
+    "item_id": 129,
+    "name": "Scovillainite",
+    "usage_count": 124,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 52,
+    "item_id": 131,
+    "name": "Sharp Beak",
+    "usage_count": 117,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 53,
+    "item_id": 107,
+    "name": "Never-Melt Ice",
+    "usage_count": 99,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 54,
+    "item_id": 115,
+    "name": "Pyroarite",
+    "usage_count": 99,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 55,
+    "item_id": 88,
+    "name": "Lopunnite",
+    "usage_count": 97,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 56,
+    "item_id": 117,
+    "name": "Raichunite X",
+    "usage_count": 95,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 57,
+    "item_id": 128,
+    "name": "Scope Lens",
+    "usage_count": 93,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 58,
+    "item_id": 39,
+    "name": "Damp Rock",
+    "usage_count": 89,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 59,
+    "item_id": 97,
+    "name": "Meganiumite",
+    "usage_count": 89,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 60,
+    "item_id": 82,
+    "name": "Leek",
+    "usage_count": 87,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 61,
+    "item_id": 150,
+    "name": "Twisted Spoon",
+    "usage_count": 85,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 62,
+    "item_id": 47,
+    "name": "Electric Seed",
+    "usage_count": 75,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 63,
+    "item_id": 22,
+    "name": "Bright Powder",
+    "usage_count": 74,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 64,
+    "item_id": 77,
+    "name": "Iron Ball",
+    "usage_count": 71,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 65,
+    "item_id": 99,
+    "name": "Meowsticite",
+    "usage_count": 69,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 66,
+    "item_id": 72,
+    "name": "Hawluchanite",
+    "usage_count": 68,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 67,
+    "item_id": 116,
+    "name": "Quick Claw",
+    "usage_count": 65,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 68,
+    "item_id": 26,
+    "name": "Charizardite X",
+    "usage_count": 62,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 69,
+    "item_id": 7,
+    "name": "Alakazite",
+    "usage_count": 61,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 70,
+    "item_id": 6,
+    "name": "Air Balloon",
+    "usage_count": 59,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 71,
+    "item_id": 125,
+    "name": "Sceptilite",
+    "usage_count": 57,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 72,
+    "item_id": 152,
+    "name": "Venusaurite",
+    "usage_count": 57,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 73,
+    "item_id": 38,
+    "name": "Crabominite",
+    "usage_count": 53,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 74,
+    "item_id": 130,
+    "name": "Scraftinite",
+    "usage_count": 53,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 75,
+    "item_id": 149,
+    "name": "Terrain Extender",
+    "usage_count": 53,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 76,
+    "item_id": 80,
+    "name": "Kebia Berry",
+    "usage_count": 51,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 77,
+    "item_id": 68,
+    "name": "Greninjite",
+    "usage_count": 50,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 78,
+    "item_id": 78,
+    "name": "Kangaskhanite",
+    "usage_count": 49,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 79,
+    "item_id": 92,
+    "name": "Magnet",
+    "usage_count": 49,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 80,
+    "item_id": 143,
+    "name": "Spell Tag",
+    "usage_count": 49,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 81,
+    "item_id": 59,
+    "name": "Garchompite",
+    "usage_count": 48,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 82,
+    "item_id": 66,
+    "name": "Golurkite",
+    "usage_count": 47,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 83,
+    "item_id": 126,
+    "name": "Scizorite",
+    "usage_count": 47,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 84,
+    "item_id": 70,
+    "name": "Haban Berry",
+    "usage_count": 46,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 85,
+    "item_id": 139,
+    "name": "Skarmorite",
+    "usage_count": 46,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 86,
+    "item_id": 135,
+    "name": "Shuca Berry",
+    "usage_count": 45,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 87,
+    "item_id": 120,
+    "name": "Rindo Berry",
+    "usage_count": 44,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 88,
+    "item_id": 101,
+    "name": "Metal Coat",
+    "usage_count": 43,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 89,
+    "item_id": 136,
+    "name": "Silk Scarf",
+    "usage_count": 39,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 90,
+    "item_id": 24,
+    "name": "Chandelurite",
+    "usage_count": 37,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 91,
+    "item_id": 75,
+    "name": "Houndoominite",
+    "usage_count": 37,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 92,
+    "item_id": 5,
+    "name": "Aggronite",
+    "usage_count": 36,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 93,
+    "item_id": 18,
+    "name": "Black Belt",
+    "usage_count": 36,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 94,
+    "item_id": 28,
+    "name": "Charti Berry",
+    "usage_count": 33,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 95,
+    "item_id": 44,
+    "name": "Drampanite",
+    "usage_count": 31,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 96,
+    "item_id": 45,
+    "name": "Eelektrossite",
+    "usage_count": 31,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 97,
+    "item_id": 145,
+    "name": "Starminite",
+    "usage_count": 31,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 98,
+    "item_id": 1,
+    "name": "Abomasite",
+    "usage_count": 30,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 99,
+    "item_id": 91,
+    "name": "Lum Berry",
+    "usage_count": 29,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 100,
+    "item_id": 105,
+    "name": "Muscle Band",
+    "usage_count": 29,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 101,
+    "item_id": 108,
+    "name": "Normal Gem",
+    "usage_count": 28,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 102,
+    "item_id": 157,
+    "name": "Wise Glasses",
+    "usage_count": 27,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 103,
+    "item_id": 53,
+    "name": "Feraligite",
+    "usage_count": 26,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 104,
+    "item_id": 93,
+    "name": "Malamarite",
+    "usage_count": 25,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 105,
+    "item_id": 140,
+    "name": "Slowbronite",
+    "usage_count": 25,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 106,
+    "item_id": 15,
+    "name": "Beedrillite",
+    "usage_count": 24,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 107,
+    "item_id": 146,
+    "name": "Steelixite",
+    "usage_count": 24,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 108,
+    "item_id": 8,
+    "name": "Altarianite",
+    "usage_count": 23,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 109,
+    "item_id": 42,
+    "name": "Dragon Fang",
+    "usage_count": 23,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 110,
+    "item_id": 69,
+    "name": "Gyaradosite",
+    "usage_count": 23,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 111,
+    "item_id": 32,
+    "name": "Chimechite",
+    "usage_count": 22,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 112,
+    "item_id": 11,
+    "name": "Babiri Berry",
+    "usage_count": 21,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 113,
+    "item_id": 41,
+    "name": "Dragalgite",
+    "usage_count": 21,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 114,
+    "item_id": 89,
+    "name": "Lucarionite",
+    "usage_count": 21,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 115,
+    "item_id": 119,
+    "name": "Red Card",
+    "usage_count": 21,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 116,
+    "item_id": 29,
+    "name": "Chesnaughtite",
+    "usage_count": 20,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 117,
+    "item_id": 127,
+    "name": "Scolipite",
+    "usage_count": 20,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 118,
+    "item_id": 142,
+    "name": "Soft Sand",
+    "usage_count": 20,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 119,
+    "item_id": 81,
+    "name": "King's Rock",
+    "usage_count": 18,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 120,
+    "item_id": 84,
+    "name": "Leppa Berry",
+    "usage_count": 17,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 121,
+    "item_id": 94,
+    "name": "Manectite",
+    "usage_count": 17,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 122,
+    "item_id": 9,
+    "name": "Ampharosite",
+    "usage_count": 16,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 123,
+    "item_id": 74,
+    "name": "Heracronite",
+    "usage_count": 16,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 124,
+    "item_id": 134,
+    "name": "Shell Bell",
+    "usage_count": 16,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 125,
+    "item_id": 35,
+    "name": "Clefablite",
+    "usage_count": 14,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 126,
+    "item_id": 158,
+    "name": "Yache Berry",
+    "usage_count": 14,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 127,
+    "item_id": 55,
+    "name": "Focus Band",
+    "usage_count": 13,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 128,
+    "item_id": 63,
+    "name": "Glalitite",
+    "usage_count": 13,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 129,
+    "item_id": 86,
+    "name": "Light Ball",
+    "usage_count": 12,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 130,
+    "item_id": 17,
+    "name": "Binding Band",
+    "usage_count": 11,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 131,
+    "item_id": 49,
+    "name": "Excadrite",
+    "usage_count": 11,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 132,
+    "item_id": 73,
+    "name": "Heat Rock",
+    "usage_count": 11,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 133,
+    "item_id": 111,
+    "name": "Payapa Berry",
+    "usage_count": 11,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 134,
+    "item_id": 112,
+    "name": "Pidgeotite",
+    "usage_count": 11,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 135,
+    "item_id": 141,
+    "name": "Smooth Rock",
+    "usage_count": 10,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 136,
+    "item_id": 154,
+    "name": "Wacan Berry",
+    "usage_count": 10,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 137,
+    "item_id": 159,
+    "name": "Zoom Lens",
+    "usage_count": 10,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 138,
+    "item_id": 16,
+    "name": "Big Root",
+    "usage_count": 9,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 139,
+    "item_id": 13,
+    "name": "Barbaracite",
+    "usage_count": 8,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 140,
+    "item_id": 48,
+    "name": "Emboarite",
+    "usage_count": 8,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 141,
+    "item_id": 58,
+    "name": "Galladite",
+    "usage_count": 8,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 142,
+    "item_id": 71,
+    "name": "Hard Stone",
+    "usage_count": 8,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 143,
+    "item_id": 10,
+    "name": "Audinite",
+    "usage_count": 7,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 144,
+    "item_id": 132,
+    "name": "Sharpedonite",
+    "usage_count": 7,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 145,
+    "item_id": 148,
+    "name": "Tanga Berry",
+    "usage_count": 7,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 146,
+    "item_id": 2,
+    "name": "Absolite",
+    "usage_count": 6,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 147,
+    "item_id": 52,
+    "name": "Falinksite",
+    "usage_count": 6,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 148,
+    "item_id": 104,
+    "name": "Misty Seed",
+    "usage_count": 6,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 149,
+    "item_id": 76,
+    "name": "Icy Rock",
+    "usage_count": 5,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 150,
+    "item_id": 137,
+    "name": "Silver Powder",
+    "usage_count": 5,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 151,
+    "item_id": 102,
+    "name": "Metronome",
+    "usage_count": 4,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 152,
+    "item_id": 123,
+    "name": "Sablenite",
+    "usage_count": 4,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 153,
+    "item_id": 96,
+    "name": "Medichamite",
+    "usage_count": 3,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 154,
+    "item_id": 12,
+    "name": "Banettite",
+    "usage_count": 2,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 155,
+    "item_id": 30,
+    "name": "Chesto Berry",
+    "usage_count": 2,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 156,
+    "item_id": 113,
+    "name": "Pinsirite",
+    "usage_count": 2,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 157,
+    "item_id": 133,
+    "name": "Shed Shell",
+    "usage_count": 2,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 158,
+    "item_id": 153,
+    "name": "Victreebelite",
+    "usage_count": 2,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 159,
+    "item_id": 31,
+    "name": "Chilan Berry",
+    "usage_count": 1,
+    "regulation": "M-C"
+  }
+]

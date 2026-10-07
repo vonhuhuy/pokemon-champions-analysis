@@ -3,1113 +3,954 @@
     "name": "Abomasite",
     "desc": "A held item that allows Abomasnow to Mega Evolve.",
     "description": "A held item that allows Abomasnow to Mega Evolve.",
-    "usage_count": 30,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_02_0674.webp"
   },
   "Absolite": {
     "name": "Absolite",
     "desc": "A held item that allows Absol to Mega Evolve into\nMega Absol.",
     "description": "A held item that allows Absol to Mega Evolve into\nMega Absol.",
-    "usage_count": 6,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_02_0677.webp"
   },
   "Absolite Z": {
     "name": "Absolite Z",
     "desc": "A held item that allows Absol to Mega Evolve into\nMega Absol Z.",
     "description": "A held item that allows Absol to Mega Evolve into\nMega Absol Z.",
-    "usage_count": 217,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_02_2638.webp"
   },
   "Aerodactylite": {
     "name": "Aerodactylite",
     "desc": "A held item that allows Aerodactyl to Mega Evolve.",
     "description": "A held item that allows Aerodactyl to Mega Evolve.",
-    "usage_count": 261,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_02_0672.webp"
   },
   "Aggronite": {
     "name": "Aggronite",
     "desc": "A held item that allows Aggron to Mega Evolve.",
     "description": "A held item that allows Aggron to Mega Evolve.",
-    "usage_count": 36,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_02_0667.webp"
   },
   "Air Balloon": {
     "name": "Air Balloon",
     "desc": "Causes the holder to float off the ground, making it\nimmune to Ground-type moves, as well as the Spikes,\nToxic Spikes, and Sticky Web statuses. Disappears for\nthe duration of the battle if the holder takes damage\nfrom a move.",
     "description": "Causes the holder to float off the ground, making it\nimmune to Ground-type moves, as well as the Spikes,\nToxic Spikes, and Sticky Web statuses. Disappears for\nthe duration of the battle if the holder takes damage\nfrom a move.",
-    "usage_count": 59,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_01_0541.webp"
   },
   "Alakazite": {
     "name": "Alakazite",
     "desc": "A held item that allows Alakazam to Mega Evolve.",
     "description": "A held item that allows Alakazam to Mega Evolve.",
-    "usage_count": 61,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_02_0679.webp"
   },
   "Altarianite": {
     "name": "Altarianite",
     "desc": "A held item that allows Altaria to Mega Evolve.",
     "description": "A held item that allows Altaria to Mega Evolve.",
-    "usage_count": 23,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_02_0755.webp"
   },
   "Ampharosite": {
     "name": "Ampharosite",
     "desc": "A held item that allows Ampharos to Mega Evolve.",
     "description": "A held item that allows Ampharos to Mega Evolve.",
-    "usage_count": 16,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_02_0658.webp"
   },
   "Audinite": {
     "name": "Audinite",
     "desc": "A held item that allows Audino to Mega Evolve.",
     "description": "A held item that allows Audino to Mega Evolve.",
-    "usage_count": 7,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_02_0757.webp"
   },
   "Babiri Berry": {
     "name": "Babiri Berry",
     "desc": "Halves the damage taken when the holder is hit with a\nsupereffective Steel-type move. Disappears for the\nduration of the battle after a single use.",
     "description": "Halves the damage taken when the holder is hit with a\nsupereffective Steel-type move. Disappears for the\nduration of the battle after a single use.",
-    "usage_count": 21,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_01_0199.webp"
   },
   "Banettite": {
     "name": "Banettite",
     "desc": "A held item that allows Banette to Mega Evolve.",
     "description": "A held item that allows Banette to Mega Evolve.",
-    "usage_count": 2,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_02_0668.webp"
   },
   "Barbaracite": {
     "name": "Barbaracite",
     "desc": "A held item that allows Barbaracle to Mega Evolve.",
     "description": "A held item that allows Barbaracle to Mega Evolve.",
-    "usage_count": 8,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_02_2581.webp"
   },
   "Baxcalibrite": {
     "name": "Baxcalibrite",
     "desc": "A held item that allows Baxcalibur to Mega Evolve.",
     "description": "A held item that allows Baxcalibur to Mega Evolve.",
-    "usage_count": 377,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_02_2648.webp"
   },
   "Beedrillite": {
     "name": "Beedrillite",
     "desc": "A held item that allows Beedrill to Mega Evolve.",
     "description": "A held item that allows Beedrill to Mega Evolve.",
-    "usage_count": 24,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_02_0770.webp"
   },
   "Big Root": {
     "name": "Big Root",
     "desc": "Boosts the amount of HP restored through HP-absorbing\nmoves by 30%. HP restored by moves such as Ingrain\nand Strength Sap will also be boosted by 30%.",
     "description": "Boosts the amount of HP restored through HP-absorbing\nmoves by 30%. HP restored by moves such as Ingrain\nand Strength Sap will also be boosted by 30%.",
-    "usage_count": 9,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_01_0296.webp"
   },
   "Binding Band": {
     "name": "Binding Band",
     "desc": "Increases the damage dealt to targets that have the\nBound status. Targets will take damage equal to 1/6 of\ntheir max HP instead of 1/8 of their max HP.",
     "description": "Increases the damage dealt to targets that have the\nBound status. Targets will take damage equal to 1/6 of\ntheir max HP instead of 1/8 of their max HP.",
-    "usage_count": 11,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_01_0544.webp"
   },
   "Black Belt": {
     "name": "Black Belt",
     "desc": "Boosts the power of the holder’s Fighting-type moves\nby 20%.",
     "description": "Boosts the power of the holder’s Fighting-type moves\nby 20%.",
-    "usage_count": 36,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_01_0241.webp"
   },
   "Black Glasses": {
     "name": "Black Glasses",
     "desc": "Boosts the power of the holder’s Dark-type moves\nby 20%.",
     "description": "Boosts the power of the holder’s Dark-type moves\nby 20%.",
-    "usage_count": 556,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_01_0240.webp"
   },
   "Blastoisinite": {
     "name": "Blastoisinite",
     "desc": "A held item that allows Blastoise to Mega Evolve.",
     "description": "A held item that allows Blastoise to Mega Evolve.",
-    "usage_count": 315,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_02_0661.webp"
   },
   "Blazikenite": {
     "name": "Blazikenite",
     "desc": "A held item that allows Blaziken to Mega Evolve.",
     "description": "A held item that allows Blaziken to Mega Evolve.",
-    "usage_count": 167,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_02_0664.webp"
   },
   "Bright Powder": {
     "name": "Bright Powder",
     "desc": "Lowers the accuracy of moves used by opponents\nagainst the holder by 10%.",
     "description": "Lowers the accuracy of moves used by opponents\nagainst the holder by 10%.",
-    "usage_count": 74,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_01_0213.webp"
   },
   "Cameruptite": {
     "name": "Cameruptite",
     "desc": "A held item that allows Camerupt to Mega Evolve.",
     "description": "A held item that allows Camerupt to Mega Evolve.",
-    "usage_count": 282,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_02_0767.webp"
   },
   "Chandelurite": {
     "name": "Chandelurite",
     "desc": "A held item that allows Chandelure to Mega Evolve.",
     "description": "A held item that allows Chandelure to Mega Evolve.",
-    "usage_count": 37,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_02_2574.webp"
   },
   "Charcoal": {
     "name": "Charcoal",
     "desc": "Boosts the power of the holder’s Fire-type moves\nby 20%.",
     "description": "Boosts the power of the holder’s Fire-type moves\nby 20%.",
-    "usage_count": 728,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_01_0249.webp"
   },
   "Charizardite X": {
     "name": "Charizardite X",
     "desc": "A held item that allows Charizard to Mega Evolve into\nMega Charizard X.",
     "description": "A held item that allows Charizard to Mega Evolve into\nMega Charizard X.",
-    "usage_count": 62,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_02_0660.webp"
   },
   "Charizardite Y": {
     "name": "Charizardite Y",
     "desc": "A held item that allows Charizard to Mega Evolve into\nMega Charizard Y.",
     "description": "A held item that allows Charizard to Mega Evolve into\nMega Charizard Y.",
-    "usage_count": 1384,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_02_0678.webp"
   },
   "Charti Berry": {
     "name": "Charti Berry",
     "desc": "Halves the damage taken when the holder is hit with\na supereffective Rock-type move. Disappears for the\nduration of the battle after a single use.",
     "description": "Halves the damage taken when the holder is hit with\na supereffective Rock-type move. Disappears for the\nduration of the battle after a single use.",
-    "usage_count": 33,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_01_0195.webp"
   },
   "Chesnaughtite": {
     "name": "Chesnaughtite",
     "desc": "A held item that allows Chesnaught to Mega Evolve.",
     "description": "A held item that allows Chesnaught to Mega Evolve.",
-    "usage_count": 20,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_02_2575.webp"
   },
   "Chesto Berry": {
     "name": "Chesto Berry",
     "desc": "Cures being asleep. Disappears for the duration of the\nbattle after a single use.",
     "description": "Cures being asleep. Disappears for the duration of the\nbattle after a single use.",
-    "usage_count": 2,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_01_0150.webp"
   },
   "Chilan Berry": {
     "name": "Chilan Berry",
     "desc": "Halves the damage taken when the holder is hit with a\nNormal-type move. Disappears for the duration of the\nbattle after a single use.",
     "description": "Halves the damage taken when the holder is hit with a\nNormal-type move. Disappears for the duration of the\nbattle after a single use.",
-    "usage_count": 1,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_01_0200.webp"
   },
   "Chimechite": {
     "name": "Chimechite",
     "desc": "A held item that allows Chimecho to Mega Evolve.",
     "description": "A held item that allows Chimecho to Mega Evolve.",
-    "usage_count": 22,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_02_2637.webp"
   },
   "Choice Scarf": {
     "name": "Choice Scarf",
     "desc": "Boosts the holder’s Speed stat by 50%. However, once\nthe holder uses a move, it becomes unable to use any\nother move but that one until it switches out of battle.",
     "description": "Boosts the holder’s Speed stat by 50%. However, once\nthe holder uses a move, it becomes unable to use any\nother move but that one until it switches out of battle.",
-    "usage_count": 3163,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_01_0287.webp"
   },
   "Chople Berry": {
     "name": "Chople Berry",
     "desc": "Halves the damage taken when the holder is hit with a\nsupereffective Fighting-type move. Disappears for the\nduration of the battle after a single use.",
     "description": "Halves the damage taken when the holder is hit with a\nsupereffective Fighting-type move. Disappears for the\nduration of the battle after a single use.",
-    "usage_count": 1836,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_01_0189.webp"
   },
   "Clefablite": {
     "name": "Clefablite",
     "desc": "A held item that allows Clefable to Mega Evolve.",
     "description": "A held item that allows Clefable to Mega Evolve.",
-    "usage_count": 14,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_02_2559.webp"
   },
   "Coba Berry": {
     "name": "Coba Berry",
     "desc": "Halves the damage taken when the holder is hit with a\nsupereffective Flying-type move. Disappears for the\nduration of the battle after a single use.",
     "description": "Halves the damage taken when the holder is hit with a\nsupereffective Flying-type move. Disappears for the\nduration of the battle after a single use.",
-    "usage_count": 158,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_01_0192.webp"
   },
   "Colbur Berry": {
     "name": "Colbur Berry",
     "desc": "Halves the damage taken when the holder is hit with\na supereffective Dark-type move. Disappears for the\nduration of the battle after a single use.",
     "description": "Halves the damage taken when the holder is hit with\na supereffective Dark-type move. Disappears for the\nduration of the battle after a single use.",
-    "usage_count": 1570,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_01_0198.webp"
   },
   "Crabominite": {
     "name": "Crabominite",
     "desc": "A held item that allows Crabominable to Mega Evolve.",
     "description": "A held item that allows Crabominable to Mega Evolve.",
-    "usage_count": 53,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_02_2644.webp"
   },
   "Damp Rock": {
     "name": "Damp Rock",
     "desc": "When the holder summons rain with its moves or\nAbility, the duration is extended by 3 turns.\n(Total duration: 8 turns)",
     "description": "When the holder summons rain with its moves or\nAbility, the duration is extended by 3 turns.\n(Total duration: 8 turns)",
-    "usage_count": 89,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_01_0285.webp"
   },
   "Delphoxite": {
     "name": "Delphoxite",
     "desc": "A held item that allows Delphox to Mega Evolve.",
     "description": "A held item that allows Delphox to Mega Evolve.",
-    "usage_count": 532,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_02_2576.webp"
   },
   "Dragalgite": {
     "name": "Dragalgite",
     "desc": "A held item that allows Dragalge to Mega Evolve.",
     "description": "A held item that allows Dragalge to Mega Evolve.",
-    "usage_count": 21,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_02_2582.webp"
   },
   "Dragon Fang": {
     "name": "Dragon Fang",
     "desc": "Boosts the power of the holder’s Dragon-type moves\nby 20%.",
     "description": "Boosts the power of the holder’s Dragon-type moves\nby 20%.",
-    "usage_count": 23,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_01_0250.webp"
   },
   "Dragoninite": {
     "name": "Dragoninite",
     "desc": "A held item that allows Dragonite to Mega Evolve.",
     "description": "A held item that allows Dragonite to Mega Evolve.",
-    "usage_count": 441,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_02_2562.webp"
   },
   "Drampanite": {
     "name": "Drampanite",
     "desc": "A held item that allows Drampa to Mega Evolve.",
     "description": "A held item that allows Drampa to Mega Evolve.",
-    "usage_count": 31,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_02_2585.webp"
   },
   "Eelektrossite": {
     "name": "Eelektrossite",
     "desc": "A held item that allows Eelektross to Mega Evolve.",
     "description": "A held item that allows Eelektross to Mega Evolve.",
-    "usage_count": 31,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_02_2573.webp"
   },
   "Eject Button": {
     "name": "Eject Button",
     "desc": "Switches the holder out of battle when the holder takes\ndamage from a move. Disappears for the duration of the\nbattle after a single use.",
     "description": "Switches the holder out of battle when the holder takes\ndamage from a move. Disappears for the duration of the\nbattle after a single use.",
-    "usage_count": 494,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_01_0547.webp"
   },
   "Electric Seed": {
     "name": "Electric Seed",
     "desc": "Boosts the holder’s Defense stat by 1 stage on Electric\nTerrain. Disappears for the duration of the battle after a\nsingle use.",
     "description": "Boosts the holder’s Defense stat by 1 stage on Electric\nTerrain. Disappears for the duration of the battle after a\nsingle use.",
-    "usage_count": 75,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_01_0881.webp"
   },
   "Emboarite": {
     "name": "Emboarite",
     "desc": "A held item that allows Emboar to Mega Evolve.",
     "description": "A held item that allows Emboar to Mega Evolve.",
-    "usage_count": 8,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_02_2569.webp"
   },
   "Excadrite": {
     "name": "Excadrite",
     "desc": "A held item that allows Excadrill to Mega Evolve.",
     "description": "A held item that allows Excadrill to Mega Evolve.",
-    "usage_count": 11,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_02_2570.webp"
   },
   "Expert Belt": {
     "name": "Expert Belt",
     "desc": "Boosts the power of the holder’s supereffective moves\nby 20%.",
     "description": "Boosts the power of the holder’s supereffective moves\nby 20%.",
-    "usage_count": 218,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_01_0268.webp"
   },
   "Fairy Feather": {
     "name": "Fairy Feather",
     "desc": "Boosts the power of the holder’s Fairy-type moves\nby 20%.",
     "description": "Boosts the power of the holder’s Fairy-type moves\nby 20%.",
-    "usage_count": 1495,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_01_2401.webp"
   },
   "Falinksite": {
     "name": "Falinksite",
     "desc": "A held item that allows Falinks to Mega Evolve.",
     "description": "A held item that allows Falinks to Mega Evolve.",
-    "usage_count": 6,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_02_2587.webp"
   },
   "Feraligite": {
     "name": "Feraligite",
     "desc": "A held item that allows Feraligatr to Mega Evolve.",
     "description": "A held item that allows Feraligatr to Mega Evolve.",
-    "usage_count": 26,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_02_2564.webp"
   },
   "Floettite": {
     "name": "Floettite",
     "desc": "A held item that allows Eternal Flower Floette to\nMega Evolve.",
     "description": "A held item that allows Eternal Flower Floette to\nMega Evolve.",
-    "usage_count": 1618,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_02_2579.webp"
   },
   "Focus Band": {
     "name": "Focus Band",
     "desc": "If the holder takes damage from a move that would\nknock it out, there’s a 10% chance the holder will\nendure the hit with 1 HP.",
     "description": "If the holder takes damage from a move that would\nknock it out, there’s a 10% chance the holder will\nendure the hit with 1 HP.",
-    "usage_count": 13,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_01_0230.webp"
   },
   "Focus Sash": {
     "name": "Focus Sash",
     "desc": "If the holder has full HP and takes damage from a move\nthat would knock it out in one hit, it will endure the hit\nwith 1 HP. Disappears for the duration of the battle after\na single use.",
     "description": "If the holder has full HP and takes damage from a move\nthat would knock it out in one hit, it will endure the hit\nwith 1 HP. Disappears for the duration of the battle after\na single use.",
-    "usage_count": 8220,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_01_0275.webp"
   },
   "Froslassite": {
     "name": "Froslassite",
     "desc": "A held item that allows Froslass to Mega Evolve.",
     "description": "A held item that allows Froslass to Mega Evolve.",
-    "usage_count": 758,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_02_2566.webp"
   },
   "Galladite": {
     "name": "Galladite",
     "desc": "A held item that allows Gallade to Mega Evolve.",
     "description": "A held item that allows Gallade to Mega Evolve.",
-    "usage_count": 8,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_02_0756.webp"
   },
   "Garchompite": {
     "name": "Garchompite",
     "desc": "A held item that allows Garchomp to Mega Evolve into\nMega Garchomp.",
     "description": "A held item that allows Garchomp to Mega Evolve into\nMega Garchomp.",
-    "usage_count": 48,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_02_0683.webp"
   },
   "Garchompite Z": {
     "name": "Garchompite Z",
     "desc": "A held item that allows Garchomp to Mega Evolve into\nMega Garchomp Z.",
     "description": "A held item that allows Garchomp to Mega Evolve into\nMega Garchomp Z.",
-    "usage_count": 1530,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_02_2640.webp"
   },
   "Gardevoirite": {
     "name": "Gardevoirite",
     "desc": "A held item that allows Gardevoir to Mega Evolve.",
     "description": "A held item that allows Gardevoir to Mega Evolve.",
-    "usage_count": 983,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_02_0657.webp"
   },
   "Gengarite": {
     "name": "Gengarite",
     "desc": "A held item that allows Gengar to Mega Evolve.",
     "description": "A held item that allows Gengar to Mega Evolve.",
-    "usage_count": 640,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_02_0656.webp"
   },
   "Glalitite": {
     "name": "Glalitite",
     "desc": "A held item that allows Glalie to Mega Evolve.",
     "description": "A held item that allows Glalie to Mega Evolve.",
-    "usage_count": 13,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_02_0763.webp"
   },
   "Glimmoranite": {
     "name": "Glimmoranite",
     "desc": "A held item that allows Glimmora to Mega Evolve.",
     "description": "A held item that allows Glimmora to Mega Evolve.",
-    "usage_count": 300,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_02_2650.webp"
   },
   "Golisopite": {
     "name": "Golisopite",
     "desc": "A held item that allows Golisopod to Mega Evolve.",
     "description": "A held item that allows Golisopod to Mega Evolve.",
-    "usage_count": 1863,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_02_2645.webp"
   },
   "Golurkite": {
     "name": "Golurkite",
     "desc": "A held item that allows Golurk to Mega Evolve.",
     "description": "A held item that allows Golurk to Mega Evolve.",
-    "usage_count": 47,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_02_2642.webp"
   },
   "Grassy Seed": {
     "name": "Grassy Seed",
     "desc": "Boosts the holder’s Defense stat by 1 stage on Grassy\nTerrain. Disappears for the duration of the battle after a\nsingle use.",
     "description": "Boosts the holder’s Defense stat by 1 stage on Grassy\nTerrain. Disappears for the duration of the battle after a\nsingle use.",
-    "usage_count": 3365,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_01_0884.webp"
   },
   "Greninjite": {
     "name": "Greninjite",
     "desc": "A held item that allows Greninja to Mega Evolve.",
     "description": "A held item that allows Greninja to Mega Evolve.",
-    "usage_count": 50,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_02_2577.webp"
   },
   "Gyaradosite": {
     "name": "Gyaradosite",
     "desc": "A held item that allows Gyarados to Mega Evolve.",
     "description": "A held item that allows Gyarados to Mega Evolve.",
-    "usage_count": 23,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_02_0676.webp"
   },
   "Haban Berry": {
     "name": "Haban Berry",
     "desc": "Halves the damage taken when the holder is hit with a\nsupereffective Dragon-type move. Disappears for the\nduration of the battle after a single use.",
     "description": "Halves the damage taken when the holder is hit with a\nsupereffective Dragon-type move. Disappears for the\nduration of the battle after a single use.",
-    "usage_count": 46,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_01_0197.webp"
   },
   "Hard Stone": {
     "name": "Hard Stone",
     "desc": "Boosts the power of the holder’s Rock-type moves\nby 20%.",
     "description": "Boosts the power of the holder’s Rock-type moves\nby 20%.",
-    "usage_count": 8,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_01_0238.webp"
   },
   "Hawluchanite": {
     "name": "Hawluchanite",
     "desc": "A held item that allows Hawlucha to Mega Evolve.",
     "description": "A held item that allows Hawlucha to Mega Evolve.",
-    "usage_count": 68,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_02_2583.webp"
   },
   "Heat Rock": {
     "name": "Heat Rock",
     "desc": "When the holder summons harsh sunlight with its moves\nor Ability, the duration is extended by 3 turns.\n(Total duration: 8 turns)",
     "description": "When the holder summons harsh sunlight with its moves\nor Ability, the duration is extended by 3 turns.\n(Total duration: 8 turns)",
-    "usage_count": 11,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_01_0284.webp"
   },
   "Heracronite": {
     "name": "Heracronite",
     "desc": "A held item that allows Heracross to Mega Evolve.",
     "description": "A held item that allows Heracross to Mega Evolve.",
-    "usage_count": 16,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_02_0680.webp"
   },
   "Houndoominite": {
     "name": "Houndoominite",
     "desc": "A held item that allows Houndoom to Mega Evolve.",
     "description": "A held item that allows Houndoom to Mega Evolve.",
-    "usage_count": 37,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_02_0666.webp"
   },
   "Icy Rock": {
     "name": "Icy Rock",
     "desc": "When the holder summons snow with its moves or\nAbility, the duration is extended by 3 turns.\n(Total duration: 8 turns)",
     "description": "When the holder summons snow with its moves or\nAbility, the duration is extended by 3 turns.\n(Total duration: 8 turns)",
-    "usage_count": 5,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_01_0282.webp"
   },
   "Iron Ball": {
     "name": "Iron Ball",
     "desc": "Halves the holder’s Speed stat. If the holder is off the\nground, it will be grounded, meaning it can be affected\nby Ground-type moves, as well as the Spikes, Toxic\nSpikes, and Sticky Web statuses.",
     "description": "Halves the holder’s Speed stat. If the holder is off the\nground, it will be grounded, meaning it can be affected\nby Ground-type moves, as well as the Spikes, Toxic\nSpikes, and Sticky Web statuses.",
-    "usage_count": 71,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_01_0278.webp"
   },
   "Kangaskhanite": {
     "name": "Kangaskhanite",
     "desc": "A held item that allows Kangaskhan to Mega Evolve.",
     "description": "A held item that allows Kangaskhan to Mega Evolve.",
-    "usage_count": 49,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_02_0675.webp"
   },
   "Kasib Berry": {
     "name": "Kasib Berry",
     "desc": "Halves the damage taken when the holder is hit with a\nsupereffective Ghost-type move. Disappears for the\nduration of the battle after a single use.",
     "description": "Halves the damage taken when the holder is hit with a\nsupereffective Ghost-type move. Disappears for the\nduration of the battle after a single use.",
-    "usage_count": 136,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_01_0196.webp"
   },
   "Kebia Berry": {
     "name": "Kebia Berry",
     "desc": "Halves the damage taken when the holder is hit with a\nsupereffective Poison-type move. Disappears for the\nduration of the battle after a single use.",
     "description": "Halves the damage taken when the holder is hit with a\nsupereffective Poison-type move. Disappears for the\nduration of the battle after a single use.",
-    "usage_count": 51,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_01_0190.webp"
   },
   "King's Rock": {
     "name": "King's Rock",
     "desc": "When the holder deals damage with its moves, there is a\n10% chance that targets will flinch.",
     "description": "When the holder deals damage with its moves, there is a\n10% chance that targets will flinch.",
-    "usage_count": 18,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_01_0221.webp"
   },
   "Leek": {
     "name": "Leek",
     "desc": "When held by a Farfetch’d or Sirfetch’d, gives the holder\na 2-stage Critical-Hit Ratio Boost.",
     "description": "When held by a Farfetch’d or Sirfetch’d, gives the holder\na 2-stage Critical-Hit Ratio Boost.",
-    "usage_count": 87,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_01_0259.webp"
   },
   "Leftovers": {
     "name": "Leftovers",
     "desc": "Restores 1/16 of the holder’s max HP at the end of\nevery turn.",
     "description": "Restores 1/16 of the holder’s max HP at the end of\nevery turn.",
-    "usage_count": 4154,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_01_0234.webp"
   },
   "Leppa Berry": {
     "name": "Leppa Berry",
     "desc": "Restores 10 PP to a move when its PP is fully depleted.\nDisappears for the duration of the battle after a single use.",
     "description": "Restores 10 PP to a move when its PP is fully depleted.\nDisappears for the duration of the battle after a single use.",
-    "usage_count": 17,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_01_0154.webp"
   },
   "Life Orb": {
     "name": "Life Orb",
     "desc": "Boosts the power of the holder’s moves by 30%.\nHowever, the holder also loses 1/10 of its max HP\neach time it successfully lands an attack.",
     "description": "Boosts the power of the holder’s moves by 30%.\nHowever, the holder also loses 1/10 of its max HP\neach time it successfully lands an attack.",
-    "usage_count": 7898,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_01_0270.webp"
   },
   "Light Ball": {
     "name": "Light Ball",
     "desc": "When held by a Pikachu, doubles the holder’s Attack\nand Sp. Atk.",
     "description": "When held by a Pikachu, doubles the holder’s Attack\nand Sp. Atk.",
-    "usage_count": 12,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_01_0236.webp"
   },
   "Light Clay": {
     "name": "Light Clay",
     "desc": "When the holder uses Light Screen, Reflect, or\nAurora Veil, the duration is extended by 3 turns.\n(Total duration: 8 turns)",
     "description": "When the holder uses Light Screen, Reflect, or\nAurora Veil, the duration is extended by 3 turns.\n(Total duration: 8 turns)",
-    "usage_count": 1055,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_01_0269.webp"
   },
   "Lopunnite": {
     "name": "Lopunnite",
     "desc": "A held item that allows Lopunny to Mega Evolve.",
     "description": "A held item that allows Lopunny to Mega Evolve.",
-    "usage_count": 97,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_02_0768.webp"
   },
   "Lucarionite": {
     "name": "Lucarionite",
     "desc": "A held item that allows Lucario to Mega Evolve into\nMega Lucario.",
     "description": "A held item that allows Lucario to Mega Evolve into\nMega Lucario.",
-    "usage_count": 21,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_02_0673.webp"
   },
   "Lucarionite Z": {
     "name": "Lucarionite Z",
     "desc": "A held item that allows Lucario to Mega Evolve into\nMega Lucario Z.",
     "description": "A held item that allows Lucario to Mega Evolve into\nMega Lucario Z.",
-    "usage_count": 632,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_02_2641.webp"
   },
   "Lum Berry": {
     "name": "Lum Berry",
     "desc": "Cures any status condition or confusion. Disappears for\nthe duration of the battle after a single use.",
     "description": "Cures any status condition or confusion. Disappears for\nthe duration of the battle after a single use.",
-    "usage_count": 29,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_01_0157.webp"
   },
   "Magnet": {
     "name": "Magnet",
     "desc": "Boosts the power of the holder’s Electric-type moves\nby 20%.",
     "description": "Boosts the power of the holder’s Electric-type moves\nby 20%.",
-    "usage_count": 49,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_01_0242.webp"
   },
   "Malamarite": {
     "name": "Malamarite",
     "desc": "A held item that allows Malamar to Mega Evolve.",
     "description": "A held item that allows Malamar to Mega Evolve.",
-    "usage_count": 25,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_02_2580.webp"
   },
   "Manectite": {
     "name": "Manectite",
     "desc": "A held item that allows Manectric to Mega Evolve.",
     "description": "A held item that allows Manectric to Mega Evolve.",
-    "usage_count": 17,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_02_0682.webp"
   },
   "Mawilite": {
     "name": "Mawilite",
     "desc": "A held item that allows Mawile to Mega Evolve.",
     "description": "A held item that allows Mawile to Mega Evolve.",
-    "usage_count": 205,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_02_0681.webp"
   },
   "Medichamite": {
     "name": "Medichamite",
     "desc": "A held item that allows Medicham to Mega Evolve.",
     "description": "A held item that allows Medicham to Mega Evolve.",
-    "usage_count": 3,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_02_0665.webp"
   },
   "Meganiumite": {
     "name": "Meganiumite",
     "desc": "A held item that allows Meganium to Mega Evolve.",
     "description": "A held item that allows Meganium to Mega Evolve.",
-    "usage_count": 89,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_02_2563.webp"
   },
   "Mental Herb": {
     "name": "Mental Herb",
     "desc": "Cures the holder of the Infatuated, Taunted, Unable to\nRepeat, Move Disabled, Healing Prevented, and Encore\nstatuses. Disappears for the duration of the battle after a\nsingle use.",
     "description": "Cures the holder of the Infatuated, Taunted, Unable to\nRepeat, Move Disabled, Healing Prevented, and Encore\nstatuses. Disappears for the duration of the battle after a\nsingle use.",
-    "usage_count": 124,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_01_0219.webp"
   },
   "Meowsticite": {
     "name": "Meowsticite",
     "desc": "A held item that allows Meowstic to Mega Evolve.",
     "description": "A held item that allows Meowstic to Mega Evolve.",
-    "usage_count": 69,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_02_2643.webp"
   },
   "Metagrossite": {
     "name": "Metagrossite",
     "desc": "A held item that allows Metagross to Mega Evolve.",
     "description": "A held item that allows Metagross to Mega Evolve.",
-    "usage_count": 628,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_02_0758.webp"
   },
   "Metal Coat": {
     "name": "Metal Coat",
     "desc": "Boosts the power of the holder’s Steel-type moves\nby 20%.",
     "description": "Boosts the power of the holder’s Steel-type moves\nby 20%.",
-    "usage_count": 43,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_01_0233.webp"
   },
   "Metronome": {
     "name": "Metronome",
     "desc": "Boosts the power of a move that is used repeatedly.\nThis boost will be 20% on the second usage, 40% on\nthe third, and so on, up to a maximum boost of 100%.\nIf the streak is broken, the move’s power returns to its\nusual value.",
     "description": "Boosts the power of a move that is used repeatedly.\nThis boost will be 20% on the second usage, 40% on\nthe third, and so on, up to a maximum boost of 100%.\nIf the streak is broken, the move’s power returns to its\nusual value.",
-    "usage_count": 4,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_01_0277.webp"
   },
   "Miracle Seed": {
     "name": "Miracle Seed",
     "desc": "Boosts the power of the holder’s Grass-type moves\nby 20%.",
     "description": "Boosts the power of the holder’s Grass-type moves\nby 20%.",
-    "usage_count": 4864,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_01_0239.webp"
   },
   "Misty Seed": {
     "name": "Misty Seed",
     "desc": "Boosts the holder’s Sp. Def stat by 1 stage on Misty\nTerrain. Disappears for the duration of the battle after a\nsingle use.",
     "description": "Boosts the holder’s Sp. Def stat by 1 stage on Misty\nTerrain. Disappears for the duration of the battle after a\nsingle use.",
-    "usage_count": 6,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_01_0883.webp"
   },
   "Muscle Band": {
     "name": "Muscle Band",
     "desc": "Boosts the power of the holder’s physical moves by 10%.",
     "description": "Boosts the power of the holder’s physical moves by 10%.",
-    "usage_count": 29,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_01_0266.webp"
   },
   "Mystic Water": {
     "name": "Mystic Water",
     "desc": "Boosts the power of the holder’s Water-type moves\nby 20%.",
     "description": "Boosts the power of the holder’s Water-type moves\nby 20%.",
-    "usage_count": 573,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_01_0243.webp"
   },
   "Never-Melt Ice": {
     "name": "Never-Melt Ice",
     "desc": "Boosts the power of the holder’s Ice-type moves\nby 20%.",
     "description": "Boosts the power of the holder’s Ice-type moves\nby 20%.",
-    "usage_count": 99,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_01_0246.webp"
   },
   "Normal Gem": {
     "name": "Normal Gem",
     "desc": "Boosts the power of the holder’s Normal-type moves by\n30%. Disappears for the duration of the battle after a\nsingle use.",
     "description": "Boosts the power of the holder’s Normal-type moves by\n30%. Disappears for the duration of the battle after a\nsingle use.",
-    "usage_count": 28,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_01_0564.webp"
   },
   "Occa Berry": {
     "name": "Occa Berry",
     "desc": "Halves the damage taken when the holder is hit with a\nsupereffective Fire-type move. Disappears for the\nduration of the battle after a single use.",
     "description": "Halves the damage taken when the holder is hit with a\nsupereffective Fire-type move. Disappears for the\nduration of the battle after a single use.",
-    "usage_count": 562,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_01_0184.webp"
   },
   "Passho Berry": {
     "name": "Passho Berry",
     "desc": "Halves the damage taken when the holder is hit with a\nsupereffective Water-type move. Disappears for the\nduration of the battle after a single use.",
     "description": "Halves the damage taken when the holder is hit with a\nsupereffective Water-type move. Disappears for the\nduration of the battle after a single use.",
-    "usage_count": 372,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_01_0185.webp"
   },
   "Payapa Berry": {
     "name": "Payapa Berry",
     "desc": "Halves the damage taken when the holder is hit with a\nsupereffective Psychic-type move. Disappears for the\nduration of the battle after a single use.",
     "description": "Halves the damage taken when the holder is hit with a\nsupereffective Psychic-type move. Disappears for the\nduration of the battle after a single use.",
-    "usage_count": 11,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_01_0193.webp"
   },
   "Pidgeotite": {
     "name": "Pidgeotite",
     "desc": "A held item that allows Pidgeot to Mega Evolve.",
     "description": "A held item that allows Pidgeot to Mega Evolve.",
-    "usage_count": 11,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_02_0762.webp"
   },
   "Pinsirite": {
     "name": "Pinsirite",
     "desc": "A held item that allows Pinsir to Mega Evolve.",
     "description": "A held item that allows Pinsir to Mega Evolve.",
-    "usage_count": 2,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_02_0671.webp"
   },
   "Psychic Seed": {
     "name": "Psychic Seed",
     "desc": "Boosts the holder’s Sp. Def stat by 1 stage on Psychic\nTerrain. Disappears for the duration of the battle after a\nsingle use.",
     "description": "Boosts the holder’s Sp. Def stat by 1 stage on Psychic\nTerrain. Disappears for the duration of the battle after a\nsingle use.",
-    "usage_count": 2241,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_01_0882.webp"
   },
   "Pyroarite": {
     "name": "Pyroarite",
     "desc": "A held item that allows Pyroar to Mega Evolve.",
     "description": "A held item that allows Pyroar to Mega Evolve.",
-    "usage_count": 99,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_02_2578.webp"
   },
   "Quick Claw": {
     "name": "Quick Claw",
     "desc": "Gives the holder’s moves a 20% chance of going first\namong moves of the same priority.",
     "description": "Gives the holder’s moves a 20% chance of going first\namong moves of the same priority.",
-    "usage_count": 65,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_01_0217.webp"
   },
   "Raichunite X": {
     "name": "Raichunite X",
     "desc": "A held item that allows Raichu to Mega Evolve into\nMega Raichu X. It has no effect on Alolan Raichu.",
     "description": "A held item that allows Raichu to Mega Evolve into\nMega Raichu X. It has no effect on Alolan Raichu.",
-    "usage_count": 95,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_02_2635.webp"
   },
   "Raichunite Y": {
     "name": "Raichunite Y",
     "desc": "A held item that allows Raichu to Mega Evolve into\nMega Raichu Y. It has no effect on Alolan Raichu.",
     "description": "A held item that allows Raichu to Mega Evolve into\nMega Raichu Y. It has no effect on Alolan Raichu.",
-    "usage_count": 2446,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_02_2636.webp"
   },
   "Red Card": {
     "name": "Red Card",
     "desc": "When the holder takes damage from a move, the\nattacker is forced to switch out of battle. Disappears\nfor the duration of the battle after a single use.",
     "description": "When the holder takes damage from a move, the\nattacker is forced to switch out of battle. Disappears\nfor the duration of the battle after a single use.",
-    "usage_count": 21,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_01_0542.webp"
   },
   "Rindo Berry": {
     "name": "Rindo Berry",
     "desc": "Halves the damage taken when the holder is hit with a\nsupereffective Grass-type move. Disappears for the\nduration of the battle after a single use.",
     "description": "Halves the damage taken when the holder is hit with a\nsupereffective Grass-type move. Disappears for the\nduration of the battle after a single use.",
-    "usage_count": 44,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_01_0187.webp"
   },
   "Rocky Helmet": {
     "name": "Rocky Helmet",
     "desc": "When the holder is hit by a contact move, the attacker\ntakes damage equal to 1/6 of its max HP.",
     "description": "When the holder is hit by a contact move, the attacker\ntakes damage equal to 1/6 of its max HP.",
-    "usage_count": 1744,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_01_0540.webp"
   },
   "Roseli Berry": {
     "name": "Roseli Berry",
     "desc": "Halves the damage taken when the holder is hit with a\nsupereffective Fairy-type move. Disappears for the\nduration of the battle after a single use.",
     "description": "Halves the damage taken when the holder is hit with a\nsupereffective Fairy-type move. Disappears for the\nduration of the battle after a single use.",
-    "usage_count": 141,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_01_0686.webp"
   },
   "Sablenite": {
     "name": "Sablenite",
     "desc": "A held item that allows Sableye to Mega Evolve.",
     "description": "A held item that allows Sableye to Mega Evolve.",
-    "usage_count": 4,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_02_0754.webp"
   },
   "Salamencite": {
     "name": "Salamencite",
     "desc": "A held item that allows Salamence to Mega Evolve.",
     "description": "A held item that allows Salamence to Mega Evolve.",
-    "usage_count": 3772,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_02_0769.webp"
   },
   "Sceptilite": {
     "name": "Sceptilite",
     "desc": "A held item that allows Sceptile to Mega Evolve.",
     "description": "A held item that allows Sceptile to Mega Evolve.",
-    "usage_count": 57,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_02_0753.webp"
   },
   "Scizorite": {
     "name": "Scizorite",
     "desc": "A held item that allows Scizor to Mega Evolve.",
     "description": "A held item that allows Scizor to Mega Evolve.",
-    "usage_count": 47,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_02_0670.webp"
   },
   "Scolipite": {
     "name": "Scolipite",
     "desc": "A held item that allows Scolipede to Mega Evolve.",
     "description": "A held item that allows Scolipede to Mega Evolve.",
-    "usage_count": 20,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_02_2571.webp"
   },
   "Scope Lens": {
     "name": "Scope Lens",
     "desc": "Gives the holder a 1-stage Critical-Hit Ratio Boost.",
     "description": "Gives the holder a 1-stage Critical-Hit Ratio Boost.",
-    "usage_count": 93,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_01_0232.webp"
   },
   "Scovillainite": {
     "name": "Scovillainite",
     "desc": "A held item that allows Scovillain to Mega Evolve.",
     "description": "A held item that allows Scovillain to Mega Evolve.",
-    "usage_count": 124,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_02_2647.webp"
   },
   "Scraftinite": {
     "name": "Scraftinite",
     "desc": "A held item that allows Scrafty to Mega Evolve.",
     "description": "A held item that allows Scrafty to Mega Evolve.",
-    "usage_count": 53,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_02_2572.webp"
   },
   "Sharp Beak": {
     "name": "Sharp Beak",
     "desc": "Boosts the power of the holder’s Flying-type moves\nby 20%.",
     "description": "Boosts the power of the holder’s Flying-type moves\nby 20%.",
-    "usage_count": 117,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_01_0244.webp"
   },
   "Sharpedonite": {
     "name": "Sharpedonite",
     "desc": "A held item that allows Sharpedo to Mega Evolve.",
     "description": "A held item that allows Sharpedo to Mega Evolve.",
-    "usage_count": 7,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_02_0759.webp"
   },
   "Shed Shell": {
     "name": "Shed Shell",
     "desc": "Enables the holder to ignore any effects that would\nusually prevent it from switching out of battle and being\nreplaced by another party Pokémon.",
     "description": "Enables the holder to ignore any effects that would\nusually prevent it from switching out of battle and being\nreplaced by another party Pokémon.",
-    "usage_count": 2,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_01_0295.webp"
   },
   "Shell Bell": {
     "name": "Shell Bell",
     "desc": "When the holder deals damage with its moves, its HP is\nrestored by 1/8 of the damage dealt.",
     "description": "When the holder deals damage with its moves, its HP is\nrestored by 1/8 of the damage dealt.",
-    "usage_count": 16,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_01_0253.webp"
   },
   "Shuca Berry": {
     "name": "Shuca Berry",
     "desc": "Halves the damage taken when the holder is hit with a\nsupereffective Ground-type move. Disappears for the\nduration of the battle after a single use.",
     "description": "Halves the damage taken when the holder is hit with a\nsupereffective Ground-type move. Disappears for the\nduration of the battle after a single use.",
-    "usage_count": 45,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_01_0191.webp"
   },
   "Silk Scarf": {
     "name": "Silk Scarf",
     "desc": "Boosts the power of the holder’s Normal-type moves\nby 20%.",
     "description": "Boosts the power of the holder’s Normal-type moves\nby 20%.",
-    "usage_count": 39,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_01_0251.webp"
   },
   "Silver Powder": {
     "name": "Silver Powder",
     "desc": "Boosts the power of the holder’s Bug-type moves\nby 20%.",
     "description": "Boosts the power of the holder’s Bug-type moves\nby 20%.",
-    "usage_count": 5,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_01_0222.webp"
   },
   "Sitrus Berry": {
     "name": "Sitrus Berry",
     "desc": "Restores 1/4 of the holder’s max HP when the holder’s\nHP drops to 1/2 or less of its max. Disappears for the\nduration of the battle after a single use.",
     "description": "Restores 1/4 of the holder’s max HP when the holder’s\nHP drops to 1/2 or less of its max. Disappears for the\nduration of the battle after a single use.",
-    "usage_count": 8065,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_01_0158.webp"
   },
   "Skarmorite": {
     "name": "Skarmorite",
     "desc": "A held item that allows Skarmory to Mega Evolve.",
     "description": "A held item that allows Skarmory to Mega Evolve.",
-    "usage_count": 46,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_02_2565.webp"
   },
   "Slowbronite": {
     "name": "Slowbronite",
     "desc": "A held item that allows Slowbro to Mega Evolve.\nIt has no effect on Galarian Slowbro.",
     "description": "A held item that allows Slowbro to Mega Evolve.\nIt has no effect on Galarian Slowbro.",
-    "usage_count": 25,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_02_0760.webp"
   },
   "Smooth Rock": {
     "name": "Smooth Rock",
     "desc": "When the holder summons a sandstorm with its moves\nor Ability, the duration is extended by 3 turns.\n(Total duration: 8 turns)",
     "description": "When the holder summons a sandstorm with its moves\nor Ability, the duration is extended by 3 turns.\n(Total duration: 8 turns)",
-    "usage_count": 10,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_01_0283.webp"
   },
   "Soft Sand": {
     "name": "Soft Sand",
     "desc": "Boosts the power of the holder’s Ground-type moves\nby 20%.",
     "description": "Boosts the power of the holder’s Ground-type moves\nby 20%.",
-    "usage_count": 20,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_01_0237.webp"
   },
   "Spell Tag": {
     "name": "Spell Tag",
     "desc": "Boosts the power of the holder’s Ghost-type moves\nby 20%.",
     "description": "Boosts the power of the holder’s Ghost-type moves\nby 20%.",
-    "usage_count": 49,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_01_0247.webp"
   },
   "Staraptite": {
     "name": "Staraptite",
     "desc": "A held item that allows Staraptor to Mega Evolve.",
     "description": "A held item that allows Staraptor to Mega Evolve.",
-    "usage_count": 1096,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_02_2639.webp"
   },
   "Starminite": {
     "name": "Starminite",
     "desc": "A held item that allows Starmie to Mega Evolve.",
     "description": "A held item that allows Starmie to Mega Evolve.",
-    "usage_count": 31,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_02_2561.webp"
   },
   "Steelixite": {
     "name": "Steelixite",
     "desc": "A held item that allows Steelix to Mega Evolve.",
     "description": "A held item that allows Steelix to Mega Evolve.",
-    "usage_count": 24,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_02_0761.webp"
   },
   "Swampertite": {
     "name": "Swampertite",
     "desc": "A held item that allows Swampert to Mega Evolve.",
     "description": "A held item that allows Swampert to Mega Evolve.",
-    "usage_count": 524,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_02_0752.webp"
   },
   "Tanga Berry": {
     "name": "Tanga Berry",
     "desc": "Halves the damage taken when the holder is hit with\na supereffective Bug-type move. Disappears for the\nduration of the battle after a single use.",
     "description": "Halves the damage taken when the holder is hit with\na supereffective Bug-type move. Disappears for the\nduration of the battle after a single use.",
-    "usage_count": 7,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_01_0194.webp"
   },
   "Terrain Extender": {
     "name": "Terrain Extender",
     "desc": "When the holder creates terrain with its moves or\nAbility, the duration is extended by 3 turns.\n(Total duration: 8 turns)",
     "description": "When the holder creates terrain with its moves or\nAbility, the duration is extended by 3 turns.\n(Total duration: 8 turns)",
-    "usage_count": 53,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_01_0879.webp"
   },
   "Twisted Spoon": {
     "name": "Twisted Spoon",
     "desc": "Boosts the power of the holder’s Psychic-type moves\nby 20%.",
     "description": "Boosts the power of the holder’s Psychic-type moves\nby 20%.",
-    "usage_count": 85,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_01_0248.webp"
   },
   "Tyranitarite": {
     "name": "Tyranitarite",
     "desc": "A held item that allows Tyranitar to Mega Evolve.",
     "description": "A held item that allows Tyranitar to Mega Evolve.",
-    "usage_count": 921,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_02_0669.webp"
   },
   "Venusaurite": {
     "name": "Venusaurite",
     "desc": "A held item that allows Venusaur to Mega Evolve.",
     "description": "A held item that allows Venusaur to Mega Evolve.",
-    "usage_count": 57,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_02_0659.webp"
   },
   "Victreebelite": {
     "name": "Victreebelite",
     "desc": "A held item that allows Victreebel to Mega Evolve.",
     "description": "A held item that allows Victreebel to Mega Evolve.",
-    "usage_count": 2,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_02_2560.webp"
   },
   "Wacan Berry": {
     "name": "Wacan Berry",
     "desc": "Halves the damage taken when the holder is hit with a\nsupereffective Electric-type move. Disappears for the\nduration of the battle after a single use.",
     "description": "Halves the damage taken when the holder is hit with a\nsupereffective Electric-type move. Disappears for the\nduration of the battle after a single use.",
-    "usage_count": 10,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_01_0186.webp"
   },
   "White Herb": {
     "name": "White Herb",
     "desc": "Restores the holder’s stats to their usual value when they\nare lowered. Disappears for the duration of the battle\nafter a single use.",
     "description": "Restores the holder’s stats to their usual value when they\nare lowered. Disappears for the duration of the battle\nafter a single use.",
-    "usage_count": 1712,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_01_0214.webp"
   },
   "Wide Lens": {
     "name": "Wide Lens",
     "desc": "Boosts the accuracy of the holder’s moves by 10%.",
     "description": "Boosts the accuracy of the holder’s moves by 10%.",
-    "usage_count": 256,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_01_0265.webp"
   },
   "Wise Glasses": {
     "name": "Wise Glasses",
     "desc": "Boosts the power of the holder’s special moves by 10%.",
     "description": "Boosts the power of the holder’s special moves by 10%.",
-    "usage_count": 27,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_01_0267.webp"
   },
   "Yache Berry": {
     "name": "Yache Berry",
     "desc": "Halves the damage taken when the holder is hit with a\nsupereffective Ice-type move. Disappears for the\nduration of the battle after a single use.",
     "description": "Halves the damage taken when the holder is hit with a\nsupereffective Ice-type move. Disappears for the\nduration of the battle after a single use.",
-    "usage_count": 14,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_01_0188.webp"
   },
   "Zoom Lens": {
     "name": "Zoom Lens",
     "desc": "Boosts the accuracy of the holder’s moves by 20% when\nthe holder acts after the targets.",
     "description": "Boosts the accuracy of the holder’s moves by 20% when\nthe holder acts after the targets.",
-    "usage_count": 10,
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_01_0276.webp"
   }
 }

@@ -28,7 +28,8 @@ This document serves as the high-level technical contract for all agents working
 
 ## 3. 🔑 Critical Design Contracts
 1. **Database Source of Truth & Projections**:
-   - [pokemon_singles_db.sqlite](file:///Users/HVo/workspace/github-huy/pokechamp/data/pokemon_singles_db.sqlite) is the primary relational source of truth (`metadata`, `pokedex`, `moves`, `items`, `abilities`, `rankings`).
+   - [pokemon_singles_db.sqlite](file:///Users/HVo/workspace/github-huy/pokechamp/data/pokemon_singles_db.sqlite) is the primary relational source of truth (`metadata`, `pokedex`, `moves`, `moves_usage`, `items`, `items_usage`, `abilities`, `abilities_usage`, `rankings`).
+   - Base tables (`moves`, `items`, `abilities`) are fixed, immutable catalogs ordered strictly alphabetically by name. Volatile ladder usage counts are decoupled into dedicated usage ranking tables (`moves_usage`, `items_usage`, `abilities_usage`).
    - All `data/*.json` files are strictly automated downstream build artifacts projected from SQLite by `export_json_from_sqlite()` so that static GitHub Pages can serve them with zero cold starts and zero hosting cost.
 2. **Team Hash Encoding (`teamhash`)**:
    - The 16-character alphanumeric hash in [teambuilder.js](file:///Users/HVo/workspace/github-huy/pokechamp/teambuilder.js) is zero-backend. Do not change the packing/unpacking bit offsets without providing backward compatibility or migration logic.

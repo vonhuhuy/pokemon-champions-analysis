@@ -2,6 +2,35 @@
 
 This log records major technical decisions, architectural shifts, and important handoff notes for future agent sessions.
 
+### [2026-10-06] Decouple Usage Counts from Base Moves, Items, and Abilities Tables
+- **Objective**: Purify base `moves`, `items`, and `abilities` tables into immutable, canonical game catalogs ordered strictly alphabetically, and split volatile competitive usage statistics into dedicated usage tables (`moves_usage`, `items_usage`, `abilities_usage`).
+- **Files Touched**:
+  - [pokemon_singles_db.sqlite](file:///Users/HVo/workspace/github-huy/pokechamp/data/pokemon_singles_db.sqlite)
+  - [moves_database.json](file:///Users/HVo/workspace/github-huy/pokechamp/data/moves_database.json)
+  - [items_database.json](file:///Users/HVo/workspace/github-huy/pokechamp/data/items_database.json)
+  - [abilities_database.json](file:///Users/HVo/workspace/github-huy/pokechamp/data/abilities_database.json)
+  - [moves_usage.json](file:///Users/HVo/workspace/github-huy/pokechamp/data/moves_usage.json)
+  - [items_usage.json](file:///Users/HVo/workspace/github-huy/pokechamp/data/items_usage.json)
+  - [abilities_usage.json](file:///Users/HVo/workspace/github-huy/pokechamp/data/abilities_usage.json)
+  - [update_database.py](file:///Users/HVo/workspace/github-huy/pokechamp/scripts/update_database.py)
+  - [build_regulation_mc_database.py](file:///Users/HVo/workspace/github-huy/pokechamp/scratch/build_regulation_mc_database.py)
+- **Key Decisions**:
+  - **Immutable Base Catalogs**: Removed `usage_count` from the `moves` (479), `items` (159), and `abilities` (198) base tables. Ordered all entries strictly alphabetically by name with permanent primary keys (1..N).
+  - **Dedicated Usage Tables**: Created `moves_usage`, `items_usage`, and `abilities_usage` in SQLite storing `(rank PRIMARY KEY, <entity>_id REFERENCES <entity>(id), name, usage_count, regulation)`.
+  - **Static Distribution Exports**: Base JSON catalogs now contain only immutable game attributes without `usage_count`. Dedicated companion JSON files (`moves_usage.json`, `items_usage.json`, `abilities_usage.json`) export the ladder usage rankings.
+
+---
+
+### [2026-10-06] Battle Page Analysis Tab Refactor & Speed Tiers Consolidation
+- **Objective**: Streamline Battle Analysis tabs by removing subjective tactical role labels (MVP Carry, Key Anchor, Matchup Liability, and recommended lead callout), keeping member cards strictly focused on moves and counter moves, and merging the Speed Tiers section into a unified "Analysis" tab.
+- **Files Touched**:
+  - [battle.html](file:///Users/HVo/workspace/github-huy/pokechamp/battle.html)
+  - [battle.js](file:///Users/HVo/workspace/github-huy/pokechamp/battle.js)
+- **Key Decisions**:
+  - **Eliminated Subjective Role & Liability Badges**: Removed `#6 Matchup Liability` (deferring liability diagnosis to AI battle plan) as well as `#1 MVP Carry`, `#2 Core Wallbreaker`, `#3 Key Anchor`, and the role footer box. Cards now cleanly display `#1` through `#6` with `Score: +X` alongside Key Targets & Threat Moves.
+  - **Removed Recommended Leads Callout**: Deleted the banner above member selection cards.
+  - **Consolidated Tabs to 3**: Merged Speed Tiers (turn-order ladder, outspeed matrix, KPIs, EV spreads & items) directly beneath the member matchup cards in `#pane-rankings`. Renamed the tab to `📊 Analysis`. The tab bar is now a clean 3-part workflow: `📊 Analysis` -> `⚔️ Head-to-Head` -> `🎯 Battle Plan`.
+
 ---
 
 ### [2026-10-06] Symmetrical Double-Lane Layout for Battle Rosters

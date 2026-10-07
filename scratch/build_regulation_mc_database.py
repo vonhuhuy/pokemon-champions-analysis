@@ -391,8 +391,7 @@ def main():
             'priority': prio,
             'contact': bool(contact),
             'desc': desc,
-            'description': desc,
-            'usage_count': usage
+            'description': desc
         }
 
     # =========================================================================
@@ -436,7 +435,6 @@ def main():
             'name': name,
             'desc': desc,
             'description': desc,
-            'usage_count': usage,
             'icon_url': img_src
         }
 
@@ -479,7 +477,6 @@ def main():
             'name': name,
             'desc': desc,
             'description': desc,
-            'usage_count': usage,
             'is_vgc_ranked': True
         }
 
@@ -515,7 +512,6 @@ def main():
                     'name': name,
                     'desc': desc,
                     'description': desc,
-                    'usage_count': usage,
                     'is_vgc_ranked': False
                 }
     print(f"   ↳ Total abilities captured: {len(abilities_records)} (139 core VGC + {len(abilities_records) - 139} extended).")
@@ -661,7 +657,7 @@ def main():
             p['sprite_url'], p['is_mega'], p['is_form'], p['form_name'], p['regulation']
         ))
 
-    # 3. Moves Table (479 moves)
+    # 3. Moves Table (479 moves, ordered alphabetically)
     cur.execute("""
     CREATE TABLE moves (
         id INTEGER PRIMARY KEY,
@@ -675,58 +671,109 @@ def main():
         priority INTEGER DEFAULT 0,
         contact INTEGER DEFAULT 0,
         description TEXT,
-        usage_count INTEGER DEFAULT 0,
         regulation TEXT DEFAULT 'M-C'
     );
     """)
-    for m in moves_records:
+    cur.execute("""
+    CREATE TABLE moves_usage (
+        rank INTEGER PRIMARY KEY,
+        move_id INTEGER NOT NULL REFERENCES moves(id),
+        move_name TEXT NOT NULL,
+        usage_count INTEGER NOT NULL,
+        regulation TEXT DEFAULT 'M-C'
+    );
+    """)
+    sorted_moves_rec = sorted(moves_records, key=lambda m: m['name'].lower())
+    m_id_map = {}
+    for i, m in enumerate(sorted_moves_rec, start=1):
         cur.execute("""
-        INSERT INTO moves VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        INSERT INTO moves VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """, (
-            m['id'], m['name'], m['slug'], m['type'], m['category'],
+            i, m['name'], m['slug'], m['type'], m['category'],
             m['power'], m['accuracy'], m['pp'], m['priority'], m['contact'],
-            m['description'], m['usage_count'], m['regulation']
+            m['description'], m['regulation']
         ))
+        m_id_map[m['name']] = (i, m.get('usage_count', 0))
 
-    # 4. Items Table (159 items)
+    sorted_m_usage = sorted(m_id_map.items(), key=lambda kv: kv[1][1], reverse=True)
+    for u_rank, (m_name, (mid, u_count)) in enumerate(sorted_m_usage, start=1):
+        cur.execute("""
+        INSERT INTO moves_usage VALUES (?, ?, ?, ?, ?)
+        """, (u_rank, mid, m_name, u_count, 'M-C'))
+
+    # 4. Items Table (159 items, ordered alphabetically)
     cur.execute("""
     CREATE TABLE items (
         id INTEGER PRIMARY KEY,
         name TEXT NOT NULL,
         slug TEXT UNIQUE NOT NULL,
         description TEXT,
-        usage_count INTEGER DEFAULT 0,
         icon_url TEXT,
         regulation TEXT DEFAULT 'M-C'
     );
     """)
-    for it in items_records:
+    cur.execute("""
+    CREATE TABLE items_usage (
+        rank INTEGER PRIMARY KEY,
+        item_id INTEGER NOT NULL REFERENCES items(id),
+        item_name TEXT NOT NULL,
+        usage_count INTEGER NOT NULL,
+        regulation TEXT DEFAULT 'M-C'
+    );
+    """)
+    sorted_items_rec = sorted(items_records, key=lambda it: it['name'].lower())
+    it_id_map = {}
+    for i, it in enumerate(sorted_items_rec, start=1):
         cur.execute("""
-        INSERT INTO items VALUES (?, ?, ?, ?, ?, ?, ?)
+        INSERT INTO items VALUES (?, ?, ?, ?, ?, ?)
         """, (
-            it['id'], it['name'], it['slug'], it['description'],
-            it['usage_count'], it['icon_url'], it['regulation']
+            i, it['name'], it['slug'], it['description'],
+            it['icon_url'], it['regulation']
         ))
+        it_id_map[it['name']] = (i, it.get('usage_count', 0))
 
-    # 5. Abilities Table (139 core + catalog)
+    sorted_it_usage = sorted(it_id_map.items(), key=lambda kv: kv[1][1], reverse=True)
+    for u_rank, (it_name, (itid, u_count)) in enumerate(sorted_it_usage, start=1):
+        cur.execute("""
+        INSERT INTO items_usage VALUES (?, ?, ?, ?, ?)
+        """, (u_rank, itid, it_name, u_count, 'M-C'))
+
+    # 5. Abilities Table (139 core + catalog, ordered alphabetically)
     cur.execute("""
     CREATE TABLE abilities (
         id INTEGER PRIMARY KEY,
         name TEXT NOT NULL,
         slug TEXT UNIQUE NOT NULL,
         description TEXT,
-        usage_count INTEGER DEFAULT 0,
         is_vgc_ranked INTEGER DEFAULT 0,
         regulation TEXT DEFAULT 'M-C'
     );
     """)
-    for ab in abilities_records:
+    cur.execute("""
+    CREATE TABLE abilities_usage (
+        rank INTEGER PRIMARY KEY,
+        ability_id INTEGER NOT NULL REFERENCES abilities(id),
+        ability_name TEXT NOT NULL,
+        usage_count INTEGER NOT NULL,
+        regulation TEXT DEFAULT 'M-C'
+    );
+    """)
+    sorted_abils_rec = sorted(abilities_records, key=lambda ab: ab['name'].lower())
+    ab_id_map = {}
+    for i, ab in enumerate(sorted_abils_rec, start=1):
         cur.execute("""
-        INSERT INTO abilities VALUES (?, ?, ?, ?, ?, ?, ?)
+        INSERT INTO abilities VALUES (?, ?, ?, ?, ?, ?)
         """, (
-            ab['id'], ab['name'], ab['slug'], ab['description'],
-            ab['usage_count'], ab['is_vgc_ranked'], ab['regulation']
+            i, ab['name'], ab['slug'], ab['description'],
+            ab['is_vgc_ranked'], ab['regulation']
         ))
+        ab_id_map[ab['name']] = (i, ab.get('usage_count', 0))
+
+    sorted_ab_usage = sorted(ab_id_map.items(), key=lambda kv: kv[1][1], reverse=True)
+    for u_rank, (ab_name, (abid, u_count)) in enumerate(sorted_ab_usage, start=1):
+        cur.execute("""
+        INSERT INTO abilities_usage VALUES (?, ?, ?, ?, ?)
+        """, (u_rank, abid, ab_name, u_count, 'M-C'))
 
     # 6. Rankings Table
     cur.execute("""
