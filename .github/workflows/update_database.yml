@@ -12,6 +12,11 @@ on:
         required: false
         type: boolean
         default: false
+      export_only:
+        description: 'Only export JSON files from SQLite source of truth (no scraping)'
+        required: false
+        type: boolean
+        default: false
   push:
     branches:
       - main
@@ -49,6 +54,9 @@ jobs:
           EXTRA_ARGS=""
           if [ "${{ inputs.force_stats }}" = "true" ]; then
             EXTRA_ARGS="--force-stats"
+          fi
+          if [ "${{ inputs.export_only }}" = "true" ]; then
+            EXTRA_ARGS="--export-only"
           fi
           python3 scripts/update_database.py $EXTRA_ARGS
 

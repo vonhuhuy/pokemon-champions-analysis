@@ -169,6 +169,20 @@ async function loadDatabases() {
 // =====================================================================
 
 function encodeTeam(slots) {
+  if (typeof PokeChampSerializer !== 'undefined' && PokeChampSerializer.encodeTeam) {
+    return PokeChampSerializer.encodeTeam(slots);
+  }
+  return encodeTeamLegacy(slots);
+}
+
+function decodeTeam(hashStr) {
+  if (typeof PokeChampSerializer !== 'undefined' && PokeChampSerializer.decodeTeam) {
+    return PokeChampSerializer.decodeTeam(hashStr, pokemonDB);
+  }
+  return decodeTeamLegacy(hashStr);
+}
+
+function encodeTeamLegacy(slots) {
   let num = 0n;
   for (let i = 0; i < 6; i++) {
     const s = slots[i];
@@ -202,9 +216,9 @@ function encodeTeam(slots) {
   return chars.reverse().join('');
 }
 
-function decodeTeam(hashStr) {
+function decodeTeamLegacy(hashStr) {
   if (!hashStr || typeof hashStr !== 'string' || hashStr.length !== 16) {
-    throw new Error('teamhash must be exactly 16 alphanumeric characters');
+    throw new Error('Legacy teamhash must be exactly 16 alphanumeric characters');
   }
 
   let num = 0n;
@@ -732,14 +746,28 @@ function initRosters() {
   const savedHash = localStorage.getItem('pokechamp_teamhash');
 
   // 1. Load Our Team
-  if (hashFromUrl && hashFromUrl.length === 16) {
+  let savedFullTeam = null;
+  try {
+    const raw = localStorage.getItem('pokechamp_team_full');
+    if (raw) savedFullTeam = JSON.parse(raw);
+  } catch (e) {}
+
+  if (hashFromUrl) {
     try {
-      ourSlots = decodeTeam(hashFromUrl);
-      ourHash = hashFromUrl;
+      if (savedFullTeam && Array.isArray(savedFullTeam) && encodeTeam(savedFullTeam) === hashFromUrl) {
+        ourSlots = savedFullTeam;
+        ourHash = hashFromUrl;
+      } else {
+        ourSlots = decodeTeam(hashFromUrl);
+        ourHash = hashFromUrl;
+      }
     } catch (e) {
       loadPresetOur('garchomp-z');
     }
-  } else if (savedHash && savedHash.length === 16 && savedHash !== '0000000000000000') {
+  } else if (savedFullTeam && Array.isArray(savedFullTeam) && savedFullTeam.some(s => s && s.pokemon)) {
+    ourSlots = savedFullTeam;
+    ourHash = encodeTeam(savedFullTeam);
+  } else if (savedHash && savedHash !== '0000000000000000') {
     try {
       ourSlots = decodeTeam(savedHash);
       ourHash = savedHash;
@@ -751,7 +779,7 @@ function initRosters() {
   }
 
   // 2. Load Enemy Team (Empty by default)
-  if (enemyHashFromUrl && enemyHashFromUrl.length === 16) {
+  if (enemyHashFromUrl) {
     try {
       enemySlots = decodeTeam(enemyHashFromUrl);
       enemyHash = enemyHashFromUrl;
@@ -2294,15 +2322,21 @@ function buildBattlePlanPrompt(ourSlots, enemySlots, matrix) {
   return `You are an elite competitive Pokémon Singles coach for Regulation M-C (3v3 Singles Bring-6-Pick-3).
 Analyze this matchup between OUR TEAM and the OPPONENT TEAM.
 
-CRITICAL INSTRUCTIONS:
-1. Keep all text, rationales, and steps extremely short and concise (1 punchy sentence each). Remove all long filler words.
-2. For Opening Lead:
-   - Provide "primaryLead": standard proactive/tempo opener, with turn 1 action branches against common opponent leads.
-   - Provide "alternativeLead": name an alternative lead option and state WHEN to use it (specifically if predicting the opponent opens with a counter to our primary lead, e.g. "Use if predicting opponent leads [EnemyCounter] to counter [PrimaryLead]"), plus the turn 1 counter-action.
-3. For Win Conditions:
-   - Provide at least 2 distinct strategies (e.g. "Plan A: Setup Sweep" and "Plan B: Bulky Attrition / Pivot Trap" or "Plan C: Fast Cleanup").
-   - Each strategy must include a title, key sweeper/anchor, recommended Tera target, and a concise 1-sentence execution sequence.
-4. For Counterplay: Provide entries for ALL 6 enemy Pokémon on their roster.
+CRITICAL COACHING REQUIREMENTS:
+1. Recommended Core (3 Lineup): Provide AT LEAST 3 distinct strategic reasons for choosing EACH of the 3 Pokémon (role in squad dynamic, key defensive resistances/sponging against opponent threats, and specific enemy targets it threatens/KOs).
+2. Unpicked / Benched Pokémon:
+   - For Pokémon not picked in the core 3, provide 2-3 reasons to consider them as a situational replacement/sub (e.g. which enemy Pokémon they counter, what preview cue triggers subbing them in, strategic upside).
+   - ONLY include a Pokémon in "doNotBring" if it is a STRICT, SEVERE liability against this specific roster (e.g. hard-countered by 3+ enemies, compounding fatal type weaknesses, 0 safe switch-ins). If none of our Pokémon have severe liabilities, leave "doNotBring" empty! Do NOT use generic ability quirks like "Emergency Exit is easily exploited" as a reason to ban a Pokémon unless it has zero viable targets.
+3. Opening Lead (Primary Lead):
+   - Provide "primaryLead" with turn 1 action branches against ALL 6 enemy Pokémon on their roster! For each enemy, give the exact play (attacks, hazard setup, or safe pivot).
+4. Alternative Lead:
+   - Provide "alternativeLead" with when to use it (specifically when predicting opponent opens with a counter to our primary lead).
+   - ALSO provide turn 1 action branches against ALL 6 enemy Pokémon on their roster!
+5. Counterplay:
+   - For EACH of their 6 Pokémon, provide MULTIPLE counter options if available (e.g. Primary Counter and Secondary Check/Backup). Include our Pokémon's name, tier (Hard Counter / Soft Check), reason, and tactical play.
+6. Win Conditions:
+   - Provide at least 2 distinct strategic paths (Plan A Setup Sweep, Plan B Bulky Attrition/Pivot).
+   - For EACH win condition, provide the full roadmap sequence AND a list of 2-3 "tripUpRisks" (potential failure points/pitfalls: e.g. Unaware walls, priority moves, surprise defensive Tera, hazard chip, or speed control).
 
 OUR 6-POKÉMON SQUAD:
 ${JSON.stringify(ourTeam, null, 2)}
@@ -2314,34 +2348,80 @@ Respond with STRICT JSON matching:
 {
   "rosterSelection": {
     "recommendedCore": [
-      { "name": "Pokemon1", "role": "Lead / Breaker / Pivot / Cleaner", "reason": "Short 1-sentence rationale." },
-      { "name": "Pokemon2", "role": "Lead / Breaker / Pivot / Cleaner", "reason": "Short 1-sentence rationale." },
-      { "name": "Pokemon3", "role": "Lead / Breaker / Pivot / Cleaner", "reason": "Short 1-sentence rationale." }
+      {
+        "name": "Pokemon1",
+        "role": "Lead / Breaker / Pivot / Cleaner",
+        "reasons": [
+          "Reason 1: Role dynamic and speed/offensive benchmark",
+          "Reason 2: Defensive resistances against enemy threats",
+          "Reason 3: Specific targets it threatens or KOs"
+        ]
+      },
+      {
+        "name": "Pokemon2",
+        "role": "Lead / Breaker / Pivot / Cleaner",
+        "reasons": [
+          "Reason 1: Defensive bulk and switch sponge utility",
+          "Reason 2: Key resistances against opponent offensive core",
+          "Reason 3: Pivoting and positional support"
+        ]
+      },
+      {
+        "name": "Pokemon3",
+        "role": "Lead / Breaker / Pivot / Cleaner",
+        "reasons": [
+          "Reason 1: Late-game win condition and sweeper benchmark",
+          "Reason 2: Tera synergy and wallbreaking power",
+          "Reason 3: Priority/coverage to clean up weakened foes"
+        ]
+      }
     ],
-    "flexOption": {
-      "name": "Pokemon4",
-      "replaces": "CorePokemon",
-      "condition": "Short preview cue when to sub in.",
-      "strategicBenefit": "Short upside."
-    },
-    "benchLiabilities": [
-      { "name": "BenchedPokemon1", "reasonNotToPick": "Short 1-sentence liability." },
-      { "name": "BenchedPokemon2", "reasonNotToPick": "Short 1-sentence liability." }
+    "situationalReplacements": [
+      {
+        "name": "BenchedPokemon1",
+        "replaces": "CorePokemon",
+        "reasons": [
+          "Cue to sub in: Specific preview scenario or matchup condition",
+          "Enemy targets: Directly walls/counters [EnemyA] & [EnemyB]",
+          "Strategic upside: Speed tier, hazard removal, or alternative typing"
+        ]
+      }
+    ],
+    "doNotBring": [
+      {
+        "name": "OnlyIfStrictSevereLiability",
+        "reasons": [
+          "Severe liability reason 1: Hard countered by 3+ enemies on roster",
+          "Severe liability reason 2: Negative damage trade against entire core"
+        ]
+      }
     ]
   },
   "turn1Lead": {
     "primaryLead": {
       "name": "PokemonName",
-      "whenToUse": "Primary proactive tempo opener.",
+      "whenToUse": "Default proactive tempo opener.",
       "branches": [
-        { "vs": "EnemyA", "action": "Exact turn 1 action." },
-        { "vs": "EnemyB", "action": "Exact turn 1 action." }
+        { "vs": "Enemy1", "action": "Exact turn 1 tactical play/move/pivot" },
+        { "vs": "Enemy2", "action": "Exact turn 1 tactical play/move/pivot" },
+        { "vs": "Enemy3", "action": "Exact turn 1 tactical play/move/pivot" },
+        { "vs": "Enemy4", "action": "Exact turn 1 tactical play/move/pivot" },
+        { "vs": "Enemy5", "action": "Exact turn 1 tactical play/move/pivot" },
+        { "vs": "Enemy6", "action": "Exact turn 1 tactical play/move/pivot" }
       ]
     },
     "alternativeLead": {
       "name": "PokemonName",
-      "whenToUse": "Use if predicting opponent leads [EnemyCounter] to counter [PrimaryLead].",
-      "action": "Immediate counter-play or pivot action."
+      "whenToUse": "Use if predicting opponent opens with [EnemyCounter] to counter [PrimaryLead].",
+      "action": "Immediate counter-play or pivot action.",
+      "branches": [
+        { "vs": "Enemy1", "action": "Exact turn 1 tactical play/move/pivot" },
+        { "vs": "Enemy2", "action": "Exact turn 1 tactical play/move/pivot" },
+        { "vs": "Enemy3", "action": "Exact turn 1 tactical play/move/pivot" },
+        { "vs": "Enemy4", "action": "Exact turn 1 tactical play/move/pivot" },
+        { "vs": "Enemy5", "action": "Exact turn 1 tactical play/move/pivot" },
+        { "vs": "Enemy6", "action": "Exact turn 1 tactical play/move/pivot" }
+      ]
     }
   },
   "winConditions": [
@@ -2349,22 +2429,42 @@ Respond with STRICT JSON matching:
       "title": "Plan A: Setup Sweep",
       "sweeper": "PokemonName",
       "teraTarget": "PokemonName (Tera Type)",
-      "sequence": "Concise 1-sentence endgame sweep sequence."
+      "sequence": "Full execution sequence roadmap from early softening to endgame clean.",
+      "tripUpRisks": [
+        "Unaware walls or priority revenge killers (e.g. Extreme Speed, Sucker Punch)",
+        "Opponent surprise defensive Tera flipping type advantage",
+        "Hazard chip breaking Focus Sash or Multiscale"
+      ]
     },
     {
       "title": "Plan B: Bulky Attrition",
       "sweeper": "PokemonName",
       "teraTarget": "PokemonName (Tera Type)",
-      "sequence": "Concise 1-sentence defensive pivot & chip sequence."
+      "sequence": "Defensive trading, hazard chip, and positioning sequence.",
+      "tripUpRisks": [
+        "Status affliction (Toxic, Burn, Paralysis) compromising recovery",
+        "Opponent setup sweepers overloading defensive sponges"
+      ]
     }
   ],
   "enemyCounterplayMatrix": [
     {
       "enemyName": "EnemyPokemonName",
       "dangerousMovesVsUs": ["Move1", "Move2"],
-      "ourBestCounter": "OurPokemonName",
-      "counterReason": "Short 1-sentence reason why it counters.",
-      "recommendedPlay": "Short 1-sentence tactical play."
+      "counters": [
+        {
+          "pokemon": "OurPokemon1",
+          "tierLabel": "Hard Counter",
+          "reason": "Resists STABs and retaliates with lethal damage.",
+          "recommendedPlay": "Switch in on predicted attack and retaliate with STAB."
+        },
+        {
+          "pokemon": "OurPokemon2",
+          "tierLabel": "Secondary Check",
+          "reason": "Outspeeds and revenge KOs or absorbs hits with bulk.",
+          "recommendedPlay": "Revenge kill or use as emergency pivot."
+        }
+      ]
     }
   ]
 }`;
@@ -2432,14 +2532,23 @@ function generateHeuristicBattlePlan(ourSlots, enemySlots, matrix) {
   const scoredOur = filledOur.map((our, ourIdx) => {
     let scoreSum = 0;
     let favorableMatches = 0;
+    let severeLosses = 0;
     let worstMatchScore = 999;
     let worstEnemy = null;
+    const favorableEnemyNames = [];
+    const severeEnemyNames = [];
 
     for (let enemyIdx = 0; enemyIdx < filledEnemy.length; enemyIdx++) {
       const duel = matrix?.[ourIdx]?.[enemyIdx];
       if (duel) {
         scoreSum += duel.scoreA;
-        if (duel.scoreA > 0.5) favorableMatches++;
+        if (duel.scoreA >= 0.5) {
+          favorableMatches++;
+          favorableEnemyNames.push(filledEnemy[enemyIdx].pokemon.name);
+        } else if (duel.scoreA <= -1.2) {
+          severeLosses++;
+          severeEnemyNames.push(filledEnemy[enemyIdx].pokemon.name);
+        }
         if (duel.scoreA < worstMatchScore) {
           worstMatchScore = duel.scoreA;
           worstEnemy = filledEnemy[enemyIdx];
@@ -2456,6 +2565,9 @@ function generateHeuristicBattlePlan(ourSlots, enemySlots, matrix) {
       ourIdx,
       scoreSum,
       favorableMatches,
+      favorableEnemyNames,
+      severeLosses,
+      severeEnemyNames,
       worstMatchScore,
       worstEnemy,
       effSpeed,
@@ -2472,94 +2584,110 @@ function generateHeuristicBattlePlan(ourSlots, enemySlots, matrix) {
   const corePivot = remainingCore.sort((a, b) => b.bulk - a.bulk)[0] || remainingCore[0];
   const coreCleaner = topCoreItems.find(x => x !== coreLead && x !== corePivot) || topCoreItems[1] || topCoreItems[0];
 
+  const leadTargets = coreLead.favorableEnemyNames.slice(0, 2).join(' and ') || 'frontline threats';
+  const pivotResists = corePivot.favorableEnemyNames.slice(0, 2).join(' & ') || 'opposing attackers';
+  const cleanerTargets = coreCleaner.favorableEnemyNames.slice(0, 2).join(' & ') || 'weakened checks';
+
   const recommendedCore = [
     {
       name: coreLead.our.pokemon.name,
       role: 'Lead',
-      reason: `Effective Speed ${coreLead.effSpeed} outpaces early threats to seize Turn 1 initiative.`
+      reasons: [
+        `Speed tier (${coreLead.effSpeed}) outpaces expected openers to establish immediate momentum.`,
+        `Pressures ${leadTargets} with strong STAB coverage to force early Terastallization.`,
+        `Dictates turn 1 tempo and creates advantageous positioning without taking early damage.`
+      ]
     },
     {
       name: corePivot.our.pokemon.name,
       role: 'Pivot',
-      reason: `Defensive bulk and key resistances provide safe switch-in sponge routes.`
+      reasons: [
+        `Defensive bulk (${corePivot.bulk} total stats) safely sponges physical and special damage.`,
+        `Provides key resistances against ${pivotResists} to absorb predicted attacks.`,
+        `Acts as a reliable tactical anchor to reposition your cleaner safely.`
+      ]
     },
     {
       name: coreCleaner.our.pokemon.name,
       role: 'Cleaner',
-      reason: `Offensive power (${coreCleaner.offense} peak stat) to clean late game once checks are chipped.`
+      reasons: [
+        `Peak offensive stat (${coreCleaner.offense}) cleanly secures late-game KOs once checks are chipped.`,
+        `Primary Terastallization beneficiary to break bulky walls and close out the match.`,
+        `Dominates late-game trades against ${cleanerTargets} with decisive coverage.`
+      ]
     }
   ];
 
-  // 4th Flex Option
-  let flexOption = null;
-  if (scoredOur.length >= 4) {
-    const flexItem = scoredOur[3];
-    let threatToCore = null;
-    let worstCoreScore = 999;
-    filledEnemy.forEach((enm, enmIdx) => {
-      let coreSum = 0;
-      topCoreItems.forEach(ci => {
-        coreSum += (matrix?.[ci.ourIdx]?.[enmIdx]?.scoreA || 0);
+  // Evaluate Benched Pokémon (remaining 3)
+  const benchedItems = scoredOur.slice(3);
+  const situationalReplacements = [];
+  const doNotBring = [];
+
+  benchedItems.forEach(bItem => {
+    // Only a strong DO NOT BRING if it is a severe liability across the enemy team
+    if (bItem.severeLosses >= 3 && bItem.favorableMatches === 0 && bItem.worstMatchScore < -1.8) {
+      doNotBring.push({
+        name: bItem.our.pokemon.name,
+        reasons: [
+          `Hard countered by ${bItem.severeEnemyNames.slice(0, 3).join(', ')} with no safe switch-in opportunities.`,
+          `Compounding defensive vulnerabilities against their offensive core with negative damage trades.`,
+          `Zero winning matchups across their 6-Pokémon roster; risks conceding free setup.`
+        ]
       });
-      if (coreSum < worstCoreScore) {
-        worstCoreScore = coreSum;
-        threatToCore = enm;
-      }
-    });
+    } else {
+      const targets = bItem.favorableEnemyNames.slice(0, 2).join(' and ') || 'their defensive anchors';
+      situationalReplacements.push({
+        name: bItem.our.pokemon.name,
+        replaces: coreCleaner.our.pokemon.name,
+        reasons: [
+          `Sub in if opponent's preview leans heavily into ${targets}.`,
+          `Directly counters ${targets} with favorable damage trading and defensive typing.`,
+          `Provides tactical flexibility (alternative speed tier, hazard control, or typing resistance).`
+        ]
+      });
+    }
+  });
 
-    const replacesPoke = topCoreItems[2] ? topCoreItems[2].our.pokemon.name : topCoreItems[0].our.pokemon.name;
-    const enemyName = threatToCore ? threatToCore.pokemon.name : (filledEnemy[0]?.pokemon?.name || 'an opponent sweeper');
+  // Turn 1 Lead Strategy: COVER ALL 6 ENEMY POKÉMON FOR PRIMARY LEAD
+  const leadName = coreLead.our.pokemon.name;
+  const leadSpe = coreLead.effSpeed;
 
-    flexOption = {
-      name: flexItem.our.pokemon.name,
-      replaces: replacesPoke,
-      condition: `If opponent brings ${enemyName} or bulky physical setup.`,
-      strategicBenefit: `Provides targeted typing coverage to neutralize ${enemyName}.`
-    };
-  }
+  const primaryLeadBranches = filledEnemy.map((enemy, enmIdx) => {
+    const eName = enemy.pokemon.name;
+    const eSpe = getEffectiveSpeed(enemy);
+    const duel = matrix?.[coreLead.ourIdx]?.[enmIdx];
+    const scoreA = duel ? duel.scoreA : 0;
+    const leadFaster = leadSpe >= eSpe;
 
-  // Bench Liabilities
-  const benchLiabilities = scoredOur.slice(3 + (flexOption ? 1 : 0)).map(bItem => {
-    const worstEnmName = bItem.worstEnemy ? bItem.worstEnemy.pokemon.name : 'enemy threats';
+    let action = '';
+    if (leadFaster && scoreA >= 1.0) {
+      action = `Outspeeds (Spe ${leadSpe} vs ${eSpe}). Fire super-effective STAB to force an immediate KO or defensive Tera.`;
+    } else if (leadFaster && scoreA < 0) {
+      action = `Outspeeds (Spe ${leadSpe} vs ${eSpe}). Scout for Focus Sash or pivot into ${corePivot.our.pokemon.name} on predicted attack.`;
+    } else if (!leadFaster && scoreA >= 1.0) {
+      action = `Outsped (Spe ${leadSpe} vs ${eSpe}). Rely on natural bulk to absorb the hit, then counter-attack with STAB.`;
+    } else {
+      action = `Outsped (Spe ${leadSpe} vs ${eSpe}). Pivot directly into ${corePivot.our.pokemon.name} to absorb attack safely.`;
+    }
+
     return {
-      name: bItem.our.pokemon.name,
-      reasonNotToPick: `Unfavorable matchup vs ${worstEnmName} (${bItem.worstMatchScore.toFixed(1)} score) with defensive vulnerabilities.`
+      vs: eName,
+      speComparison: leadFaster ? 'Faster' : 'Slower',
+      action
     };
   });
 
-  // Turn 1 Lead Strategy (Primary + Alternative)
-  const fastestEnemy = [...filledEnemy].sort((a, b) => getEffectiveSpeed(b) - getEffectiveSpeed(a))[0];
-  const secondFastestEnemy = filledEnemy.length > 1 ? [...filledEnemy].sort((a, b) => getEffectiveSpeed(b) - getEffectiveSpeed(a))[1] : null;
-
-  const leadName = coreLead.our.pokemon.name;
-  const leadFaster = fastestEnemy ? coreLead.effSpeed >= getEffectiveSpeed(fastestEnemy) : true;
-
   const primaryLead = {
     name: leadName,
-    whenToUse: `Primary tempo lead (Spe ${coreLead.effSpeed}).`,
-    branches: [
-      {
-        vs: fastestEnemy ? fastestEnemy.pokemon.name : 'Fast Lead',
-        action: leadFaster
-          ? `Outspeeds. Fire off STAB attack to force early Tera or an emergency switch.`
-          : `Outsped. Pivot into ${corePivot.our.pokemon.name} to absorb attack safely.`
-      }
-    ]
+    whenToUse: `Primary tempo lead (Spe ${leadSpe}). Establish initiative and pressure their frontline early.`,
+    branches: primaryLeadBranches
   };
 
-  if (secondFastestEnemy) {
-    primaryLead.branches.push({
-      vs: secondFastestEnemy.pokemon.name,
-      action: `Deploy STAB coverage or hazard control; preserve HP for late-game.`
-    });
-  }
-
-  // Find the opponent Pokémon that most threatens or counters our primary lead
-  const leadIdx = filledOur.indexOf(coreLead.our);
+  // Alternative Lead: Find opponent's biggest counter to our primary lead
   let enemyCounterToLead = null;
   let worstLeadDuelScore = 999;
   filledEnemy.forEach((enm, enmIdx) => {
-    const duel = matrix?.[leadIdx]?.[enmIdx];
+    const duel = matrix?.[coreLead.ourIdx]?.[enmIdx];
     const scoreA = duel ? duel.scoreA : 0;
     if (scoreA < worstLeadDuelScore) {
       worstLeadDuelScore = scoreA;
@@ -2567,7 +2695,7 @@ function generateHeuristicBattlePlan(ourSlots, enemySlots, matrix) {
     }
   });
 
-  const enemyCounterName = enemyCounterToLead ? enemyCounterToLead.pokemon.name : (fastestEnemy ? fastestEnemy.pokemon.name : 'a fast check');
+  const enemyCounterName = enemyCounterToLead ? enemyCounterToLead.pokemon.name : (filledEnemy[0]?.pokemon?.name || 'their counter');
   const enemyCounterIdx = enemyCounterToLead ? filledEnemy.indexOf(enemyCounterToLead) : 0;
 
   // Find our squad member that best punishes this predicted counter-lead
@@ -2576,7 +2704,7 @@ function generateHeuristicBattlePlan(ourSlots, enemySlots, matrix) {
   const candidateAltMembers = [
     corePivot.our,
     coreCleaner.our,
-    ...(flexOption ? [filledOur.find(o => o.pokemon.name === flexOption.name)] : [])
+    ...benchedItems.map(b => b.our)
   ].filter(Boolean);
 
   candidateAltMembers.forEach(cand => {
@@ -2588,38 +2716,84 @@ function generateHeuristicBattlePlan(ourSlots, enemySlots, matrix) {
     }
   });
 
+  const altLeadName = bestAltMember.pokemon.name;
+  const altLeadSpe = getEffectiveSpeed(bestAltMember);
+  const altLeadIdx = filledOur.indexOf(bestAltMember);
+
+  // Turn 1 Lead Strategy: COVER ALL 6 ENEMY POKÉMON FOR ALTERNATIVE LEAD AS WELL!
+  const alternativeLeadBranches = filledEnemy.map((enemy, enmIdx) => {
+    const eName = enemy.pokemon.name;
+    const eSpe = getEffectiveSpeed(enemy);
+    const duel = matrix?.[altLeadIdx]?.[enmIdx];
+    const scoreA = duel ? duel.scoreA : 0;
+    const altFaster = altLeadSpe >= eSpe;
+
+    let action = '';
+    if (altFaster && scoreA >= 1.0) {
+      action = `Outspeeds (Spe ${altLeadSpe} vs ${eSpe}). Punish with super-effective coverage or set entry hazards.`;
+    } else if (altFaster && scoreA < 0) {
+      action = `Outspeeds (Spe ${altLeadSpe} vs ${eSpe}). Chip with secondary coverage or execute tactical pivot.`;
+    } else if (!altFaster && scoreA >= 1.0) {
+      action = `Outsped (Spe ${altLeadSpe} vs ${eSpe}). Absorb hit with defensive bulk and strike back with heavy STAB.`;
+    } else {
+      action = `Outsped (Spe ${altLeadSpe} vs ${eSpe}). Pivot into ${corePivot.our.pokemon.name !== bestAltMember ? corePivot.our.pokemon.name : coreLead.our.pokemon.name} to avoid lethal chip.`;
+    }
+
+    return {
+      vs: eName,
+      speComparison: altFaster ? 'Faster' : 'Slower',
+      action
+    };
+  });
+
   const alternativeLead = {
-    name: bestAltMember.pokemon.name,
+    name: altLeadName,
     whenToUse: `Use if predicting opponent opens with ${enemyCounterName} to counter ${leadName}.`,
-    action: `Directly punishes ${enemyCounterName} with typing advantage or safe pivot to seize initiative.`
+    action: `Directly punishes ${enemyCounterName} with typing advantage or safe pivot to seize initiative.`,
+    branches: alternativeLeadBranches
   };
 
-  // Multiple Win Conditions (Plan A and Plan B, plus Plan C)
+  // Multiple Win Conditions with Trip-up Risks
   const winConditions = [
     {
       title: 'Plan A: Setup & Sweep',
       sweeper: coreCleaner.our.pokemon.name,
       teraTarget: `${coreCleaner.our.pokemon.name} (${coreCleaner.our.teraType || 'Tera ' + coreCleaner.our.pokemon.types[0]})`,
-      sequence: `Lead ${leadName}, soften defensive walls with ${corePivot.our.pokemon.name}, then Tera ${coreCleaner.our.pokemon.name} to clean up.`
+      sequence: `Lead ${leadName}, soften defensive walls with ${corePivot.our.pokemon.name}, then Tera ${coreCleaner.our.pokemon.name} to clean up endgame.`,
+      tripUpRisks: [
+        'Unaware walls (e.g. Dondozo, Skeledirge, Clodsire) ignoring setup stat boosts.',
+        'Opponent priority attacks (Extreme Speed, Sucker Punch, Grassy Glide) bypassing speed tier.',
+        'Surprise defensive Terastallization turning a predicted super-effective KO into a resisted hit.'
+      ]
     },
     {
       title: 'Plan B: Bulky Attrition & Pivot',
       sweeper: corePivot.our.pokemon.name,
       teraTarget: `${corePivot.our.pokemon.name} (${corePivot.our.teraType || 'Tera ' + (corePivot.our.pokemon.types[1] || corePivot.our.pokemon.types[0])})`,
-      sequence: `Absorb opponent sweepers with ${corePivot.our.pokemon.name}, chip with hazards/status, and win through defensive positioning.`
+      sequence: `Absorb opponent sweepers with ${corePivot.our.pokemon.name}, chip with hazards/status, and win through defensive positioning.`,
+      tripUpRisks: [
+        'Status affliction (Toxic, Burn, Paralysis) permanently reducing defensive recovery.',
+        'Opponent setup sweepers (Swords Dance / Nasty Plot) overpowering defensive bulk.',
+        'Entry hazard accumulation (Stealth Rock / Spikes) eroding switch-in HP.'
+      ]
     }
   ];
 
-  if (flexOption && flexOption.name) {
+  if (situationalReplacements.length > 0) {
+    const sub = situationalReplacements[0];
     winConditions.push({
       title: 'Plan C: Flex Counter-Punch',
-      sweeper: flexOption.name,
-      teraTarget: `${flexOption.name} (Offensive Tera)`,
-      sequence: `Deploy ${flexOption.name} against their predicted core to break defensive anchors early.`
+      sweeper: sub.name,
+      teraTarget: `${sub.name} (Offensive Tera)`,
+      sequence: `Deploy ${sub.name} against their predicted core to break defensive anchors early.`,
+      tripUpRisks: [
+        'Opponent predicting the substitution pick and altering their opening lead accordingly.',
+        'Losing pivotal defensive resistances normally provided by the primary core.'
+      ]
     });
   }
 
-  // Enemy Counterplay Matrix for each enemy Pokémon
+  // Enemy Counterplay Matrix with MULTIPLE COUNTERS PER ENEMY
   const enemyCounterplayMatrix = filledEnemy.map((enemy, enmIdx) => {
     const eName = enemy.pokemon.name;
     const eMoves = (enemy.moves && enemy.moves.length > 0)
@@ -2640,40 +2814,63 @@ function generateHeuristicBattlePlan(ourSlots, enemySlots, matrix) {
 
     const displayDangerous = dangerousMoves.length > 0 ? dangerousMoves.slice(0, 2) : eMoves.slice(0, 2);
 
-    let bestOurItem = null;
-    let bestScore = -999;
-    filledOur.forEach((our, ourIdx) => {
+    // Rank all our Pokémon against this enemy
+    const rankedCounters = filledOur.map((our, ourIdx) => {
       const duel = matrix?.[ourIdx]?.[enmIdx];
-      if (duel && duel.scoreA > bestScore) {
-        bestScore = duel.scoreA;
-        bestOurItem = our;
+      return {
+        our,
+        scoreA: duel ? duel.scoreA : 0,
+        duel
+      };
+    }).sort((a, b) => b.scoreA - a.scoreA);
+
+    const counters = [];
+    if (rankedCounters.length > 0) {
+      const top = rankedCounters[0];
+      const tierLabel = top.scoreA >= 2.0 ? 'Hard Counter' : (top.scoreA >= 0.8 ? 'Soft Check' : (top.scoreA >= -0.8 ? 'Even Matchup' : 'Check'));
+      let reason = 'Favorable type resistances and higher damage output';
+      if (top.duel) {
+        if (top.duel.fasterA) reason = `Outspeeds (${top.duel.speA} vs ${top.duel.speB}) with super-effective coverage`;
+        else if (top.duel.scoreA >= 2) reason = `Walls ${eName}'s attacks with defensive bulk/resistances`;
+        else reason = `Absorbs offensive hits and deals heavy return damage`;
       }
-    });
+      counters.push({
+        pokemon: top.our.pokemon.name,
+        tierLabel,
+        reason,
+        recommendedPlay: `Switch ${top.our.pokemon.name} into predicted attack and punish with STAB.`
+      });
+    }
 
-    const counterName = bestOurItem ? bestOurItem.pokemon.name : coreLead.our.pokemon.name;
-    const duelDetails = bestOurItem ? matrix?.[filledOur.indexOf(bestOurItem)]?.[enmIdx] : null;
-
-    let counterReason = 'Favorable type resistances and higher damage output';
-    if (duelDetails) {
-      if (duelDetails.fasterA) counterReason = `Outspeeds (${duelDetails.speA} vs ${duelDetails.speB}) with super-effective coverage`;
-      else if (duelDetails.scoreA >= 2) counterReason = `Walls ${eName}'s attacks with defensive bulk/resistances`;
-      else counterReason = `Absorbs offensive hits and deals heavy return damage`;
+    if (rankedCounters.length > 1 && rankedCounters[1].scoreA >= 0.2) {
+      const second = rankedCounters[1];
+      const tierLabel = second.scoreA >= 1.5 ? 'Hard Counter' : 'Secondary Check';
+      let reason = second.duel?.fasterA
+        ? `Outspeeds as a reliable revenge killer`
+        : `Defensive backup with solid switch-in bulk`;
+      counters.push({
+        pokemon: second.our.pokemon.name,
+        tierLabel,
+        reason,
+        recommendedPlay: `Bring in as revenge killer or secondary pivot.`
+      });
     }
 
     return {
       enemyName: eName,
       dangerousMovesVsUs: displayDangerous,
-      ourBestCounter: counterName,
-      counterReason,
-      recommendedPlay: `Switch ${counterName} into predicted attack and punish with STAB.`
+      ourBestCounter: counters[0]?.pokemon || coreLead.our.pokemon.name,
+      counterReason: counters[0]?.reason || 'Favorable matchup',
+      recommendedPlay: counters[0]?.recommendedPlay || 'Trade damage carefully.',
+      counters
     };
   });
 
   return {
     rosterSelection: {
       recommendedCore,
-      flexOption,
-      benchLiabilities
+      situationalReplacements,
+      doNotBring
     },
     turn1Lead: {
       primaryLead,
@@ -2705,52 +2902,152 @@ function renderBattlePlanResults(plan, isGemini) {
   };
 
   const coreList = plan.rosterSelection?.recommendedCore || [];
-  const flexOpt = plan.rosterSelection?.flexOption;
-  const benchList = plan.rosterSelection?.benchLiabilities || [];
+  const subsList = plan.rosterSelection?.situationalReplacements || [];
+  let doNotBringList = plan.rosterSelection?.doNotBring || [];
 
-  // Opening Lead extraction (support both primary/alt structure and legacy single structure)
+  // Fallback for legacy format with flexOption & benchLiabilities
+  if (subsList.length === 0 && plan.rosterSelection?.flexOption) {
+    const flex = plan.rosterSelection.flexOption;
+    subsList.push({
+      name: flex.name,
+      replaces: flex.replaces,
+      reasons: [
+        `Cue: ${flex.condition || 'Opponent runs specific counter'}`,
+        `Benefit: ${flex.strategicBenefit || 'Targeted offensive/defensive coverage'}`
+      ]
+    });
+  }
+
+  if (subsList.length === 0 && doNotBringList.length === 0 && plan.rosterSelection?.benchLiabilities) {
+    plan.rosterSelection.benchLiabilities.forEach(b => {
+      subsList.push({
+        name: b.name,
+        replaces: coreList[2]?.name || 'Core',
+        reasons: [
+          `Alternative pick if opponent brings specific defensive anchors`,
+          b.reasonNotToPick || 'Situational coverage and typing flexibility'
+        ]
+      });
+    });
+  }
+
+  // Opening Lead extraction & COVERING ALL 6 ENEMY POKÉMON
+  const filledOur = ourSlots.filter(Boolean);
+  const filledEnemy = enemySlots.filter(Boolean);
+
   const turn1Data = plan.turn1Lead || {};
   const primaryLead = turn1Data.primaryLead || {
     name: turn1Data.recommendedLead || (coreList[0]?.name || 'Lead'),
     whenToUse: 'Primary tempo lead.',
-    branches: (turn1Data.turn1Branches || []).map(b => ({
-      vs: b.opponentPossibleLead,
-      action: b.recommendedMoveOrAction
-    }))
+    branches: []
   };
 
-  const altLead = turn1Data.alternativeLead || (coreList[1] ? {
+  // Ensure primary lead covers all 6 enemy Pokémon
+  const primaryCovered = new Set((primaryLead.branches || []).map(b => (b.vs || '').toLowerCase()));
+  const fullPrimaryBranches = [...(primaryLead.branches || [])];
+  filledEnemy.forEach((enm, enmIdx) => {
+    const eName = enm.pokemon.name;
+    if (!primaryCovered.has(eName.toLowerCase())) {
+      const eSpe = getEffectiveSpeed(enm);
+      const leadMon = filledOur.find(o => o.pokemon.name.toLowerCase() === primaryLead.name.toLowerCase()) || filledOur[0];
+      const leadSpe = leadMon ? getEffectiveSpeed(leadMon) : 100;
+      const duel = leadMon ? lastCalculatedMatrix?.[filledOur.indexOf(leadMon)]?.[enmIdx] : null;
+      const scoreA = duel ? duel.scoreA : 0;
+      const leadFaster = leadSpe >= eSpe;
+      fullPrimaryBranches.push({
+        vs: eName,
+        speComparison: leadFaster ? 'Faster' : 'Slower',
+        action: leadFaster
+          ? `Outspeeds (Spe ${leadSpe} vs ${eSpe}). Fire STAB attack or set hazards.`
+          : `Outsped (Spe ${leadSpe} vs ${eSpe}). Pivot safely to absorb attack.`
+      });
+    }
+  });
+  primaryLead.branches = fullPrimaryBranches;
+
+  let altLead = turn1Data.alternativeLead || (coreList[1] ? {
     name: coreList[1].name,
     whenToUse: `Use if predicting opponent leads a counter against ${primaryLead.name}.`,
-    action: `Absorbs opening attack with defensive bulk and pivots safely.`
+    action: `Absorbs opening attack with defensive bulk and pivots safely.`,
+    branches: []
   } : null);
 
-  // Win Conditions extraction (support array or single winCondition, guarantee at least 2)
+  // Ensure alternative lead covers all 6 enemy Pokémon
+  if (altLead) {
+    const altCovered = new Set((altLead.branches || []).map(b => (b.vs || '').toLowerCase()));
+    const fullAltBranches = [...(altLead.branches || [])];
+    filledEnemy.forEach((enm, enmIdx) => {
+      const eName = enm.pokemon.name;
+      if (!altCovered.has(eName.toLowerCase())) {
+        const eSpe = getEffectiveSpeed(enm);
+        const altMon = filledOur.find(o => o.pokemon.name.toLowerCase() === altLead.name.toLowerCase()) || filledOur[1] || filledOur[0];
+        const altSpe = altMon ? getEffectiveSpeed(altMon) : 100;
+        const duel = altMon ? lastCalculatedMatrix?.[filledOur.indexOf(altMon)]?.[enmIdx] : null;
+        const scoreA = duel ? duel.scoreA : 0;
+        const altFaster = altSpe >= eSpe;
+        fullAltBranches.push({
+          vs: eName,
+          speComparison: altFaster ? 'Faster' : 'Slower',
+          action: altFaster
+            ? `Outspeeds (Spe ${altSpe} vs ${eSpe}). Punish with super-effective coverage or set hazards.`
+            : `Outsped (Spe ${altSpe} vs ${eSpe}). Absorb hit with bulk or pivot safely.`
+        });
+      }
+    });
+    altLead.branches = fullAltBranches;
+  }
+
+  // Win Conditions extraction & trip-up risks
   let winconList = Array.isArray(plan.winConditions) ? [...plan.winConditions] : [];
   if (winconList.length === 0 && plan.winCondition) {
     winconList.push({
       title: 'Plan A: Setup & Sweep',
       sweeper: plan.winCondition.primarySweeper || coreList[2]?.name || coreList[0]?.name,
       teraTarget: plan.winCondition.teraTarget || `${coreList[2]?.name || 'Cleaner'} (Offensive Tera)`,
-      sequence: plan.winCondition.executionSequence || 'Break defensive anchors and sweep endgame.'
+      sequence: plan.winCondition.executionSequence || 'Break defensive anchors and sweep endgame.',
+      tripUpRisks: [
+        'Unaware walls (e.g. Dondozo, Skeledirge) ignoring setup stat stages.',
+        'Opponent priority attacks (Extreme Speed, Sucker Punch) bypassing speed tier.',
+        'Surprise defensive Terastallization turning a super-effective hit into a resistance.'
+      ]
     });
   }
 
-  // Guarantee at least 2 win condition strategies
   if (winconList.length < 2) {
     const pivotName = coreList[1]?.name || coreList[0]?.name || 'Bulky Pivot';
     winconList.push({
       title: 'Plan B: Bulky Attrition & Pivot',
       sweeper: pivotName,
       teraTarget: `${pivotName} (Defensive Tera)`,
-      sequence: 'Trade damage safely through defensive resistances, chip with hazards/status, and win via positioning.'
+      sequence: 'Trade damage safely through defensive resistances, chip with hazards/status, and win via positioning.',
+      tripUpRisks: [
+        'Status affliction (Toxic, Burn, Paralysis) permanently reducing defensive recovery.',
+        'Opponent setup sweepers (Swords Dance / Nasty Plot) overpowering defensive bulk.',
+        'Entry hazard accumulation (Stealth Rock / Spikes) eroding switch-in HP.'
+      ]
     });
   }
 
-  // BUILD ALL 6 ENEMY POKÉMON COUNTERPLAY (SORTED: HARD COUNTER -> NO COUNTER)
-  const filledOur = ourSlots.filter(Boolean);
-  const filledEnemy = enemySlots.filter(Boolean);
+  // Ensure trip-up risks exist on every win condition
+  winconList.forEach((wc, idx) => {
+    if (!Array.isArray(wc.tripUpRisks) || wc.tripUpRisks.length === 0) {
+      if (idx === 0) {
+        wc.tripUpRisks = [
+          'Unaware walls (e.g. Dondozo, Skeledirge) ignoring setup stat stages.',
+          'Opponent priority attacks (Extreme Speed, Sucker Punch, Grassy Glide) bypassing speed tier.',
+          'Surprise defensive Terastallization flipping type effectiveness.'
+        ];
+      } else {
+        wc.tripUpRisks = [
+          'Status affliction (Toxic, Burn, Paralysis) compromising recovery.',
+          'Opponent setup sweepers overpowering defensive sponges.',
+          'Entry hazards breaking focus or wearing down entry HP.'
+        ];
+      }
+    }
+  });
 
+  // BUILD ALL 6 ENEMY POKÉMON COUNTERPLAY WITH MULTIPLE COUNTERS
   const counterplayList = filledEnemy.map((enemy, enmIdx) => {
     const eName = enemy.pokemon.name;
     const aiEntry = (plan.enemyCounterplayMatrix || []).find(
@@ -2768,13 +3065,6 @@ function renderBattlePlanResults(plan, isGemini) {
       }
     });
 
-    const counterName = aiEntry.ourBestCounter || (bestCounterOur ? bestCounterOur.pokemon.name : null);
-
-    // Determine Counter Tier:
-    // 1: Hard Counter (score >= 2.0)
-    // 2: Soft Check (score >= 0.8)
-    // 3: Even Matchup (score >= -0.8)
-    // 4: No Counter / Threat (score < -0.8)
     let tier = 3;
     let tierLabel = 'Even';
     let tierClass = 'tier-even';
@@ -2797,20 +3087,44 @@ function renderBattlePlanResults(plan, isGemini) {
       ? aiEntry.dangerousMovesVsUs.slice(0, 2)
       : (enemy.moves && enemy.moves.length > 0 ? enemy.moves.slice(0, 2) : (enemy.pokemon.moves || []).slice(0, 2).map(m => m.name));
 
-    let reason = aiEntry.counterReason;
-    if (!reason || reason.length > 120) {
-      if (tier === 1) reason = 'Complete defensive bulk and type advantage.';
-      else if (tier === 2) reason = 'Outspeeds with super-effective coverage.';
-      else if (tier === 3) reason = 'Skill matchup; trade damage carefully.';
-      else reason = 'Severe threat to team; avoid direct 1v1.';
-    }
+    // Multiple Counters Extraction
+    let counters = [];
+    if (Array.isArray(aiEntry.counters) && aiEntry.counters.length > 0) {
+      counters = aiEntry.counters.map(c => ({
+        pokemon: c.pokemon,
+        tierLabel: c.tierLabel || 'Counter',
+        reason: c.reason,
+        recommendedPlay: c.recommendedPlay || c.play || 'Deploy STAB or switch on predicted move.'
+      }));
+    } else {
+      // Build top 2 counters from matrix
+      const ranked = filledOur.map((our, ourIdx) => {
+        const duel = lastCalculatedMatrix?.[ourIdx]?.[enmIdx];
+        return {
+          our,
+          scoreA: duel ? duel.scoreA : 0,
+          duel
+        };
+      }).sort((a, b) => b.scoreA - a.scoreA);
 
-    let play = aiEntry.recommendedPlay;
-    if (!play || play.length > 120) {
-      if (tier === 1) play = `Switch into ${counterName} on predicted attack; punish with STAB.`;
-      else if (tier === 2) play = `Revenge kill or bring in after sacrifice.`;
-      else if (tier === 3) play = `Scout Tera and trade damage.`;
-      else play = `Requires Terastallization or prior chip damage to KO.`;
+      if (ranked[0]) {
+        const topScore = ranked[0].scoreA;
+        counters.push({
+          pokemon: aiEntry.ourBestCounter || ranked[0].our.pokemon.name,
+          tierLabel: topScore >= 2.0 ? 'Hard Counter' : (topScore >= 0.8 ? 'Soft Check' : 'Primary Check'),
+          reason: aiEntry.counterReason || (topScore >= 1.0 ? 'Favorable type resistances and higher damage output.' : 'Best available trade against this threat.'),
+          recommendedPlay: aiEntry.recommendedPlay || `Switch ${ranked[0].our.pokemon.name} into predicted attack and punish with STAB.`
+        });
+      }
+
+      if (ranked[1] && ranked[1].scoreA >= 0.2) {
+        counters.push({
+          pokemon: ranked[1].our.pokemon.name,
+          tierLabel: ranked[1].scoreA >= 1.5 ? 'Hard Counter' : 'Secondary Check',
+          reason: ranked[1].duel?.fasterA ? 'Outspeeds as a reliable revenge killer.' : 'Defensive backup with solid switch-in bulk.',
+          recommendedPlay: 'Bring in as revenge killer or secondary pivot.'
+        });
+      }
     }
 
     return {
@@ -2818,14 +3132,12 @@ function renderBattlePlanResults(plan, isGemini) {
       enemyName: eName,
       enemyTypes: enemy.pokemon.types || [],
       enemySpeed: getEffectiveSpeed(enemy),
-      counterName,
       tier,
       tierLabel,
       tierClass,
       bestScore,
       dangerousMoves,
-      reason,
-      play
+      counters
     };
   });
 
@@ -2845,69 +3157,85 @@ function renderBattlePlanResults(plan, isGemini) {
 
       <!-- Core 3 -->
       <div class="core-roster-grid">
-        ${coreList.map((item, idx) => `
-          <div class="core-poke-card">
-            <span class="core-card-rank-badge">#${idx + 1}</span>
-            <div class="core-card-header">
-              <img src="${getSpriteUrl(item.name)}" alt="${item.name}" class="core-poke-sprite" onerror="this.style.opacity='0.4'">
-              <div class="core-poke-info">
-                <span class="core-poke-name">${item.name}</span>
-                ${getRoleBadge(item.role)}
-              </div>
-            </div>
-            <div class="core-poke-reason">${item.reason}</div>
-          </div>
-        `).join('')}
-      </div>
-
-      <!-- 4th Flex Option -->
-      ${flexOpt ? `
-        <div class="tactics-flex-card">
-          <div class="flex-card-head">
-            <div class="flex-title-group">
-              <span class="flex-pill-badge">🔄 4th Flex Option</span>
-              <span class="flex-replace-target">Sub for <strong>${flexOpt.replaces}</strong></span>
-            </div>
-          </div>
-          <div class="flex-card-body">
-            <div class="flex-poke-preview">
-              <img src="${getSpriteUrl(flexOpt.name)}" alt="${flexOpt.name}" onerror="this.style.opacity='0.4'">
-              <span>${flexOpt.name}</span>
-            </div>
-            <div class="flex-text-details">
-              <div class="flex-condition-box">
-                <strong>Cue:</strong> ${flexOpt.condition}
-              </div>
-              <p style="font-size:0.84rem; color:#cbd5e1; margin:0; line-height:1.4;">
-                <strong>Upside:</strong> ${flexOpt.strategicBenefit}
-              </p>
-            </div>
-          </div>
-        </div>
-      ` : ''}
-
-      <!-- Bench Liabilities -->
-      ${benchList.length > 0 ? `
-        <div>
-          <h5 style="font-size:0.86rem; color:#fb7185; margin:0.5rem 0 0.5rem 0; font-weight:800;">
-            ⛔ Do Not Bring
-          </h5>
-          <div class="bench-grid">
-            ${benchList.map(item => `
-              <div class="bench-card">
-                <img src="${getSpriteUrl(item.name)}" alt="${item.name}" class="bench-poke-sprite" onerror="this.style.opacity='0.4'">
-                <div class="bench-content">
-                  <div class="bench-header-line">
-                    <span class="bench-poke-name">${item.name}</span>
-                    <span class="bench-warning-pill">Bench</span>
-                  </div>
-                  <p class="bench-reason">${item.reasonNotToPick}</p>
+        ${coreList.map((item, idx) => {
+          const reasons = Array.isArray(item.reasons) ? item.reasons : (item.reason ? [item.reason] : []);
+          return `
+            <div class="core-poke-card">
+              <span class="core-card-rank-badge">#${idx + 1}</span>
+              <div class="core-card-header">
+                <img src="${getSpriteUrl(item.name)}" alt="${item.name}" class="core-poke-sprite" onerror="this.style.opacity='0.4'">
+                <div class="core-poke-info">
+                  <span class="core-poke-name">${item.name}</span>
+                  ${getRoleBadge(item.role)}
                 </div>
               </div>
-            `).join('')}
+              <ul class="core-reasons-list">
+                ${reasons.map(r => `<li>${r}</li>`).join('')}
+              </ul>
+            </div>
+          `;
+        }).join('')}
+      </div>
+
+      <!-- Situational Bench Options & Replacements -->
+      ${subsList.length > 0 ? `
+        <div class="subs-section">
+          <h5 class="tactics-subheading">🔄 Situational Bench Options & Replacements</h5>
+          <div class="subs-grid">
+            ${subsList.map(sub => {
+              const subReasons = Array.isArray(sub.reasons)
+                ? sub.reasons
+                : (sub.reason ? [sub.reason] : (sub.strategicBenefit ? [sub.condition, sub.strategicBenefit] : []));
+              return `
+                <div class="sub-card">
+                  <div class="sub-header-line">
+                    <div style="display:flex; align-items:center; gap:0.5rem;">
+                      <img src="${getSpriteUrl(sub.name)}" alt="${sub.name}" class="sub-poke-sprite" onerror="this.style.opacity='0.4'">
+                      <strong class="sub-poke-name">${sub.name}</strong>
+                    </div>
+                    <span class="sub-tag">Sub for ${sub.replaces || 'Core'}</span>
+                  </div>
+                  <ul class="sub-reasons-list">
+                    ${subReasons.map(r => `<li>${r}</li>`).join('')}
+                  </ul>
+                </div>
+              `;
+            }).join('')}
           </div>
         </div>
       ` : ''}
+
+      <!-- Strict Do Not Bring Liabilities -->
+      ${doNotBringList.length > 0 ? `
+        <div class="do-not-bring-section">
+          <h5 class="tactics-subheading do-not-bring-heading">⛔ Do Not Bring (Strict Liabilities)</h5>
+          <div class="bench-grid">
+            ${doNotBringList.map(item => {
+              const noReasons = Array.isArray(item.reasons)
+                ? item.reasons
+                : (item.reasonNotToPick ? [item.reasonNotToPick] : (item.reason ? [item.reason] : []));
+              return `
+                <div class="bench-card">
+                  <img src="${getSpriteUrl(item.name)}" alt="${item.name}" class="bench-poke-sprite" onerror="this.style.opacity='0.4'">
+                  <div class="bench-content">
+                    <div class="bench-header-line">
+                      <span class="bench-poke-name">${item.name}</span>
+                      <span class="bench-warning-pill">Strict No</span>
+                    </div>
+                    <ul class="bench-reasons-list">
+                      ${noReasons.map(r => `<li>${r}</li>`).join('')}
+                    </ul>
+                  </div>
+                </div>
+              `;
+            }).join('')}
+          </div>
+        </div>
+      ` : `
+        <div class="bench-safe-banner">
+          <span>✅ All 6 squad members have viable matchups against this opponent roster. No strict liabilities.</span>
+        </div>
+      `}
     </div>
 
     <!-- SECTION 2: GAMEPLAN -->
@@ -2917,7 +3245,7 @@ function renderBattlePlanResults(plan, isGemini) {
       </div>
 
       <div class="tactics-exec-grid">
-        <!-- Opening Lead (Primary + Alternative) -->
+        <!-- Opening Lead (Primary + Alternative) with ALL 6 ENEMY BRANCHES -->
         <div class="exec-card">
           <div class="exec-card-head">
             <span>⚡ Opening Lead</span>
@@ -2933,19 +3261,23 @@ function renderBattlePlanResults(plan, isGemini) {
               </div>
             </div>
 
-            <!-- Branches -->
+            <!-- All 6 Branches for Primary Lead -->
             ${primaryLead.branches && primaryLead.branches.length > 0 ? `
-              <div class="lead-branches-list">
+              <div class="lead-branches-grid">
                 ${primaryLead.branches.map(b => `
                   <div class="lead-branch-item">
-                    <span>vs <strong>${b.vs}</strong>:</span>
-                    <p style="margin:0.2rem 0 0 0; color:#e2e8f0;">${b.action}</p>
+                    <div class="branch-enemy-tag">
+                      <img src="${getSpriteUrl(b.vs)}" alt="${b.vs}" class="branch-enemy-sprite" onerror="this.style.opacity='0.4'">
+                      <strong>vs ${b.vs}</strong>
+                      ${b.speComparison ? `<span class="branch-speed-tag ${b.speComparison === 'Faster' ? 'tag-faster' : 'tag-slower'}">${b.speComparison}</span>` : ''}
+                    </div>
+                    <p class="branch-action-text">${b.action}</p>
                   </div>
                 `).join('')}
               </div>
             ` : ''}
 
-            <!-- Alternative Lead -->
+            <!-- Alternative Lead with All 6 Branches -->
             ${altLead ? `
               <div class="alt-lead-box">
                 <div class="alt-lead-head">
@@ -2959,12 +3291,27 @@ function renderBattlePlanResults(plan, isGemini) {
                 </div>
                 <p class="alt-lead-cue"><strong>When to use:</strong> ${altLead.whenToUse}</p>
                 <p class="alt-lead-cue" style="color:#cbd5e1;"><strong>Turn 1 Play:</strong> ${altLead.action}</p>
+
+                ${altLead.branches && altLead.branches.length > 0 ? `
+                  <div class="lead-branches-grid" style="margin-top:0.4rem;">
+                    ${altLead.branches.map(b => `
+                      <div class="lead-branch-item">
+                        <div class="branch-enemy-tag">
+                          <img src="${getSpriteUrl(b.vs)}" alt="${b.vs}" class="branch-enemy-sprite" onerror="this.style.opacity='0.4'">
+                          <strong>vs ${b.vs}</strong>
+                          ${b.speComparison ? `<span class="branch-speed-tag ${b.speComparison === 'Faster' ? 'tag-faster' : 'tag-slower'}">${b.speComparison}</span>` : ''}
+                        </div>
+                        <p class="branch-action-text">${b.action}</p>
+                      </div>
+                    `).join('')}
+                  </div>
+                ` : ''}
               </div>
             ` : ''}
           </div>
         </div>
 
-        <!-- Win Conditions (At least 2 strategies) -->
+        <!-- Win Conditions (At least 2 strategies with Trip-up Risks) -->
         <div class="exec-card">
           <div class="exec-card-head">
             <span>👑 Win Conditions</span>
@@ -2979,6 +3326,14 @@ function renderBattlePlanResults(plan, isGemini) {
                   <span class="wincon-tera-badge">${wc.sweeper ? `<img src="${getSpriteUrl(wc.sweeper)}" alt="${wc.sweeper}" class="wincon-mini-sprite" onerror="this.style.display='none'">` : ''}${wc.teraTarget || wc.sweeper}</span>
                 </div>
                 <p class="wincon-sequence-text">${wc.sequence}</p>
+                ${wc.tripUpRisks && wc.tripUpRisks.length > 0 ? `
+                  <div class="wincon-pitfalls-box">
+                    <span class="wincon-pitfalls-title">⚠️ Potential Pitfalls & Disruption:</span>
+                    <ul class="wincon-pitfalls-list">
+                      ${wc.tripUpRisks.map(r => `<li>${r}</li>`).join('')}
+                    </ul>
+                  </div>
+                ` : ''}
               </div>
             `).join('')}
           </div>
@@ -2986,7 +3341,7 @@ function renderBattlePlanResults(plan, isGemini) {
       </div>
     </div>
 
-    <!-- SECTION 3: COUNTERPLAY (ALL 6 ENEMY POKÉMON SORTED HARD COUNTER -> NO COUNTER) -->
+    <!-- SECTION 3: COUNTERPLAY (ALL 6 ENEMY POKÉMON WITH MULTIPLE COUNTERS) -->
     <div class="tactics-section-block">
       <div class="tactics-section-title">
         <span>🥊 Counterplay</span>
@@ -3018,18 +3373,22 @@ function renderBattlePlanResults(plan, isGemini) {
 
             <div class="threat-counter-block ${t.tier === 4 ? 'tier-threat-block' : ''}">
               <div class="counter-header-row">
-                ${t.counterName ? `
-                  <div class="counter-poke-target">
-                    <img src="${getSpriteUrl(t.counterName)}" alt="${t.counterName}" onerror="this.style.opacity='0.4'">
-                    <span>Counter: <strong>${t.counterName}</strong></span>
-                  </div>
-                ` : `
-                  <span style="font-weight:800; color:#fb7185;">Top Threat</span>
-                `}
+                <span class="counter-block-title">Targeted Counters (${t.counters.length}):</span>
                 <span class="counter-badge-pill ${t.tierClass}">${t.tierLabel}</span>
               </div>
-              <p style="font-size:0.78rem; color:#93c5fd; margin:0;">${t.reason}</p>
-              <p class="counter-play-text"><strong>Play:</strong> ${t.play}</p>
+              <div class="threat-counters-list">
+                ${t.counters.map((c, cIdx) => `
+                  <div class="counter-item-row">
+                    <div class="counter-poke-target">
+                      <img src="${getSpriteUrl(c.pokemon)}" alt="${c.pokemon}" onerror="this.style.opacity='0.4'">
+                      <span>${cIdx === 0 ? 'Primary' : 'Secondary'}: <strong>${c.pokemon}</strong></span>
+                      <span class="counter-sub-pill ${c.tierLabel?.toLowerCase().includes('hard') ? 'tier-hard' : 'tier-soft'}">${c.tierLabel}</span>
+                    </div>
+                    <p style="font-size:0.78rem; color:#93c5fd; margin:0.2rem 0 0 0;">${c.reason}</p>
+                    <p class="counter-play-text"><strong>Play:</strong> ${c.recommendedPlay}</p>
+                  </div>
+                `).join('')}
+              </div>
             </div>
           </div>
         `).join('')}
@@ -3072,7 +3431,7 @@ function renderEmptyState() {
       <div style="font-size: 2.2rem; margin-bottom: 0.6rem;">⚔️</div>
       <h3 style="font-size: 1.15rem; color: #f8fafc; margin-bottom: 0.4rem;">Enemy Team is Empty</h3>
       <p style="font-size: 0.86rem; color: var(--text-dim); max-width: 440px; margin: 0 auto;">
-        Select one of the <strong>Meta Teams</strong> above (Mega Garchomp Z, Mega Salamence, Mimikyu Core, Bulky Balance, Hyper Offense, or Random Meta), or click <strong>"+ Add Pokémon"</strong> to begin battle analysis!
+        Click <strong>"+ Add Pokémon"</strong> above or <strong>"📥 Import Hash"</strong> to configure the enemy team and begin battle analysis!
       </p>
     </div>
   `;

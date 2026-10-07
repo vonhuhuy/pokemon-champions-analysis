@@ -4,9 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>PokéChamp — Competitive Pokémon Team Builder & Synergy Matrix</title>
-  <meta name="description" content="Build, optimize, and analyze competitive 6-Pokémon teams with real-time defensive synergy, speed tiers, offensive coverage, and 16-character teamhash sharing.">
+  <meta name="description" content="Build, optimize, and analyze competitive 6-Pokémon teams with real-time defensive synergy, speed tiers, offensive coverage, and lossless Base64 teamhash sharing.">
   <link rel="stylesheet" href="index.css?v=3.0">
-  <link rel="stylesheet" href="teambuilder.css?v=3.2">
+  <link rel="stylesheet" href="teambuilder.css?v=3.3">
 </head>
 <body>
 
@@ -70,13 +70,13 @@
         <a id="btn-battle-analysis" href="battle.html" class="btn-hash-action btn-battle-action" title="Test team against an opponent in Battle">
           <span>💥</span> Test in Battle
         </a>
-        <button id="btn-copy-hash" class="btn-hash-action" title="Copy 16-character alphanumeric key">
+        <button id="btn-copy-hash" class="btn-hash-action" title="Copy teamhash key">
           <span>📋</span> Copy Hash
         </button>
         <button id="btn-copy-link" class="btn-hash-action btn-primary-action" title="Copy full shareable URL with teamhash">
           <span>🔗</span> Share Team Link
         </button>
-        <button id="btn-import-hash" class="btn-hash-action" title="Import a 16-character teamhash">
+        <button id="btn-import-hash" class="btn-hash-action" title="Import a shareable teamhash">
           <span>📥</span> Import Hash
         </button>
         <button id="btn-export-showdown" class="btn-hash-action" title="Export to Pokémon Showdown format">
@@ -102,7 +102,7 @@
           🛡️ Defensive Matrix
         </button>
         <button class="analytics-tab-btn" data-tab="offensive">
-          ⚔️ STAB Coverage
+          🎯 Offensive Coverage
         </button>
         <button class="analytics-tab-btn" data-tab="speed">
           ⚡ Speed Tiers
@@ -137,12 +137,12 @@
         </div>
       </div>
 
-      <!-- Tab 2: Offensive STAB Coverage -->
+      <!-- Tab 2: Offensive Coverage -->
       <div class="tab-pane" id="pane-offensive">
         <div class="pane-header">
           <div>
-            <h3>Offensive STAB & Coverage Breakdown</h3>
-            <p>Checks how many opponent types can be struck for super-effective (2x) STAB damage by your current squad.</p>
+            <h3>Offensive Coverage Breakdown</h3>
+            <p>Checks how many opponent types can be struck for super-effective (2×) damage by your team's moveset (STAB and coverage moves).</p>
           </div>
           <div id="coverage-score-pill" class="coverage-score-pill">
             0 / 18 Types Covered
@@ -312,9 +312,9 @@
         <h3>📥 Import Team Hash</h3>
         <button class="modal-close-btn" id="import-close">✕</button>
       </div>
-      <p class="dialog-desc">Enter any 16-character alphanumeric <code>teamhash</code> to load the team:</p>
+      <p class="dialog-desc">Enter any shareable <code>teamhash</code> to load the team:</p>
       <div class="dialog-input-wrap">
-        <input type="text" id="import-hash-input" class="dialog-input" placeholder="e.g. 01NlukICnCDEMNWS" maxlength="16" autocomplete="off" spellcheck="false">
+        <input type="text" id="import-hash-input" class="dialog-input" placeholder="e.g. paste teamhash here" maxlength="128" autocomplete="off" spellcheck="false">
       </div>
       <div class="dialog-footer">
         <button class="btn-cancel" id="btn-import-cancel">Cancel</button>
@@ -354,7 +354,8 @@
   <div id="toast" class="toast"></div>
 
   <!-- Scripts -->
-  <script src="teambuilder.js?v=3.3"></script>
+  <script src="proto/team_serializer.js?v=3.0"></script>
+  <script src="teambuilder.js?v=3.8"></script>
   <script src="type-tooltip.js?v=3.0"></script>
 </body>
 </html>

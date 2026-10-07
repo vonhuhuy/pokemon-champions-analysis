@@ -167,10 +167,19 @@ document.addEventListener('DOMContentLoaded', async () => {
   const urlParams = new URLSearchParams(window.location.search);
   const hashFromUrl = urlParams.get('teamhash');
   const savedHash = localStorage.getItem('pokechamp_teamhash');
+  const savedFullTeam = loadFullTeamState();
 
-  if (hashFromUrl && hashFromUrl.length === 16) {
-    loadTeamFromHash(hashFromUrl);
-  } else if (savedHash && savedHash.length === 16 && savedHash !== '0000000000000000') {
+  if (hashFromUrl) {
+    if (savedFullTeam && encodeTeam(savedFullTeam) === hashFromUrl) {
+      teamSlots = savedFullTeam;
+      renderAll();
+    } else {
+      loadTeamFromHash(hashFromUrl);
+    }
+  } else if (savedFullTeam && savedFullTeam.some(s => s && s.pokemon)) {
+    teamSlots = savedFullTeam;
+    renderAll();
+  } else if (savedHash && savedHash !== '0000000000000000') {
     loadTeamFromHash(savedHash);
   } else {
     loadPreset('starter', false);
@@ -348,6 +357,20 @@ function populateDefaultBuild(p) {
 // =====================================================================
 
 function encodeTeam(slots) {
+  if (typeof PokeChampSerializer !== 'undefined' && PokeChampSerializer.encodeTeam) {
+    return PokeChampSerializer.encodeTeam(slots);
+  }
+  return encodeTeamLegacy(slots);
+}
+
+function decodeTeam(hashStr) {
+  if (typeof PokeChampSerializer !== 'undefined' && PokeChampSerializer.decodeTeam) {
+    return PokeChampSerializer.decodeTeam(hashStr, pokemonDB);
+  }
+  return decodeTeamLegacy(hashStr);
+}
+
+function encodeTeamLegacy(slots) {
   let num = 0n;
   for (let i = 0; i < 6; i++) {
     const s = slots[i];
@@ -357,7 +380,7 @@ function encodeTeam(slots) {
     let abilityIdx = 0;
 
     if (s && s.pokemon) {
-      pokemonId = s.pokemon.rank; // 1..262
+      pokemonId = s.pokemon.rank;
       teraIdx = Math.max(0, TERA_TYPES.indexOf(s.teraType));
 
       const topItems = (s.pokemon.items || []).slice(0, 3).map(it => it.name);
@@ -381,9 +404,9 @@ function encodeTeam(slots) {
   return chars.reverse().join('');
 }
 
-function decodeTeam(hashStr) {
+function decodeTeamLegacy(hashStr) {
   if (!hashStr || typeof hashStr !== 'string' || hashStr.length !== 16) {
-    throw new Error('teamhash must be exactly 16 alphanumeric characters');
+    throw new Error('Legacy teamhash must be exactly 16 alphanumeric characters');
   }
 
   let num = 0n;
@@ -431,6 +454,18 @@ function decodeTeam(hashStr) {
   return slots.reverse();
 }
 
+function loadFullTeamState() {
+  try {
+    const raw = localStorage.getItem('pokechamp_team_full');
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed) || parsed.length !== 6) return null;
+    return parsed;
+  } catch (e) {
+    return null;
+  }
+}
+
 function updateSerializedHash() {
   const hash = encodeTeam(teamSlots);
   const display = document.getElementById('teamhash-display');
@@ -438,6 +473,7 @@ function updateSerializedHash() {
 
   try {
     localStorage.setItem('pokechamp_teamhash', hash);
+    localStorage.setItem('pokechamp_team_full', JSON.stringify(teamSlots));
   } catch (e) {}
 
   const newUrl = window.location.pathname + '?teamhash=' + hash;
@@ -1013,6 +1049,7 @@ function drawerToggleMove(moveName) {
 
   renderDrawerContent();
   renderTeamSlots();
+  updateSerializedHash();
 }
 
 function drawerSelectItem(itemName) {
@@ -1048,6 +1085,7 @@ function drawerApplySpread(spreadIndex) {
 
   renderDrawerContent();
   renderTeamSlots();
+  updateSerializedHash();
   showToast(`Applied ${spItem.usage || ''} competitive spread`);
 }
 
@@ -1057,6 +1095,7 @@ function removeSlotMove(slotIdx, moveIdx) {
     teamSlots[slotIdx].moves.splice(moveIdx, 1);
     renderTeamSlots();
     if (drawerSlotIdx === slotIdx) renderDrawerContent();
+    updateSerializedHash();
   }
 }
 
@@ -1081,6 +1120,7 @@ function updateSlotNature(slotIdx, nature) {
   if (teamSlots[slotIdx]) {
     teamSlots[slotIdx].nature = nature;
     renderTeamSlots();
+    updateSerializedHash();
   }
 }
 
@@ -1102,6 +1142,7 @@ function closeSpreadModal() {
   if (modal) modal.classList.remove('open', 'active');
   spreadModalSlotIdx = null;
   renderTeamSlots();
+  updateSerializedHash();
 }
 
 function renderSpreadModal() {
@@ -1239,6 +1280,7 @@ function onSpreadSliderChange(statKey, newValStr) {
 
   // Update underlying card reactively
   renderTeamSlots();
+  updateSerializedHash();
 }
 
 function onSpreadModalNatureChange(nature) {
@@ -1246,6 +1288,7 @@ function onSpreadModalNatureChange(nature) {
   teamSlots[spreadModalSlotIdx].nature = nature;
   renderSpreadModal();
   renderTeamSlots();
+  updateSerializedHash();
 }
 
 // =====================================================================
@@ -1370,10 +1413,11 @@ function renderDefensiveMatrix() {
 }
 
 // =====================================================================
-// Offensive STAB Coverage
+// =====================================================================
+// Offensive Coverage Breakdown
 // =====================================================================
 
-function getTeamStabDealers(targetType) {
+function getTeamOffensiveDealers(targetType) {
   const filled = teamSlots.filter(s => s && s.pokemon);
   const dealers = [];
 
@@ -1392,26 +1436,33 @@ function getTeamStabDealers(targetType) {
 
       const mType = getMoveType(mName, poke);
       const isStab = pokeTypes.includes(mType) || (s.teraType && s.teraType !== 'Default' && s.teraType === mType);
-      if (!isStab) return;
 
       const chart = TYPE_CHART[mType] || {};
       if (chart[targetType] === 2) {
-        hits.push({ move: mName, type: mType });
+        hits.push({ move: mName, type: mType, isStab });
       }
     });
 
     if (hits.length > 0) {
+      // Sort hits so STAB moves appear first
+      hits.sort((a, b) => (b.isStab ? 1 : 0) - (a.isStab ? 1 : 0));
       dealers.push({
         pokemon: poke.name,
         sprite: getSpriteUrl(poke.name),
         types: pokeTypes,
+        hasStab: hits.some(h => h.isStab),
         moves: hits
       });
     }
   });
 
+  // Sort dealers so team members with STAB moves appear first
+  dealers.sort((a, b) => (b.hasStab ? 1 : 0) - (a.hasStab ? 1 : 0));
+
   return dealers;
 }
+
+const getTeamStabDealers = getTeamOffensiveDealers;
 
 function renderOffensiveCoverage() {
   const grid = document.getElementById('offensive-grid');
@@ -1423,7 +1474,7 @@ function renderOffensiveCoverage() {
   if (filled.length === 0) {
     grid.innerHTML = `
       <div style="grid-column: 1 / -1; text-align: center; padding: 2rem; color: var(--text-muted);">
-        Add Pokémon to your team to calculate super-effective STAB coverage.
+        Add Pokémon to your team to calculate super-effective offensive coverage.
       </div>
     `;
     if (scorePill) scorePill.textContent = '0 / 18 Types Covered';
@@ -1433,12 +1484,12 @@ function renderOffensiveCoverage() {
   let coveredCount = 0;
 
   const cardsHtml = ALL_TYPES.map(targetType => {
-    const dealers = getTeamStabDealers(targetType);
+    const dealers = getTeamOffensiveDealers(targetType);
     const isCovered = dealers.length > 0;
     if (isCovered) coveredCount++;
 
-    let shortText = 'No STAB hit';
-    let fullTitle = 'No STAB hit';
+    let shortText = 'Uncovered';
+    let fullTitle = `No super-effective moves against ${targetType}`;
 
     if (isCovered) {
       const firstDealer = dealers[0];
@@ -1450,14 +1501,17 @@ function renderOffensiveCoverage() {
       } else {
         shortText = `${firstDealer.pokemon} (${firstMove}) +${dealers.length - 1} more`;
       }
-      fullTitle = dealers.map(d => `${d.pokemon} (${d.moves.map(m => m.move).join(', ')})`).join(' • ');
+      fullTitle = dealers.map(d => {
+        const movesDesc = d.moves.map(m => m.isStab ? `${m.move} [STAB]` : m.move).join(', ');
+        return `${d.pokemon} (${movesDesc})`;
+      }).join(' • ');
     }
 
     return `
       <div class="offensive-card ${isCovered ? 'covered' : ''}" data-off-coverage-type="${targetType}">
         <span class="type-badge type-${targetType}">${targetType}</span>
         <span class="offensive-status-badge ${isCovered ? 'covered' : 'missing'}">
-          ${isCovered ? `✓ Covered (${dealers.length})` : '✕ Missing STAB'}
+          ${isCovered ? `✓ Covered (${dealers.length})` : '✕ Uncovered'}
         </span>
         <div class="offensive-dealers" title="${fullTitle}">
           ${shortText}
@@ -1771,7 +1825,7 @@ function renderQuickAddSuggestions() {
         <span class="quick-add-subtitle">Meta suggestions that support your selected Pokemon</span>
       </div>
       <div style="font-size: 0.82rem; color: var(--text-muted); padding: 0.2rem 0 0.6rem;">
-        Add a Pokémon to your team to receive instant synergy, weakness-patching & STAB coverage suggestions.
+        Add a Pokémon to your team to receive instant synergy, weakness-patching & offensive coverage suggestions.
       </div>
     `;
     return;
@@ -2933,14 +2987,14 @@ function buildDefensiveMatrixTooltipHtml(type) {
 }
 
 function buildOffensiveStabTooltipHtml(targetType) {
-  const dealers = getTeamStabDealers(targetType);
+  const dealers = getTeamOffensiveDealers(targetType);
   const isCovered = dealers.length > 0;
 
   const renderDealerRows = () => {
     if (!isCovered) {
       return `
         <div class="tb-tip-empty-state" style="line-height: 1.5; padding: 0.35rem 0.2rem;">
-          No Pokémon on your current team carries a damaging STAB move that deals super-effective damage to <strong>${targetType}</strong>.
+          No Pokémon on your current team carries a super-effective damaging move against <strong>${targetType}</strong>.
         </div>
       `;
     }
@@ -2950,18 +3004,23 @@ function buildOffensiveStabTooltipHtml(targetType) {
         <span class="tb-dealer-move-tag">
           <span class="type-badge type-${m.type}">${m.type}</span>
           <span>${m.move}</span>
+          ${m.isStab ? '<span class="tb-stab-indicator" title="Same Type Attack Bonus (1.5× Damage multiplier)">STAB</span>' : ''}
         </span>
       `).join(' ');
+
+      const hasStab = d.moves.some(m => m.isStab);
+      const multText = hasStab ? '2× STAB (300%)' : '2× Coverage (200%)';
+      const multCls = hasStab ? 'mult-stab' : 'mult-coverage';
 
       return `
         <div class="tb-dealer-row">
           <div class="tb-poke-row-left">
             <img src="${d.sprite}" alt="${d.pokemon}" class="tb-poke-mini-sprite" onerror="this.style.opacity='0.4'">
             <span class="tb-poke-name">${d.pokemon}</span>
-            <div style="margin-left: 0.4rem;">${movesHtml}</div>
+            <div style="margin-left: 0.4rem; display: inline-flex; flex-wrap: wrap; gap: 0.35rem; align-items: center;">${movesHtml}</div>
           </div>
-          <span class="tb-mult-pill mult-2x" style="background: rgba(56, 189, 248, 0.2); border-color: rgba(56, 189, 248, 0.45); color: #38bdf8;">
-            2× STAB (200%)
+          <span class="tb-mult-pill ${multCls}">
+            ${multText}
           </span>
         </div>
       `;
@@ -2973,13 +3032,13 @@ function buildOffensiveStabTooltipHtml(targetType) {
       <div class="tb-tip-title-box">
         <span class="type-badge type-${targetType}" style="font-size: 0.85rem; padding: 0.25rem 0.65rem;">${targetType}</span>
         <div class="tb-tip-title-col">
-          <div class="tb-tip-main-label">Offensive STAB vs ${targetType}</div>
-          <div class="tb-tip-sub-label">Team Members Providing Super-Effective STAB Hits</div>
+          <div class="tb-tip-main-label">Offensive Coverage vs ${targetType}</div>
+          <div class="tb-tip-sub-label">Team Members Providing Super-Effective Hits (STAB & Coverage)</div>
         </div>
       </div>
       <div class="tb-tip-summary-pills">
         <span class="tb-tip-stat-pill ${isCovered ? 'pill-adv' : 'pill-weak'}">
-          ${isCovered ? `✓ Covered (${dealers.length})` : '✕ Missing STAB'}
+          ${isCovered ? `✓ Covered (${dealers.length})` : '✕ Uncovered'}
         </span>
       </div>
     </div>
@@ -2987,8 +3046,8 @@ function buildOffensiveStabTooltipHtml(targetType) {
     <div class="tb-tip-sections-wrap">
       <div class="tb-tip-section">
         <div class="tb-tip-sec-hdr">
-          <span class="tb-tip-sec-tag advantage">⚔️ STAB Attacks (${dealers.length})</span>
-          <span class="tb-tip-sec-sub">Deals 200% STAB Damage</span>
+          <span class="tb-tip-sec-tag advantage">🎯 Super-Effective Attacks (${dealers.length})</span>
+          <span class="tb-tip-sec-sub">Deals 200%–300% Damage</span>
         </div>
         ${renderDealerRows()}
       </div>

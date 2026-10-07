@@ -1,0 +1,30 @@
+syntax = "proto3";
+
+package pokechamp;
+
+// Represents EV/stat investment for a Pokemon (each 0 to 252)
+message StatSpread {
+  uint32 hp = 1;
+  uint32 atk = 2;
+  uint32 def = 3;
+  uint32 spa = 4;
+  uint32 spd = 5;
+  uint32 spe = 6;
+}
+
+// Represents a single Pokemon slot build in the team
+message PokemonSlot {
+  uint32 rank = 1;              // Species rank in PokeChamp DB (1..300, 0 = empty)
+  uint32 tera_type = 2;         // Tera type index in TERA_TYPES
+  uint32 item_id = 3;           // Item index in Proto dictionary (0 = none)
+  uint32 ability_id = 4;        // Ability index in Proto dictionary (0 = default/none)
+  uint32 nature_id = 5;         // Nature index in Proto dictionary (0..24)
+  repeated uint32 move_ids = 6; // Move indices in Proto dictionary (up to 4 moves)
+  StatSpread spread = 7;        // 6-stat EV spread
+}
+
+// Complete 6-slot Team message for serialization, sharing, and persistence
+message Team {
+  uint32 version = 1;           // Schema version (currently 1)
+  repeated PokemonSlot slots = 2; // Exactly 6 slots (can include empty slots)
+}

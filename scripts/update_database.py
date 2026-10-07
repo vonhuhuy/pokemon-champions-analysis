@@ -29,7 +29,10 @@ REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATA_DIR = os.path.join(REPO_ROOT, "data")
 DB_JSON_PATH = os.path.join(DATA_DIR, "pokemon_singles_db.json")
 DB_SQLITE_PATH = os.path.join(DATA_DIR, "pokemon_singles_db.sqlite")
+POKEDEX_JSON_PATH = os.path.join(DATA_DIR, "pokedex_database.json")
 MOVES_JSON_PATH = os.path.join(DATA_DIR, "moves_database.json")
+ITEMS_JSON_PATH = os.path.join(DATA_DIR, "items_database.json")
+ABILITIES_JSON_PATH = os.path.join(DATA_DIR, "abilities_database.json")
 
 URL_TIER_LIST = "https://www.pokemon-zone.com/champions/ranked-seasons/singles/tier-list/"
 URL_SINGLES_PAGE = "https://www.pokemon-zone.com/champions/ranked-seasons/singles/?page={page}"
@@ -488,7 +491,16 @@ def save_atomic_json(filepath, data):
 
 
 def build_sqlite_db(records, sqlite_path):
-    """Rebuild SQLite database in a clean transaction with learnable_moves support."""
+    """
+    Rebuild SQLite database with normalized Regulation M-C architecture:
+    - metadata: regulation version and dataset counts
+    - pokedex: 347 Regulation M-C Pokémon (stable index 1..347)
+    - moves: 479 moves
+    - items: 159 held items
+    - abilities: 139 core VGC abilities (+ catalog)
+    - rankings: ranked ladder linked to pokedex.id
+    - pokemon: backward-compatible view
+    """
     dirname = os.path.dirname(sqlite_path)
     os.makedirs(dirname, exist_ok=True)
     
@@ -498,53 +510,422 @@ def build_sqlite_db(records, sqlite_path):
         
     conn = sqlite3.connect(temp_sqlite)
     cur = conn.cursor()
+
+    # 1. Metadata Table
     cur.execute("""
-    CREATE TABLE pokemon (
-        rank INTEGER PRIMARY KEY,
-        name TEXT,
-        tier TEXT,
-        tier_label TEXT,
+    CREATE TABLE metadata (
+        key TEXT PRIMARY KEY,
+        value TEXT
+    );
+    """)
+
+    # 2. Pokedex Table (347 species)
+    cur.execute("""
+    CREATE TABLE pokedex (
+        id INTEGER PRIMARY KEY,
+        dex_number INTEGER,
+        name TEXT NOT NULL,
+        slug TEXT UNIQUE NOT NULL,
         types TEXT,
+        types_json TEXT,
+        hp INTEGER,
+        atk INTEGER,
+        def INTEGER,
+        spa INTEGER,
+        spd INTEGER,
+        spe INTEGER,
+        bst INTEGER,
         base_stats_json TEXT,
         type_effectiveness_json TEXT,
+        abilities_json TEXT,
+        sprite_url TEXT,
+        is_mega INTEGER DEFAULT 0,
+        is_form INTEGER DEFAULT 0,
+        form_name TEXT,
+        regulation TEXT DEFAULT 'M-C'
+    );
+    """)
+
+    # Load pokedex records from POKEDEX_JSON_PATH if present
+    pokedex_records = []
+    if os.path.exists(POKEDEX_JSON_PATH):
+        try:
+            with open(POKEDEX_JSON_PATH, "r", encoding="utf-8") as f:
+                pokedex_records = json.load(f)
+            for p in pokedex_records:
+                cur.execute("""
+                INSERT INTO pokedex VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """, (
+                    p['id'], p['dex_number'], p['name'], p['slug'], p['types'], p['types_json'],
+                    p['hp'], p['atk'], p['def'], p['spa'], p['spd'], p['spe'], p['bst'],
+                    p['base_stats_json'], p['type_effectiveness_json'], p['abilities_json'],
+                    p.get('sprite_url', ''), p.get('is_mega', 0), p.get('is_form', 0),
+                    p.get('form_name', ''), p.get('regulation', 'M-C')
+                ))
+        except Exception as e:
+            print(f"   ⚠️ Could not load {POKEDEX_JSON_PATH}: {e}")
+
+    # 3. Moves Table (479 moves)
+    cur.execute("""
+    CREATE TABLE moves (
+        id INTEGER PRIMARY KEY,
+        name TEXT NOT NULL,
+        slug TEXT UNIQUE NOT NULL,
+        type TEXT NOT NULL,
+        category TEXT NOT NULL,
+        power INTEGER DEFAULT 0,
+        accuracy INTEGER DEFAULT 100,
+        pp INTEGER DEFAULT 10,
+        priority INTEGER DEFAULT 0,
+        contact INTEGER DEFAULT 0,
+        description TEXT,
+        usage_count INTEGER DEFAULT 0,
+        regulation TEXT DEFAULT 'M-C'
+    );
+    """)
+    moves_count = 0
+    if os.path.exists(MOVES_JSON_PATH):
+        try:
+            with open(MOVES_JSON_PATH, "r", encoding="utf-8") as f:
+                moves_db = json.load(f)
+            m_id = 1
+            for m_name, m_data in moves_db.items():
+                m_slug = m_name.lower().replace(" ", "-").replace("'", "").replace(".", "")
+                cur.execute("""
+                INSERT INTO moves VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """, (
+                    m_id, m_name, m_slug, m_data.get('type', 'Normal'),
+                    m_data.get('category', 'Physical'), m_data.get('power', 0),
+                    m_data.get('accuracy', 100), m_data.get('pp', 10),
+                    m_data.get('priority', 0), 1 if m_data.get('contact') else 0,
+                    m_data.get('desc', m_data.get('description', '')),
+                    m_data.get('usage_count', 0), 'M-C'
+                ))
+                m_id += 1
+            moves_count = len(moves_db)
+        except Exception as e:
+            print(f"   ⚠️ Could not load {MOVES_JSON_PATH}: {e}")
+
+    # 4. Items Table (159 items)
+    cur.execute("""
+    CREATE TABLE items (
+        id INTEGER PRIMARY KEY,
+        name TEXT NOT NULL,
+        slug TEXT UNIQUE NOT NULL,
+        description TEXT,
+        usage_count INTEGER DEFAULT 0,
+        icon_url TEXT,
+        regulation TEXT DEFAULT 'M-C'
+    );
+    """)
+    items_count = 0
+    if os.path.exists(ITEMS_JSON_PATH):
+        try:
+            with open(ITEMS_JSON_PATH, "r", encoding="utf-8") as f:
+                items_db = json.load(f)
+            it_id = 1
+            for it_name, it_data in items_db.items():
+                it_slug = it_name.lower().replace(" ", "-").replace("'", "").replace(".", "")
+                cur.execute("""
+                INSERT INTO items VALUES (?, ?, ?, ?, ?, ?, ?)
+                """, (
+                    it_id, it_name, it_slug, it_data.get('description', ''),
+                    it_data.get('usage_count', 0), it_data.get('icon_url', ''), 'M-C'
+                ))
+                it_id += 1
+            items_count = len(items_db)
+        except Exception as e:
+            print(f"   ⚠️ Could not load {ITEMS_JSON_PATH}: {e}")
+
+    # 5. Abilities Table (139 core + catalog)
+    cur.execute("""
+    CREATE TABLE abilities (
+        id INTEGER PRIMARY KEY,
+        name TEXT NOT NULL,
+        slug TEXT UNIQUE NOT NULL,
+        description TEXT,
+        usage_count INTEGER DEFAULT 0,
+        is_vgc_ranked INTEGER DEFAULT 0,
+        regulation TEXT DEFAULT 'M-C'
+    );
+    """)
+    abilities_count = 0
+    if os.path.exists(ABILITIES_JSON_PATH):
+        try:
+            with open(ABILITIES_JSON_PATH, "r", encoding="utf-8") as f:
+                ab_db = json.load(f)
+            ab_id = 1
+            for ab_name, ab_data in ab_db.items():
+                ab_slug = ab_name.lower().replace(" ", "-").replace("'", "").replace(".", "")
+                is_vgc = 1 if ab_data.get('is_vgc_ranked') else 0
+                cur.execute("""
+                INSERT INTO abilities VALUES (?, ?, ?, ?, ?, ?, ?)
+                """, (
+                    ab_id, ab_name, ab_slug, ab_data.get('description', ''),
+                    ab_data.get('usage_count', 0), is_vgc, 'M-C'
+                ))
+                ab_id += 1
+            abilities_count = len(ab_db)
+        except Exception as e:
+            print(f"   ⚠️ Could not load {ABILITIES_JSON_PATH}: {e}")
+
+    # 6. Rankings Table
+    cur.execute("""
+    CREATE TABLE rankings (
+        rank INTEGER PRIMARY KEY,
+        pokemon_id INTEGER NOT NULL REFERENCES pokedex(id),
+        pokemon_slug TEXT NOT NULL,
+        pokemon_name TEXT NOT NULL,
+        tier TEXT,
+        tier_label TEXT,
         moves_json TEXT,
         learnable_moves_json TEXT,
         abilities_json TEXT,
         items_json TEXT,
         stat_alignments_json TEXT,
         stat_points_json TEXT,
-        teammates_json TEXT
-    )
+        teammates_json TEXT,
+        regulation TEXT DEFAULT 'M-C'
+    );
     """)
+
+    # Pokedex lookup map
+    def norm_s(s): return re.sub(r'[^a-z0-9]', '', (s or '').lower())
+    pokedex_map_name = {norm_s(p['name']): p for p in pokedex_records}
+    pokedex_map_slug = {norm_s(p['slug']): p for p in pokedex_records}
+
+    NAME_ALIAS_MAP = {
+        'wash rotom': 'rotom-wash-rotom',
+        'heat rotom': 'rotom-heat-rotom',
+        'mow rotom': 'rotom-mow-rotom',
+        'frost rotom': 'rotom-frost-rotom',
+        'fan rotom': 'rotom-fan-rotom',
+        'floette': 'floette-eternal-flower',
+        'maushold [family of four]': 'maushold',
+        'vivillon [fancy pattern]': 'vivillon',
+        'squawkabilly [yellow plumage]': 'squawkabilly',
+    }
+
     for r in records:
+        r_name = r['name']
+        r_norm = norm_s(r_name)
+        matched = None
+        if r_name.lower() in NAME_ALIAS_MAP:
+            matched = pokedex_map_slug.get(norm_s(NAME_ALIAS_MAP[r_name.lower()]))
+        elif r_norm in pokedex_map_slug:
+            matched = pokedex_map_slug[r_norm]
+        elif r_norm in pokedex_map_name:
+            matched = pokedex_map_name[r_norm]
+
+        poke_id = matched['id'] if matched else r['rank']
+        poke_slug = matched['slug'] if matched else norm_s(r_name)
+        r['pokedex_id'] = poke_id
+        r['pokedex_slug'] = poke_slug
+
         cur.execute("""
-        INSERT INTO pokemon VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        INSERT INTO rankings VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """, (
             r['rank'],
+            poke_id,
+            poke_slug,
             r['name'],
             r['tier'],
             r['tier_label'],
-            ", ".join(r['types']),
-            json.dumps(r.get('base_stats', {}), ensure_ascii=False),
-            json.dumps(r.get('type_effectiveness', {}), ensure_ascii=False),
             json.dumps(r.get('moves', []), ensure_ascii=False),
             json.dumps(r.get('learnable_moves', []), ensure_ascii=False),
             json.dumps(r.get('abilities', []), ensure_ascii=False),
             json.dumps(r.get('items', []), ensure_ascii=False),
             json.dumps(r.get('stat_alignments', []), ensure_ascii=False),
             json.dumps(r.get('stat_points', []), ensure_ascii=False),
-            json.dumps(r.get('teammates', []), ensure_ascii=False)
+            json.dumps(r.get('teammates', []), ensure_ascii=False),
+            'M-C'
         ))
+
+    # 7. Backward-Compatible View: pokemon
+    cur.execute("""
+    CREATE VIEW pokemon AS
+    SELECT
+        r.rank,
+        p.id AS pokedex_id,
+        p.name,
+        r.tier,
+        r.tier_label,
+        p.types,
+        p.base_stats_json,
+        p.type_effectiveness_json,
+        r.moves_json,
+        r.learnable_moves_json,
+        r.abilities_json,
+        r.items_json,
+        r.stat_alignments_json,
+        r.stat_points_json,
+        r.teammates_json,
+        r.regulation
+    FROM rankings r
+    JOIN pokedex p ON r.pokemon_id = p.id;
+    """)
+
+    # Populate metadata
+    metadata_entries = [
+        ('regulation', 'M-C'),
+        ('regulation_name', 'Regulation M-C'),
+        ('source', 'Pokémon Champions & VGC (Limitless & Pokédata)'),
+        ('pokedex_count', str(len(pokedex_records))),
+        ('moves_count', str(moves_count)),
+        ('items_count', str(items_count)),
+        ('abilities_count', '139'),
+        ('total_abilities_count', str(abilities_count)),
+        ('rankings_count', str(len(records))),
+        ('updated_at', time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime()))
+    ]
+    cur.executemany("INSERT INTO metadata VALUES (?, ?)", metadata_entries)
+
     conn.commit()
     conn.close()
     os.replace(temp_sqlite, sqlite_path)
+
+
+def export_json_from_sqlite(sqlite_path):
+    """
+    Export all client-facing JSON distribution files directly from SQLite
+    as the authoritative source of truth:
+    - pokedex_database.json (from pokedex table)
+    - pokemon_singles_db.json (from rankings table joined with pokedex)
+    - moves_database.json (from moves table)
+    - items_database.json (from items table)
+    - abilities_database.json (from abilities table)
+    """
+    if not os.path.exists(sqlite_path):
+        raise FileNotFoundError(f"SQLite database not found at {sqlite_path}")
+
+    conn = sqlite3.connect(sqlite_path)
+    conn.row_factory = sqlite3.Row
+    cur = conn.cursor()
+
+    # 1. Pokedex Export
+    cur.execute("SELECT * FROM pokedex ORDER BY id")
+    pokedex_records = [dict(r) for r in cur.fetchall()]
+    save_atomic_json(POKEDEX_JSON_PATH, pokedex_records)
+    print(f"   ↳ Exported {len(pokedex_records)} entries to {POKEDEX_JSON_PATH}")
+
+    # 2. Rankings Export (pokemon_singles_db.json)
+    cur.execute("""
+    SELECT
+        r.rank,
+        r.pokemon_id,
+        p.name,
+        p.slug as query,
+        r.tier,
+        r.tier_label,
+        p.types_json,
+        p.base_stats_json,
+        p.type_effectiveness_json,
+        r.moves_json,
+        r.learnable_moves_json,
+        r.abilities_json,
+        r.items_json,
+        r.stat_alignments_json,
+        r.stat_points_json,
+        r.teammates_json
+    FROM rankings r
+    JOIN pokedex p ON r.pokemon_id = p.id
+    ORDER BY r.rank
+    """)
+    rankings_rows = []
+    for r in cur.fetchall():
+        row_dict = {
+            'rank': r['rank'],
+            'pokedex_id': r['pokemon_id'],
+            'name': r['name'],
+            'query': r['query'],
+            'tier': r['tier'],
+            'tier_label': r['tier_label'],
+            'types': json.loads(r['types_json']) if r['types_json'] else [],
+            'base_stats': json.loads(r['base_stats_json']) if r['base_stats_json'] else {},
+            'type_effectiveness': json.loads(r['type_effectiveness_json']) if r['type_effectiveness_json'] else {},
+            'moves': json.loads(r['moves_json']) if r['moves_json'] else [],
+            'learnable_moves': json.loads(r['learnable_moves_json']) if r['learnable_moves_json'] else [],
+            'abilities': json.loads(r['abilities_json']) if r['abilities_json'] else [],
+            'items': json.loads(r['items_json']) if r['items_json'] else [],
+            'stat_alignments': json.loads(r['stat_alignments_json']) if r['stat_alignments_json'] else [],
+            'stat_points': json.loads(r['stat_points_json']) if r['stat_points_json'] else [],
+            'teammates': json.loads(r['teammates_json']) if r['teammates_json'] else [],
+        }
+        rankings_rows.append(row_dict)
+    save_atomic_json(DB_JSON_PATH, rankings_rows)
+    print(f"   ↳ Exported {len(rankings_rows)} entries to {DB_JSON_PATH}")
+
+    # 3. Moves Export
+    cur.execute("SELECT * FROM moves ORDER BY name")
+    moves_export = {}
+    for r in cur.fetchall():
+        d = r['description'] or ''
+        prio = r['priority'] if 'priority' in r.keys() else 0
+        contact = bool(r['contact']) if 'contact' in r.keys() else False
+        moves_export[r['name']] = {
+            'name': r['name'],
+            'type': r['type'],
+            'category': r['category'],
+            'power': r['power'],
+            'accuracy': r['accuracy'],
+            'pp': r['pp'],
+            'priority': prio,
+            'contact': contact,
+            'desc': d,
+            'description': d,
+            'usage_count': r['usage_count']
+        }
+    save_atomic_json(MOVES_JSON_PATH, moves_export)
+    print(f"   ↳ Exported {len(moves_export)} entries to {MOVES_JSON_PATH}")
+
+    # 4. Items Export
+    cur.execute("SELECT * FROM items ORDER BY name")
+    items_export = {}
+    for r in cur.fetchall():
+        d = r['description'] or ''
+        items_export[r['name']] = {
+            'name': r['name'],
+            'desc': d,
+            'description': d,
+            'usage_count': r['usage_count'],
+            'icon_url': r['icon_url']
+        }
+    save_atomic_json(ITEMS_JSON_PATH, items_export)
+    print(f"   ↳ Exported {len(items_export)} entries to {ITEMS_JSON_PATH}")
+
+    # 5. Abilities Export
+    cur.execute("SELECT * FROM abilities ORDER BY name")
+    ab_export = {}
+    for r in cur.fetchall():
+        d = r['description'] or ''
+        ab_export[r['name']] = {
+            'name': r['name'],
+            'desc': d,
+            'description': d,
+            'usage_count': r['usage_count'],
+            'is_vgc_ranked': bool(r['is_vgc_ranked'])
+        }
+    save_atomic_json(ABILITIES_JSON_PATH, ab_export)
+    print(f"   ↳ Exported {len(ab_export)} entries to {ABILITIES_JSON_PATH}")
+
+    conn.close()
 
 
 def main():
     parser = argparse.ArgumentParser(description="Update PokéChamp competitive databases")
     parser.add_argument("--workers", type=int, default=8, help="Concurrent workers for species scrape (default: 8)")
     parser.add_argument("--dry-run", action="store_true", help="Perform scrape without overwriting database files")
+    parser.add_argument("--export-only", action="store_true", help="Export all JSON distribution files directly from SQLite without scraping")
     args = parser.parse_args()
+
+    if args.export_only:
+        print("=" * 70)
+        print("⚡ PokéChamp: Exporting JSON Artifacts from SQLite Source of Truth")
+        print(f"Time: {time.strftime('%Y-%m-%d %H:%M:%S UTC', time.gmtime())}")
+        print("=" * 70)
+        export_json_from_sqlite(DB_SQLITE_PATH)
+        print("\n✨ All JSON files successfully synchronized from SQLite!")
+        return
 
     start_time = time.time()
     print("=" * 70)
@@ -642,14 +1023,11 @@ def main():
     if args.dry_run:
         print("   ↳ [DRY RUN] Skipping file writes.")
     else:
-        save_atomic_json(DB_JSON_PATH, records)
-        print(f"   ↳ Saved {len(records)} records to {DB_JSON_PATH}")
-        
-        save_atomic_json(MOVES_JSON_PATH, existing_moves)
-        print(f"   ↳ Saved {len(existing_moves)} entries to {MOVES_JSON_PATH}")
-        
         build_sqlite_db(records, DB_SQLITE_PATH)
         print(f"   ↳ Saved SQLite database to {DB_SQLITE_PATH}")
+
+        print("\n📤 Exporting all JSON distribution files from SQLite source of truth...")
+        export_json_from_sqlite(DB_SQLITE_PATH)
 
     elapsed = time.time() - start_time
     print("\n" + "=" * 70)

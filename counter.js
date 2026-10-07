@@ -214,7 +214,7 @@ function getRole(p) {
 
   // Check if top 3 moves are mostly status moves (defensive role)
   const top6Moves = p.moves.slice(0, 6);
-  const statusCount = top6Moves.filter(m => STATUS_MOVE_NAMES.has(m.name) || (movesDB[m.name]?.category === 'status')).length;
+  const statusCount = top6Moves.filter(m => STATUS_MOVE_NAMES.has(m.name) || ((movesDB[m.name]?.category || '').toLowerCase() === 'status')).length;
   const movesAreDefensive = statusCount >= 3;
 
   if (movesAreDefensive || defenseStat > offenseStat * 1.4) {
@@ -244,7 +244,7 @@ function analyzeMovesCoverage(attacker, defender) {
 
   for (const move of top6) {
     const moveData = movesDB[move.name] || {};
-    const category = moveData.category || 'status';
+    const category = (moveData.category || 'status').toLowerCase();
     const isStatus = category === 'status' || STATUS_MOVE_NAMES.has(move.name);
     const moveType = move.type || moveData.type || 'Normal';
     const power = moveData.power || 0;
@@ -422,8 +422,9 @@ function renderMoveCoverage(moves, attacker, defender) {
 
   const rows = moves.map(m => {
     const typeColor = TYPE_COLORS[m.type] || '#aaa';
-    const catLabel = m.category === 'physical' ? 'Physical'
-                   : m.category === 'special'  ? 'Special'
+    const cat = (m.category || '').toLowerCase();
+    const catLabel = cat === 'physical' ? 'Physical'
+                   : cat === 'special'  ? 'Special'
                    : 'Status';
 
     // Accuracy: null = always hits (Swift, Aura Sphere, etc.)
@@ -435,7 +436,7 @@ function renderMoveCoverage(moves, attacker, defender) {
       ? `<div class="move-entry-desc">${m.desc}</div>`
       : '';
 
-    if (m.category === 'status') {
+    if (cat === 'status') {
       return `
         <div class="move-entry move-entry-status">
           <div class="move-entry-main">

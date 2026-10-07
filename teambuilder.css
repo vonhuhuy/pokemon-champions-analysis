@@ -2752,6 +2752,35 @@
   color: #c084fc;
 }
 
+.tb-mult-pill.mult-stab {
+  background: rgba(56, 189, 248, 0.2);
+  border: 1px solid rgba(56, 189, 248, 0.45);
+  color: #38bdf8;
+}
+
+.tb-mult-pill.mult-coverage {
+  background: rgba(148, 163, 184, 0.18);
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  color: #cbd5e1;
+}
+
+.tb-stab-indicator {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.58rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  background: linear-gradient(135deg, rgba(56, 189, 248, 0.3), rgba(14, 165, 233, 0.2));
+  color: #38bdf8;
+  border: 1px solid rgba(56, 189, 248, 0.55);
+  padding: 0.05rem 0.3rem;
+  border-radius: 3px;
+  cursor: help;
+  line-height: 1.1;
+  box-shadow: 0 0 6px rgba(56, 189, 248, 0.25);
+}
+
 .tb-tip-empty-state {
   font-size: 0.74rem;
   color: var(--text-dim);
