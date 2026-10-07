@@ -1,1388 +1,1388 @@
 [
   {
     "rank": 1,
-    "ability_id": 55,
-    "name": "Grassy Surge",
-    "usage_count": 1492,
+    "ability_id": 1,
+    "name": "Adaptability",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 2,
-    "ability_id": 188,
-    "name": "Unburden",
-    "usage_count": 1036,
+    "ability_id": 2,
+    "name": "Aerilate",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 3,
-    "ability_id": 77,
-    "name": "Intimidate",
-    "usage_count": 849,
+    "ability_id": 3,
+    "name": "Aftermath",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 4,
-    "ability_id": 52,
-    "name": "Good as Gold",
-    "usage_count": 816,
+    "ability_id": 4,
+    "name": "Analytic",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 5,
-    "ability_id": 2,
-    "name": "Aerilate",
-    "usage_count": 813,
+    "ability_id": 5,
+    "name": "Anger Point",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 6,
-    "ability_id": 106,
-    "name": "No Guard",
-    "usage_count": 724,
+    "ability_id": 6,
+    "name": "Armor Tail",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 7,
-    "ability_id": 27,
-    "name": "Defiant",
-    "usage_count": 702,
+    "ability_id": 7,
+    "name": "Aroma Veil",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 8,
-    "ability_id": 123,
-    "name": "Psychic Surge",
-    "usage_count": 666,
+    "ability_id": 8,
+    "name": "Aura Guard",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 9,
-    "ability_id": 135,
-    "name": "Rock Head",
-    "usage_count": 590,
+    "ability_id": 9,
+    "name": "Battle Armor",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 10,
-    "ability_id": 184,
-    "name": "Tough Claws",
-    "usage_count": 586,
+    "ability_id": 10,
+    "name": "Berserk",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 11,
-    "ability_id": 116,
-    "name": "Pixilate",
-    "usage_count": 540,
+    "ability_id": 11,
+    "name": "Big Pecks",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 12,
-    "ability_id": 30,
-    "name": "Drizzle",
-    "usage_count": 491,
+    "ability_id": 12,
+    "name": "Blaze",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 13,
-    "ability_id": 1,
-    "name": "Adaptability",
-    "usage_count": 485,
+    "ability_id": 13,
+    "name": "Bulletproof",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 14,
-    "ability_id": 31,
-    "name": "Drought",
-    "usage_count": 450,
+    "ability_id": 14,
+    "name": "Cheek Pouch",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 15,
-    "ability_id": 18,
-    "name": "Competitive",
-    "usage_count": 446,
+    "ability_id": 15,
+    "name": "Chlorophyll",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 16,
-    "ability_id": 82,
-    "name": "Levitate",
-    "usage_count": 419,
+    "ability_id": 16,
+    "name": "Clear Body",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 17,
-    "ability_id": 162,
-    "name": "Stamina",
-    "usage_count": 398,
+    "ability_id": 17,
+    "name": "Cloud Nine",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 18,
-    "ability_id": 6,
-    "name": "Armor Tail",
-    "usage_count": 395,
+    "ability_id": 18,
+    "name": "Competitive",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 19,
-    "ability_id": 20,
-    "name": "Contrary",
-    "usage_count": 371,
+    "ability_id": 19,
+    "name": "Compound Eyes",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 20,
-    "ability_id": 120,
-    "name": "Prankster",
-    "usage_count": 350,
+    "ability_id": 20,
+    "name": "Contrary",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 21,
-    "ability_id": 39,
-    "name": "Fairy Aura",
-    "usage_count": 318,
+    "ability_id": 21,
+    "name": "Corrosion",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 22,
-    "ability_id": 140,
-    "name": "Sand Stream",
-    "usage_count": 258,
+    "ability_id": 22,
+    "name": "Cud Chew",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 23,
-    "ability_id": 43,
-    "name": "Flash Fire",
-    "usage_count": 243,
+    "ability_id": 23,
+    "name": "Curious Medicine",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 24,
-    "ability_id": 155,
-    "name": "Snow Warning",
-    "usage_count": 231,
+    "ability_id": 24,
+    "name": "Cursed Body",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 25,
-    "ability_id": 136,
-    "name": "Rough Skin",
-    "usage_count": 227,
+    "ability_id": 25,
+    "name": "Cute Charm",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 26,
-    "ability_id": 138,
-    "name": "Sand Rush",
-    "usage_count": 203,
+    "ability_id": 26,
+    "name": "Damp",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 27,
-    "ability_id": 42,
-    "name": "Flame Body",
-    "usage_count": 202,
+    "ability_id": 27,
+    "name": "Defiant",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 28,
-    "ability_id": 146,
-    "name": "Shadow Tag",
-    "usage_count": 150,
+    "ability_id": 28,
+    "name": "Disguise",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 29,
-    "ability_id": 62,
-    "name": "Hospitality",
-    "usage_count": 128,
+    "ability_id": 29,
+    "name": "Dragonize",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 30,
-    "ability_id": 175,
-    "name": "Swift Swim",
-    "usage_count": 127,
+    "ability_id": 30,
+    "name": "Drizzle",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 31,
-    "ability_id": 15,
-    "name": "Chlorophyll",
-    "usage_count": 113,
+    "ability_id": 31,
+    "name": "Drought",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 32,
-    "ability_id": 158,
-    "name": "Soundproof",
-    "usage_count": 110,
+    "ability_id": 32,
+    "name": "Dry Skin",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 33,
-    "ability_id": 119,
-    "name": "Poison Touch",
-    "usage_count": 104,
+    "ability_id": 33,
+    "name": "Early Bird",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 34,
-    "ability_id": 88,
-    "name": "Liquid Voice",
-    "usage_count": 82,
+    "ability_id": 34,
+    "name": "Earth Eater",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 35,
-    "ability_id": 73,
-    "name": "Infiltrator",
-    "usage_count": 76,
+    "ability_id": 35,
+    "name": "Eelevate",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 36,
-    "ability_id": 98,
-    "name": "Mirror Armor",
-    "usage_count": 73,
+    "ability_id": 36,
+    "name": "Electric Surge",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 37,
-    "ability_id": 103,
-    "name": "Multiscale",
-    "usage_count": 73,
+    "ability_id": 37,
+    "name": "Electromorphosis",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 38,
-    "ability_id": 147,
-    "name": "Sharpness",
-    "usage_count": 71,
+    "ability_id": 38,
+    "name": "Emergency Exit",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 39,
-    "ability_id": 148,
-    "name": "Sheer Force",
-    "usage_count": 67,
+    "ability_id": 39,
+    "name": "Fairy Aura",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 40,
-    "ability_id": 159,
-    "name": "Speed Boost",
-    "usage_count": 64,
+    "ability_id": 40,
+    "name": "Filter",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 41,
-    "ability_id": 8,
-    "name": "Aura Guard",
-    "usage_count": 61,
+    "ability_id": 41,
+    "name": "Fire Mane",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 42,
-    "ability_id": 90,
-    "name": "Magic Bounce",
-    "usage_count": 52,
+    "ability_id": 42,
+    "name": "Flame Body",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 43,
-    "ability_id": 94,
-    "name": "Mega Launcher",
-    "usage_count": 44,
+    "ability_id": 43,
+    "name": "Flash Fire",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 44,
-    "ability_id": 78,
-    "name": "Iron Fist",
-    "usage_count": 41,
+    "ability_id": 44,
+    "name": "Flower Veil",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 45,
-    "ability_id": 19,
-    "name": "Compound Eyes",
-    "usage_count": 39,
+    "ability_id": 45,
+    "name": "Fluffy",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 46,
-    "ability_id": 181,
-    "name": "Thermal Exchange",
-    "usage_count": 39,
+    "ability_id": 46,
+    "name": "Forecast",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 47,
     "ability_id": 47,
     "name": "Friend Guard",
-    "usage_count": 33,
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 48,
-    "ability_id": 50,
-    "name": "Gale Wings",
-    "usage_count": 32,
+    "ability_id": 48,
+    "name": "Frisk",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 49,
-    "ability_id": 143,
-    "name": "Scrappy",
-    "usage_count": 31,
+    "ability_id": 49,
+    "name": "Fur Coat",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 50,
-    "ability_id": 63,
-    "name": "Huge Power",
-    "usage_count": 30,
+    "ability_id": 50,
+    "name": "Gale Wings",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 51,
-    "ability_id": 185,
-    "name": "Toxic Debris",
-    "usage_count": 30,
+    "ability_id": 51,
+    "name": "Gluttony",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 52,
-    "ability_id": 16,
-    "name": "Clear Body",
-    "usage_count": 26,
+    "ability_id": 52,
+    "name": "Good as Gold",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 53,
-    "ability_id": 179,
-    "name": "Technician",
-    "usage_count": 24,
+    "ability_id": 53,
+    "name": "Gooey",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 54,
-    "ability_id": 12,
-    "name": "Blaze",
-    "usage_count": 23,
+    "ability_id": 54,
+    "name": "Grass Pelt",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 55,
-    "ability_id": 32,
-    "name": "Dry Skin",
-    "usage_count": 23,
+    "ability_id": 55,
+    "name": "Grassy Surge",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 56,
-    "ability_id": 105,
-    "name": "Natural Cure",
-    "usage_count": 23,
+    "ability_id": 56,
+    "name": "Guard Dog",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 57,
-    "ability_id": 132,
-    "name": "Refrigerate",
-    "usage_count": 22,
+    "ability_id": 57,
+    "name": "Guts",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 58,
-    "ability_id": 160,
-    "name": "Spicy Spray",
-    "usage_count": 22,
+    "ability_id": 58,
+    "name": "Harvest",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 59,
-    "ability_id": 189,
-    "name": "Unnerve",
-    "usage_count": 22,
+    "ability_id": 59,
+    "name": "Healer",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 60,
-    "ability_id": 80,
-    "name": "Keen Eye",
-    "usage_count": 21,
+    "ability_id": 60,
+    "name": "Heatproof",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 61,
-    "ability_id": 41,
-    "name": "Fire Mane",
-    "usage_count": 19,
+    "ability_id": 61,
+    "name": "Heavy Metal",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 62,
-    "ability_id": 133,
-    "name": "Regenerator",
-    "usage_count": 19,
+    "ability_id": 62,
+    "name": "Hospitality",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 63,
-    "ability_id": 25,
-    "name": "Cute Charm",
-    "usage_count": 18,
+    "ability_id": 63,
+    "name": "Huge Power",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 64,
-    "ability_id": 36,
-    "name": "Electric Surge",
-    "usage_count": 18,
+    "ability_id": 64,
+    "name": "Hunger Switch",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 65,
-    "ability_id": 145,
-    "name": "Seed Sower",
-    "usage_count": 18,
+    "ability_id": 65,
+    "name": "Hustle",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 66,
-    "ability_id": 17,
-    "name": "Cloud Nine",
-    "usage_count": 17,
+    "ability_id": 66,
+    "name": "Hydration",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 67,
-    "ability_id": 99,
-    "name": "Mold Breaker",
-    "usage_count": 16,
+    "ability_id": 67,
+    "name": "Hyper Cutter",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 68,
-    "ability_id": 75,
-    "name": "Inner Focus",
-    "usage_count": 15,
+    "ability_id": 68,
+    "name": "Ice Body",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 69,
-    "ability_id": 137,
-    "name": "Sand Force",
-    "usage_count": 15,
+    "ability_id": 69,
+    "name": "Illuminate",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 70,
-    "ability_id": 13,
-    "name": "Bulletproof",
-    "usage_count": 14,
+    "ability_id": 70,
+    "name": "Illusion",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 71,
-    "ability_id": 22,
-    "name": "Cud Chew",
-    "usage_count": 13,
+    "ability_id": 71,
+    "name": "Immunity",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 72,
-    "ability_id": 166,
-    "name": "Steely Spirit",
-    "usage_count": 13,
+    "ability_id": 72,
+    "name": "Imposter",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 73,
-    "ability_id": 196,
-    "name": "Weak Armor",
-    "usage_count": 13,
+    "ability_id": 73,
+    "name": "Infiltrator",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 74,
-    "ability_id": 95,
-    "name": "Mega Sol",
-    "usage_count": 12,
+    "ability_id": 74,
+    "name": "Innards Out",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 75,
-    "ability_id": 109,
-    "name": "Overcoat",
-    "usage_count": 12,
+    "ability_id": 75,
+    "name": "Inner Focus",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 76,
-    "ability_id": 194,
-    "name": "Water Absorb",
-    "usage_count": 12,
+    "ability_id": 76,
+    "name": "Insomnia",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 77,
-    "ability_id": 58,
-    "name": "Harvest",
-    "usage_count": 11,
+    "ability_id": 77,
+    "name": "Intimidate",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 78,
-    "ability_id": 122,
-    "name": "Protean",
-    "usage_count": 11,
+    "ability_id": 78,
+    "name": "Iron Fist",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 79,
-    "ability_id": 127,
-    "name": "Queenly Majesty",
-    "usage_count": 11,
+    "ability_id": 79,
+    "name": "Justified",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 80,
-    "ability_id": 149,
-    "name": "Shell Armor",
-    "usage_count": 11,
+    "ability_id": 80,
+    "name": "Keen Eye",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 81,
-    "ability_id": 186,
-    "name": "Trace",
-    "usage_count": 11,
+    "ability_id": 81,
+    "name": "Klutz",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 82,
-    "ability_id": 65,
-    "name": "Hustle",
-    "usage_count": 10,
+    "ability_id": 82,
+    "name": "Levitate",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 83,
-    "ability_id": 168,
-    "name": "Sturdy",
-    "usage_count": 10,
+    "ability_id": 83,
+    "name": "Libero",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 84,
-    "ability_id": 182,
-    "name": "Thick Fat",
-    "usage_count": 10,
+    "ability_id": 84,
+    "name": "Light Metal",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 85,
-    "ability_id": 107,
-    "name": "Oblivious",
-    "usage_count": 9,
+    "ability_id": 85,
+    "name": "Lightning Rod",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 86,
-    "ability_id": 124,
-    "name": "Punk Rock",
-    "usage_count": 9,
+    "ability_id": 86,
+    "name": "Limber",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 87,
-    "ability_id": 126,
-    "name": "Purifying Salt",
-    "usage_count": 9,
+    "ability_id": 87,
+    "name": "Liquid Ooze",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 88,
-    "ability_id": 163,
-    "name": "Stance Change",
-    "usage_count": 9,
+    "ability_id": 88,
+    "name": "Liquid Voice",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 89,
-    "ability_id": 165,
-    "name": "Steadfast",
-    "usage_count": 9,
+    "ability_id": 89,
+    "name": "Long Reach",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 90,
-    "ability_id": 192,
-    "name": "Volt Absorb",
-    "usage_count": 9,
+    "ability_id": 90,
+    "name": "Magic Bounce",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 91,
-    "ability_id": 70,
-    "name": "Illusion",
-    "usage_count": 8,
+    "ability_id": 91,
+    "name": "Magic Guard",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 92,
-    "ability_id": 71,
-    "name": "Immunity",
-    "usage_count": 8,
+    "ability_id": 92,
+    "name": "Magician",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 93,
-    "ability_id": 87,
-    "name": "Liquid Ooze",
-    "usage_count": 8,
+    "ability_id": 93,
+    "name": "Marvel Scale",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 94,
-    "ability_id": 164,
-    "name": "Static",
-    "usage_count": 8,
+    "ability_id": 94,
+    "name": "Mega Launcher",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 95,
-    "ability_id": 28,
-    "name": "Disguise",
-    "usage_count": 7,
+    "ability_id": 95,
+    "name": "Mega Sol",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 96,
-    "ability_id": 131,
-    "name": "Reckless",
-    "usage_count": 7,
+    "ability_id": 96,
+    "name": "Merciless",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 97,
-    "ability_id": 169,
-    "name": "Super Luck",
-    "usage_count": 7,
+    "ability_id": 97,
+    "name": "Mimicry",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 98,
-    "ability_id": 173,
-    "name": "Swarm",
-    "usage_count": 7,
+    "ability_id": 98,
+    "name": "Mirror Armor",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 99,
-    "ability_id": 53,
-    "name": "Gooey",
-    "usage_count": 6,
+    "ability_id": 99,
+    "name": "Mold Breaker",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 100,
-    "ability_id": 72,
-    "name": "Imposter",
-    "usage_count": 6,
+    "ability_id": 100,
+    "name": "Moody",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 101,
-    "ability_id": 86,
-    "name": "Limber",
-    "usage_count": 6,
+    "ability_id": 101,
+    "name": "Motor Drive",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 102,
-    "ability_id": 151,
-    "name": "Skill Link",
-    "usage_count": 6,
+    "ability_id": 102,
+    "name": "Moxie",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 103,
-    "ability_id": 176,
-    "name": "Symbiosis",
-    "usage_count": 6,
+    "ability_id": 103,
+    "name": "Multiscale",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 104,
-    "ability_id": 183,
-    "name": "Torrent",
-    "usage_count": 6,
+    "ability_id": 104,
+    "name": "Mummy",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 105,
-    "ability_id": 195,
-    "name": "Water Bubble",
-    "usage_count": 6,
+    "ability_id": 105,
+    "name": "Natural Cure",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 106,
-    "ability_id": 96,
-    "name": "Merciless",
-    "usage_count": 5,
+    "ability_id": 106,
+    "name": "No Guard",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 107,
-    "ability_id": 113,
-    "name": "Pickpocket",
-    "usage_count": 5,
+    "ability_id": 107,
+    "name": "Oblivious",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 108,
-    "ability_id": 125,
-    "name": "Pure Power",
-    "usage_count": 5,
+    "ability_id": 108,
+    "name": "Opportunist",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 109,
-    "ability_id": 161,
-    "name": "Stalwart",
-    "usage_count": 5,
+    "ability_id": 109,
+    "name": "Overcoat",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 110,
-    "ability_id": 187,
-    "name": "Unaware",
-    "usage_count": 5,
+    "ability_id": 110,
+    "name": "Overgrow",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 111,
-    "ability_id": 197,
-    "name": "White Smoke",
-    "usage_count": 5,
+    "ability_id": 111,
+    "name": "Own Tempo",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 112,
-    "ability_id": 10,
-    "name": "Berserk",
-    "usage_count": 4,
+    "ability_id": 112,
+    "name": "Parental Bond",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 113,
-    "ability_id": 24,
-    "name": "Cursed Body",
-    "usage_count": 4,
+    "ability_id": 113,
+    "name": "Pickpocket",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 114,
-    "ability_id": 26,
-    "name": "Damp",
-    "usage_count": 4,
+    "ability_id": 114,
+    "name": "Pickup",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 115,
-    "ability_id": 66,
-    "name": "Hydration",
-    "usage_count": 4,
+    "ability_id": 115,
+    "name": "Piercing Drill",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 116,
-    "ability_id": 67,
-    "name": "Hyper Cutter",
-    "usage_count": 4,
+    "ability_id": 116,
+    "name": "Pixilate",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 117,
-    "ability_id": 85,
-    "name": "Lightning Rod",
-    "usage_count": 4,
+    "ability_id": 117,
+    "name": "Plus",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 118,
-    "ability_id": 121,
-    "name": "Pressure",
-    "usage_count": 4,
+    "ability_id": 118,
+    "name": "Poison Point",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 119,
-    "ability_id": 150,
-    "name": "Shield Dust",
-    "usage_count": 4,
+    "ability_id": 119,
+    "name": "Poison Touch",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 120,
-    "ability_id": 156,
-    "name": "Solar Power",
-    "usage_count": 4,
+    "ability_id": 120,
+    "name": "Prankster",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 121,
-    "ability_id": 170,
-    "name": "Supersweet Syrup",
-    "usage_count": 4,
+    "ability_id": 121,
+    "name": "Pressure",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 122,
-    "ability_id": 11,
-    "name": "Big Pecks",
-    "usage_count": 3,
+    "ability_id": 122,
+    "name": "Protean",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 123,
-    "ability_id": 23,
-    "name": "Curious Medicine",
-    "usage_count": 3,
+    "ability_id": 123,
+    "name": "Psychic Surge",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 124,
-    "ability_id": 37,
-    "name": "Electromorphosis",
-    "usage_count": 3,
+    "ability_id": 124,
+    "name": "Punk Rock",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 125,
-    "ability_id": 40,
-    "name": "Filter",
-    "usage_count": 3,
+    "ability_id": 125,
+    "name": "Pure Power",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 126,
-    "ability_id": 46,
-    "name": "Forecast",
-    "usage_count": 3,
+    "ability_id": 126,
+    "name": "Purifying Salt",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 127,
-    "ability_id": 54,
-    "name": "Grass Pelt",
-    "usage_count": 3,
+    "ability_id": 127,
+    "name": "Queenly Majesty",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 128,
-    "ability_id": 56,
-    "name": "Guard Dog",
-    "usage_count": 3,
+    "ability_id": 128,
+    "name": "Quick Draw",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 129,
-    "ability_id": 79,
-    "name": "Justified",
-    "usage_count": 3,
+    "ability_id": 129,
+    "name": "Rain Dish",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 130,
-    "ability_id": 91,
-    "name": "Magic Guard",
-    "usage_count": 3,
+    "ability_id": 130,
+    "name": "Receiver",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 131,
-    "ability_id": 97,
-    "name": "Mimicry",
-    "usage_count": 3,
+    "ability_id": 131,
+    "name": "Reckless",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 132,
-    "ability_id": 104,
-    "name": "Mummy",
-    "usage_count": 3,
+    "ability_id": 132,
+    "name": "Refrigerate",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 133,
-    "ability_id": 108,
-    "name": "Opportunist",
-    "usage_count": 3,
+    "ability_id": 133,
+    "name": "Regenerator",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 134,
-    "ability_id": 110,
-    "name": "Overgrow",
-    "usage_count": 3,
+    "ability_id": 134,
+    "name": "Rivalry",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 135,
-    "ability_id": 115,
-    "name": "Piercing Drill",
-    "usage_count": 3,
+    "ability_id": 135,
+    "name": "Rock Head",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 136,
-    "ability_id": 142,
-    "name": "Sap Sipper",
-    "usage_count": 3,
+    "ability_id": 136,
+    "name": "Rough Skin",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 137,
-    "ability_id": 171,
-    "name": "Supreme Overlord",
-    "usage_count": 3,
+    "ability_id": 137,
+    "name": "Sand Force",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 138,
-    "ability_id": 172,
-    "name": "Surge Surfer",
-    "usage_count": 3,
+    "ability_id": 138,
+    "name": "Sand Rush",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 139,
-    "ability_id": 191,
-    "name": "Vital Spirit",
-    "usage_count": 3,
+    "ability_id": 139,
+    "name": "Sand Spit",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 140,
-    "ability_id": 193,
-    "name": "Wandering Spirit",
-    "usage_count": 3,
+    "ability_id": 140,
+    "name": "Sand Stream",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 141,
-    "ability_id": 198,
-    "name": "Zero to Hero",
-    "usage_count": 3,
+    "ability_id": 141,
+    "name": "Sand Veil",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 142,
-    "ability_id": 4,
-    "name": "Analytic",
-    "usage_count": 2,
+    "ability_id": 142,
+    "name": "Sap Sipper",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 143,
-    "ability_id": 7,
-    "name": "Aroma Veil",
-    "usage_count": 2,
+    "ability_id": 143,
+    "name": "Scrappy",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 144,
-    "ability_id": 29,
-    "name": "Dragonize",
-    "usage_count": 2,
+    "ability_id": 144,
+    "name": "Screen Cleaner",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 145,
-    "ability_id": 34,
-    "name": "Earth Eater",
-    "usage_count": 2,
+    "ability_id": 145,
+    "name": "Seed Sower",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 146,
-    "ability_id": 45,
-    "name": "Fluffy",
-    "usage_count": 2,
+    "ability_id": 146,
+    "name": "Shadow Tag",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 147,
-    "ability_id": 48,
-    "name": "Frisk",
-    "usage_count": 2,
+    "ability_id": 147,
+    "name": "Sharpness",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 148,
-    "ability_id": 49,
-    "name": "Fur Coat",
-    "usage_count": 2,
+    "ability_id": 148,
+    "name": "Sheer Force",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 149,
-    "ability_id": 51,
-    "name": "Gluttony",
-    "usage_count": 2,
+    "ability_id": 149,
+    "name": "Shell Armor",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 150,
-    "ability_id": 59,
-    "name": "Healer",
-    "usage_count": 2,
+    "ability_id": 150,
+    "name": "Shield Dust",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 151,
-    "ability_id": 69,
-    "name": "Illuminate",
-    "usage_count": 2,
+    "ability_id": 151,
+    "name": "Skill Link",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 152,
-    "ability_id": 74,
-    "name": "Innards Out",
-    "usage_count": 2,
+    "ability_id": 152,
+    "name": "Slush Rush",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 153,
-    "ability_id": 89,
-    "name": "Long Reach",
-    "usage_count": 2,
+    "ability_id": 153,
+    "name": "Sniper",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 154,
-    "ability_id": 93,
-    "name": "Marvel Scale",
-    "usage_count": 2,
+    "ability_id": 154,
+    "name": "Snow Cloak",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 155,
-    "ability_id": 112,
-    "name": "Parental Bond",
-    "usage_count": 2,
+    "ability_id": 155,
+    "name": "Snow Warning",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 156,
-    "ability_id": 128,
-    "name": "Quick Draw",
-    "usage_count": 2,
+    "ability_id": 156,
+    "name": "Solar Power",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 157,
-    "ability_id": 144,
-    "name": "Screen Cleaner",
-    "usage_count": 2,
+    "ability_id": 157,
+    "name": "Solid Rock",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 158,
-    "ability_id": 153,
-    "name": "Sniper",
-    "usage_count": 2,
+    "ability_id": 158,
+    "name": "Soundproof",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 159,
-    "ability_id": 177,
-    "name": "Synchronize",
-    "usage_count": 2,
+    "ability_id": 159,
+    "name": "Speed Boost",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 160,
-    "ability_id": 190,
-    "name": "Unseen Fist",
-    "usage_count": 2,
+    "ability_id": 160,
+    "name": "Spicy Spray",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 161,
-    "ability_id": 3,
-    "name": "Aftermath",
-    "usage_count": 1,
+    "ability_id": 161,
+    "name": "Stalwart",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 162,
-    "ability_id": 5,
-    "name": "Anger Point",
-    "usage_count": 1,
+    "ability_id": 162,
+    "name": "Stamina",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 163,
-    "ability_id": 9,
-    "name": "Battle Armor",
-    "usage_count": 1,
+    "ability_id": 163,
+    "name": "Stance Change",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 164,
-    "ability_id": 14,
-    "name": "Cheek Pouch",
-    "usage_count": 1,
+    "ability_id": 164,
+    "name": "Static",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 165,
-    "ability_id": 21,
-    "name": "Corrosion",
-    "usage_count": 1,
+    "ability_id": 165,
+    "name": "Steadfast",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 166,
-    "ability_id": 33,
-    "name": "Early Bird",
-    "usage_count": 1,
+    "ability_id": 166,
+    "name": "Steely Spirit",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 167,
-    "ability_id": 35,
-    "name": "Eelevate",
-    "usage_count": 1,
+    "ability_id": 167,
+    "name": "Strong Jaw",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 168,
-    "ability_id": 38,
-    "name": "Emergency Exit",
-    "usage_count": 1,
+    "ability_id": 168,
+    "name": "Sturdy",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 169,
-    "ability_id": 44,
-    "name": "Flower Veil",
-    "usage_count": 1,
+    "ability_id": 169,
+    "name": "Super Luck",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 170,
-    "ability_id": 57,
-    "name": "Guts",
-    "usage_count": 1,
+    "ability_id": 170,
+    "name": "Supersweet Syrup",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 171,
-    "ability_id": 60,
-    "name": "Heatproof",
-    "usage_count": 1,
+    "ability_id": 171,
+    "name": "Supreme Overlord",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 172,
-    "ability_id": 61,
-    "name": "Heavy Metal",
-    "usage_count": 1,
+    "ability_id": 172,
+    "name": "Surge Surfer",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 173,
-    "ability_id": 64,
-    "name": "Hunger Switch",
-    "usage_count": 1,
+    "ability_id": 173,
+    "name": "Swarm",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 174,
-    "ability_id": 68,
-    "name": "Ice Body",
-    "usage_count": 1,
+    "ability_id": 174,
+    "name": "Sweet Veil",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 175,
-    "ability_id": 76,
-    "name": "Insomnia",
-    "usage_count": 1,
+    "ability_id": 175,
+    "name": "Swift Swim",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 176,
-    "ability_id": 81,
-    "name": "Klutz",
-    "usage_count": 1,
+    "ability_id": 176,
+    "name": "Symbiosis",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 177,
-    "ability_id": 83,
-    "name": "Libero",
-    "usage_count": 1,
+    "ability_id": 177,
+    "name": "Synchronize",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 178,
-    "ability_id": 84,
-    "name": "Light Metal",
-    "usage_count": 1,
+    "ability_id": 178,
+    "name": "Tangled Feet",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 179,
-    "ability_id": 92,
-    "name": "Magician",
-    "usage_count": 1,
+    "ability_id": 179,
+    "name": "Technician",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 180,
-    "ability_id": 100,
-    "name": "Moody",
-    "usage_count": 1,
+    "ability_id": 180,
+    "name": "Telepathy",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 181,
-    "ability_id": 101,
-    "name": "Motor Drive",
-    "usage_count": 1,
+    "ability_id": 181,
+    "name": "Thermal Exchange",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 182,
-    "ability_id": 102,
-    "name": "Moxie",
-    "usage_count": 1,
+    "ability_id": 182,
+    "name": "Thick Fat",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 183,
-    "ability_id": 111,
-    "name": "Own Tempo",
-    "usage_count": 1,
+    "ability_id": 183,
+    "name": "Torrent",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 184,
-    "ability_id": 114,
-    "name": "Pickup",
-    "usage_count": 1,
+    "ability_id": 184,
+    "name": "Tough Claws",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 185,
-    "ability_id": 117,
-    "name": "Plus",
-    "usage_count": 1,
+    "ability_id": 185,
+    "name": "Toxic Debris",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 186,
-    "ability_id": 118,
-    "name": "Poison Point",
-    "usage_count": 1,
+    "ability_id": 186,
+    "name": "Trace",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 187,
-    "ability_id": 129,
-    "name": "Rain Dish",
-    "usage_count": 1,
+    "ability_id": 187,
+    "name": "Unaware",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 188,
-    "ability_id": 130,
-    "name": "Receiver",
-    "usage_count": 1,
+    "ability_id": 188,
+    "name": "Unburden",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 189,
-    "ability_id": 134,
-    "name": "Rivalry",
-    "usage_count": 1,
+    "ability_id": 189,
+    "name": "Unnerve",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 190,
-    "ability_id": 139,
-    "name": "Sand Spit",
-    "usage_count": 1,
+    "ability_id": 190,
+    "name": "Unseen Fist",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 191,
-    "ability_id": 141,
-    "name": "Sand Veil",
-    "usage_count": 1,
+    "ability_id": 191,
+    "name": "Vital Spirit",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 192,
-    "ability_id": 152,
-    "name": "Slush Rush",
-    "usage_count": 1,
+    "ability_id": 192,
+    "name": "Volt Absorb",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 193,
-    "ability_id": 154,
-    "name": "Snow Cloak",
-    "usage_count": 1,
+    "ability_id": 193,
+    "name": "Wandering Spirit",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 194,
-    "ability_id": 157,
-    "name": "Solid Rock",
-    "usage_count": 1,
+    "ability_id": 194,
+    "name": "Water Absorb",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 195,
-    "ability_id": 167,
-    "name": "Strong Jaw",
-    "usage_count": 1,
+    "ability_id": 195,
+    "name": "Water Bubble",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 196,
-    "ability_id": 174,
-    "name": "Sweet Veil",
-    "usage_count": 1,
+    "ability_id": 196,
+    "name": "Weak Armor",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 197,
-    "ability_id": 178,
-    "name": "Tangled Feet",
-    "usage_count": 1,
+    "ability_id": 197,
+    "name": "White Smoke",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 198,
-    "ability_id": 180,
-    "name": "Telepathy",
-    "usage_count": 1,
+    "ability_id": 198,
+    "name": "Zero to Hero",
+    "usage_count": 0,
     "regulation": "M-C"
   }
 ]

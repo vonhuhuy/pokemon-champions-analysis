@@ -1,3355 +1,3355 @@
 [
   {
     "rank": 1,
-    "move_id": 311,
-    "name": "Protect",
-    "usage_count": 52881,
+    "move_id": 1,
+    "name": "Accelerock",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 2,
-    "move_id": 141,
-    "name": "Fake Out",
-    "usage_count": 17557,
+    "move_id": 2,
+    "name": "Acid Armor",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 3,
-    "move_id": 73,
-    "name": "Close Combat",
-    "usage_count": 8663,
+    "move_id": 3,
+    "name": "Acid Spray",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 4,
-    "move_id": 422,
-    "name": "Tailwind",
-    "usage_count": 7546,
+    "move_id": 4,
+    "name": "Acrobatics",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 5,
-    "move_id": 181,
-    "name": "Grassy Glide",
-    "usage_count": 7124,
+    "move_id": 5,
+    "name": "Acupressure",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 6,
-    "move_id": 211,
-    "name": "Hyper Voice",
-    "usage_count": 7068,
+    "move_id": 6,
+    "name": "Aerial Ace",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 7,
-    "move_id": 157,
-    "name": "Flare Blitz",
-    "usage_count": 6668,
+    "move_id": 7,
+    "name": "After You",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 8,
-    "move_id": 472,
-    "name": "Wood Hammer",
-    "usage_count": 6423,
+    "move_id": 8,
+    "name": "Agility",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 9,
-    "move_id": 447,
-    "name": "Trick Room",
-    "usage_count": 6364,
+    "move_id": 9,
+    "name": "Air Cutter",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 10,
-    "move_id": 227,
-    "name": "Iron Head",
-    "usage_count": 5529,
+    "move_id": 10,
+    "name": "Air Slash",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 11,
-    "move_id": 340,
-    "name": "Rock Slide",
-    "usage_count": 5428,
+    "move_id": 11,
+    "name": "Alluring Voice",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 12,
-    "move_id": 359,
-    "name": "Shadow Ball",
-    "usage_count": 5308,
+    "move_id": 12,
+    "name": "Ally Switch",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 13,
-    "move_id": 99,
-    "name": "Dire Claw",
-    "usage_count": 5026,
+    "move_id": 13,
+    "name": "Amnesia",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 14,
-    "move_id": 291,
-    "name": "Parting Shot",
-    "usage_count": 5013,
+    "move_id": 14,
+    "name": "Ancient Power",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 15,
-    "move_id": 202,
-    "name": "High Horsepower",
-    "usage_count": 4888,
+    "move_id": 15,
+    "name": "Apple Acid",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 16,
-    "move_id": 465,
-    "name": "Weather Ball",
-    "usage_count": 4207,
+    "move_id": 16,
+    "name": "Aqua Cutter",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 17,
-    "move_id": 198,
-    "name": "Heat Wave",
-    "usage_count": 4046,
+    "move_id": 17,
+    "name": "Aqua Jet",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 18,
-    "move_id": 200,
-    "name": "Helping Hand",
-    "usage_count": 3892,
+    "move_id": 18,
+    "name": "Aqua Ring",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 19,
-    "move_id": 453,
-    "name": "U-turn",
-    "usage_count": 3846,
+    "move_id": 19,
+    "name": "Aqua Step",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 20,
-    "move_id": 412,
-    "name": "Sucker Punch",
-    "usage_count": 3822,
+    "move_id": 20,
+    "name": "Aqua Tail",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 21,
-    "move_id": 278,
-    "name": "Nasty Plot",
-    "usage_count": 3670,
+    "move_id": 21,
+    "name": "Armor Cannon",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 22,
-    "move_id": 106,
-    "name": "Draco Meteor",
-    "usage_count": 3653,
+    "move_id": 22,
+    "name": "Aromatic Mist",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 23,
-    "move_id": 313,
-    "name": "Psychic",
-    "usage_count": 3544,
+    "move_id": 23,
+    "name": "Assurance",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 24,
-    "move_id": 136,
-    "name": "Expanding Force",
-    "usage_count": 3431,
+    "move_id": 24,
+    "name": "Attract",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 25,
-    "move_id": 111,
-    "name": "Dragon Pulse",
-    "usage_count": 3307,
+    "move_id": 25,
+    "name": "Aura Sphere",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 26,
-    "move_id": 254,
-    "name": "Make It Rain",
-    "usage_count": 3199,
+    "move_id": 26,
+    "name": "Aura Wheel",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 27,
-    "move_id": 233,
-    "name": "Kowtow Cleave",
-    "usage_count": 3085,
+    "move_id": 27,
+    "name": "Aurora Veil",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 28,
-    "move_id": 464,
-    "name": "Wave Crash",
-    "usage_count": 2833,
+    "move_id": 28,
+    "name": "Avalanche",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 29,
-    "move_id": 269,
-    "name": "Moonblast",
-    "usage_count": 2824,
+    "move_id": 29,
+    "name": "Baby-Doll Eyes",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 30,
-    "move_id": 430,
-    "name": "Throat Chop",
-    "usage_count": 2688,
+    "move_id": 30,
+    "name": "Baneful Bunker",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 31,
-    "move_id": 93,
-    "name": "Dazzling Gleam",
-    "usage_count": 2631,
+    "move_id": 31,
+    "name": "Barb Barrage",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 32,
-    "move_id": 167,
-    "name": "Follow Me",
-    "usage_count": 2619,
+    "move_id": 32,
+    "name": "Baton Pass",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 33,
-    "move_id": 121,
-    "name": "Earth Power",
-    "usage_count": 2613,
+    "move_id": 33,
+    "name": "Beak Blast",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 34,
-    "move_id": 164,
-    "name": "Focus Blast",
-    "usage_count": 2565,
+    "move_id": 34,
+    "name": "Beat Up",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 35,
-    "move_id": 17,
-    "name": "Aqua Jet",
-    "usage_count": 2452,
+    "move_id": 35,
+    "name": "Belch",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 36,
-    "move_id": 477,
-    "name": "Zap Cannon",
-    "usage_count": 2441,
+    "move_id": 36,
+    "name": "Belly Drum",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 37,
-    "move_id": 236,
-    "name": "Last Respects",
-    "usage_count": 2388,
+    "move_id": 37,
+    "name": "Bind",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 38,
-    "move_id": 246,
-    "name": "Low Kick",
-    "usage_count": 2333,
+    "move_id": 38,
+    "name": "Bite",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 39,
-    "move_id": 207,
-    "name": "Hurricane",
-    "usage_count": 2273,
+    "move_id": 39,
+    "name": "Bitter Blade",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 40,
-    "move_id": 62,
-    "name": "Calm Mind",
-    "usage_count": 2220,
+    "move_id": 40,
+    "name": "Bitter Malice",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 41,
-    "move_id": 420,
-    "name": "Swords Dance",
-    "usage_count": 2209,
+    "move_id": 41,
+    "name": "Blast Burn",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 42,
-    "move_id": 139,
-    "name": "Extreme Speed",
-    "usage_count": 2052,
+    "move_id": 42,
+    "name": "Blaze Kick",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 43,
-    "move_id": 158,
-    "name": "Flash Cannon",
-    "usage_count": 2052,
+    "move_id": 43,
+    "name": "Blizzard",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 44,
-    "move_id": 193,
-    "name": "Head Smash",
-    "usage_count": 2048,
+    "move_id": 44,
+    "name": "Block",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 45,
-    "move_id": 156,
-    "name": "Flamethrower",
-    "usage_count": 2047,
+    "move_id": 45,
+    "name": "Body Press",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 46,
-    "move_id": 306,
-    "name": "Power Gem",
-    "usage_count": 2028,
+    "move_id": 46,
+    "name": "Body Slam",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 47,
-    "move_id": 468,
-    "name": "Wide Guard",
-    "usage_count": 2024,
+    "move_id": 47,
+    "name": "Bone Rush",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 48,
-    "move_id": 240,
-    "name": "Leech Life",
-    "usage_count": 1834,
+    "move_id": 48,
+    "name": "Boomburst",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 49,
-    "move_id": 97,
-    "name": "Detect",
-    "usage_count": 1833,
+    "move_id": 49,
+    "name": "Bounce",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 50,
-    "move_id": 326,
-    "name": "Rage Powder",
-    "usage_count": 1803,
+    "move_id": 50,
+    "name": "Brave Bird",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 51,
-    "move_id": 128,
-    "name": "Electro Shot",
-    "usage_count": 1692,
+    "move_id": 51,
+    "name": "Breaking Swipe",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 52,
-    "move_id": 378,
-    "name": "Sludge Bomb",
-    "usage_count": 1689,
+    "move_id": 52,
+    "name": "Brick Break",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 53,
-    "move_id": 130,
-    "name": "Encore",
-    "usage_count": 1665,
+    "move_id": 53,
+    "name": "Brutal Swing",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 54,
-    "move_id": 50,
-    "name": "Brave Bird",
-    "usage_count": 1620,
+    "move_id": 54,
+    "name": "Bug Bite",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 55,
-    "move_id": 232,
-    "name": "Knock Off",
-    "usage_count": 1611,
+    "move_id": 55,
+    "name": "Bug Buzz",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 56,
-    "move_id": 213,
-    "name": "Ice Beam",
-    "usage_count": 1531,
+    "move_id": 56,
+    "name": "Bulk Up",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 57,
-    "move_id": 92,
-    "name": "Darkest Lariat",
-    "usage_count": 1508,
+    "move_id": 57,
+    "name": "Bulldoze",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 58,
-    "move_id": 210,
-    "name": "Hyper Beam",
-    "usage_count": 1468,
+    "move_id": 58,
+    "name": "Bullet Punch",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 59,
-    "move_id": 435,
-    "name": "Thunderbolt",
-    "usage_count": 1458,
+    "move_id": 59,
+    "name": "Bullet Seed",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 60,
-    "move_id": 25,
-    "name": "Aura Sphere",
-    "usage_count": 1451,
+    "move_id": 60,
+    "name": "Burn Up",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 61,
-    "move_id": 43,
-    "name": "Blizzard",
-    "usage_count": 1289,
+    "move_id": 61,
+    "name": "Burning Jealousy",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 62,
-    "move_id": 322,
-    "name": "Quick Attack",
-    "usage_count": 1225,
+    "move_id": 62,
+    "name": "Calm Mind",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 63,
-    "move_id": 122,
-    "name": "Earthquake",
-    "usage_count": 1207,
+    "move_id": 63,
+    "name": "Ceaseless Edge",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 64,
-    "move_id": 108,
-    "name": "Dragon Claw",
-    "usage_count": 1160,
+    "move_id": 64,
+    "name": "Charge",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 65,
-    "move_id": 216,
-    "name": "Ice Punch",
-    "usage_count": 1145,
+    "move_id": 65,
+    "name": "Charge Beam",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 66,
-    "move_id": 160,
-    "name": "Flip Turn",
-    "usage_count": 1127,
+    "move_id": 66,
+    "name": "Charm",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 67,
-    "move_id": 244,
-    "name": "Light Screen",
-    "usage_count": 1097,
+    "move_id": 67,
+    "name": "Chilling Water",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 68,
-    "move_id": 221,
-    "name": "Icy Wind",
-    "usage_count": 1094,
+    "move_id": 68,
+    "name": "Chilly Reception",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 69,
-    "move_id": 105,
-    "name": "Double-Edge",
-    "usage_count": 1089,
+    "move_id": 69,
+    "name": "Circle Throw",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 70,
-    "move_id": 401,
-    "name": "Stomping Tantrum",
-    "usage_count": 1017,
+    "move_id": 70,
+    "name": "Clanging Scales",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 71,
-    "move_id": 351,
-    "name": "Scald",
-    "usage_count": 1008,
+    "move_id": 71,
+    "name": "Clangorous Soul",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 72,
-    "move_id": 27,
-    "name": "Aurora Veil",
-    "usage_count": 964,
+    "move_id": 72,
+    "name": "Clear Smog",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 73,
-    "move_id": 333,
-    "name": "Reflect",
-    "usage_count": 964,
+    "move_id": 73,
+    "name": "Close Combat",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 74,
-    "move_id": 288,
-    "name": "Overheat",
-    "usage_count": 925,
+    "move_id": 74,
+    "name": "Coaching",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 75,
-    "move_id": 276,
-    "name": "Muddy Water",
-    "usage_count": 923,
+    "move_id": 75,
+    "name": "Coil",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 76,
-    "move_id": 293,
-    "name": "Perish Song",
-    "usage_count": 912,
+    "move_id": 76,
+    "name": "Comeuppance",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 77,
-    "move_id": 387,
-    "name": "Solar Beam",
-    "usage_count": 897,
+    "move_id": 77,
+    "name": "Confuse Ray",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 78,
-    "move_id": 74,
-    "name": "Coaching",
-    "usage_count": 863,
+    "move_id": 78,
+    "name": "Copycat",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 79,
-    "move_id": 14,
-    "name": "Ancient Power",
-    "usage_count": 825,
+    "move_id": 79,
+    "name": "Corrosive Gas",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 80,
-    "move_id": 135,
-    "name": "Eruption",
-    "usage_count": 824,
+    "move_id": 80,
+    "name": "Cosmic Power",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 81,
-    "move_id": 255,
-    "name": "Matcha Gotcha",
-    "usage_count": 824,
+    "move_id": 81,
+    "name": "Cotton Guard",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 82,
-    "move_id": 383,
-    "name": "Snarl",
-    "usage_count": 759,
+    "move_id": 82,
+    "name": "Cotton Spore",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 83,
-    "move_id": 277,
-    "name": "Mystical Fire",
-    "usage_count": 758,
+    "move_id": 83,
+    "name": "Counter",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 84,
-    "move_id": 314,
-    "name": "Psychic Fangs",
-    "usage_count": 754,
+    "move_id": 84,
+    "name": "Court Change",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 85,
-    "move_id": 341,
-    "name": "Rock Tomb",
-    "usage_count": 708,
+    "move_id": 85,
+    "name": "Crabhammer",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 86,
-    "move_id": 91,
-    "name": "Dark Pulse",
-    "usage_count": 694,
+    "move_id": 86,
+    "name": "Cross Chop",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 87,
-    "move_id": 344,
-    "name": "Roost",
-    "usage_count": 685,
+    "move_id": 87,
+    "name": "Cross Poison",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 88,
-    "move_id": 376,
-    "name": "Sleep Powder",
-    "usage_count": 684,
+    "move_id": 88,
+    "name": "Crunch",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 89,
-    "move_id": 470,
-    "name": "Will-O-Wisp",
-    "usage_count": 665,
+    "move_id": 89,
+    "name": "Crush Claw",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 90,
-    "move_id": 393,
-    "name": "Spirit Break",
-    "usage_count": 636,
+    "move_id": 90,
+    "name": "Curse",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 91,
-    "move_id": 245,
-    "name": "Liquidation",
-    "usage_count": 634,
+    "move_id": 91,
+    "name": "Dark Pulse",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 92,
-    "move_id": 446,
-    "name": "Trick",
-    "usage_count": 626,
+    "move_id": 92,
+    "name": "Darkest Lariat",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 93,
-    "move_id": 408,
-    "name": "Struggle Bug",
-    "usage_count": 600,
+    "move_id": 93,
+    "name": "Dazzling Gleam",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 94,
-    "move_id": 222,
-    "name": "Imprison",
-    "usage_count": 588,
+    "move_id": 94,
+    "name": "Decorate",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 95,
-    "move_id": 119,
-    "name": "Dual Wingbeat",
-    "usage_count": 587,
+    "move_id": 95,
+    "name": "Defog",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 96,
-    "move_id": 324,
-    "name": "Quiver Dance",
-    "usage_count": 585,
+    "move_id": 96,
+    "name": "Destiny Bond",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 97,
-    "move_id": 212,
-    "name": "Hypnosis",
-    "usage_count": 584,
+    "move_id": 97,
+    "name": "Detect",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 98,
-    "move_id": 423,
-    "name": "Taunt",
-    "usage_count": 576,
+    "move_id": 98,
+    "name": "Dig",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 99,
-    "move_id": 115,
-    "name": "Draining Kiss",
-    "usage_count": 575,
+    "move_id": 99,
+    "name": "Dire Claw",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 100,
-    "move_id": 21,
-    "name": "Armor Cannon",
-    "usage_count": 566,
+    "move_id": 100,
+    "name": "Disable",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 101,
-    "move_id": 175,
-    "name": "Giga Drain",
-    "usage_count": 566,
+    "move_id": 101,
+    "name": "Discharge",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 102,
-    "move_id": 75,
-    "name": "Coil",
-    "usage_count": 541,
+    "move_id": 102,
+    "name": "Dive",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 103,
-    "move_id": 242,
-    "name": "Life Dew",
-    "usage_count": 534,
+    "move_id": 103,
+    "name": "Double Hit",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 104,
-    "move_id": 427,
-    "name": "Terrain Pulse",
-    "usage_count": 529,
+    "move_id": 104,
+    "name": "Double Shock",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 105,
-    "move_id": 56,
-    "name": "Bulk Up",
-    "usage_count": 518,
+    "move_id": 105,
+    "name": "Double-Edge",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 106,
-    "move_id": 109,
-    "name": "Dragon Dance",
-    "usage_count": 491,
+    "move_id": 106,
+    "name": "Draco Meteor",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 107,
-    "move_id": 45,
-    "name": "Body Press",
-    "usage_count": 474,
+    "move_id": 107,
+    "name": "Dragon Cheer",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 108,
-    "move_id": 392,
-    "name": "Spiky Shield",
-    "usage_count": 450,
+    "move_id": 108,
+    "name": "Dragon Claw",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 109,
-    "move_id": 331,
-    "name": "Recover",
-    "usage_count": 442,
+    "move_id": 109,
+    "name": "Dragon Dance",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 110,
-    "move_id": 217,
-    "name": "Ice Shard",
-    "usage_count": 441,
+    "move_id": 110,
+    "name": "Dragon Darts",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 111,
-    "move_id": 178,
-    "name": "Glaive Rush",
-    "usage_count": 417,
+    "move_id": 111,
+    "name": "Dragon Pulse",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 112,
-    "move_id": 300,
-    "name": "Poison Jab",
-    "usage_count": 412,
+    "move_id": 112,
+    "name": "Dragon Rush",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 113,
-    "move_id": 239,
-    "name": "Leaf Storm",
-    "usage_count": 395,
+    "move_id": 113,
+    "name": "Dragon Tail",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 114,
-    "move_id": 243,
-    "name": "Light of Ruin",
-    "usage_count": 394,
+    "move_id": 114,
+    "name": "Drain Punch",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 115,
-    "move_id": 328,
-    "name": "Rain Dance",
-    "usage_count": 394,
+    "move_id": 115,
+    "name": "Draining Kiss",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 116,
-    "move_id": 297,
-    "name": "Play Rough",
-    "usage_count": 376,
+    "move_id": 116,
+    "name": "Drill Peck",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 117,
-    "move_id": 144,
-    "name": "Feint",
-    "usage_count": 371,
+    "move_id": 117,
+    "name": "Drill Run",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 118,
-    "move_id": 104,
-    "name": "Double Shock",
-    "usage_count": 368,
+    "move_id": 118,
+    "name": "Drum Beating",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 119,
-    "move_id": 360,
-    "name": "Shadow Claw",
-    "usage_count": 345,
+    "move_id": 119,
+    "name": "Dual Wingbeat",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 120,
-    "move_id": 476,
-    "name": "Yawn",
-    "usage_count": 334,
+    "move_id": 120,
+    "name": "Dynamic Punch",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 121,
-    "move_id": 114,
-    "name": "Drain Punch",
-    "usage_count": 326,
+    "move_id": 121,
+    "name": "Earth Power",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 122,
-    "move_id": 4,
-    "name": "Acrobatics",
-    "usage_count": 325,
+    "move_id": 122,
+    "name": "Earthquake",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 123,
-    "move_id": 281,
-    "name": "Night Slash",
-    "usage_count": 325,
+    "move_id": 123,
+    "name": "Eerie Impulse",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 124,
-    "move_id": 362,
-    "name": "Shadow Sneak",
-    "usage_count": 310,
+    "move_id": 124,
+    "name": "Eerie Spell",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 125,
-    "move_id": 70,
-    "name": "Clanging Scales",
-    "usage_count": 309,
+    "move_id": 125,
+    "name": "Electric Terrain",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 126,
-    "move_id": 133,
-    "name": "Energy Ball",
-    "usage_count": 309,
+    "move_id": 126,
+    "name": "Electrify",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 127,
-    "move_id": 452,
-    "name": "Twin Beam",
-    "usage_count": 308,
+    "move_id": 127,
+    "name": "Electro Ball",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 128,
-    "move_id": 462,
-    "name": "Water Spout",
-    "usage_count": 301,
+    "move_id": 128,
+    "name": "Electro Shot",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 129,
-    "move_id": 153,
-    "name": "First Impression",
-    "usage_count": 293,
+    "move_id": 129,
+    "name": "Electroweb",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 130,
-    "move_id": 219,
-    "name": "Icicle Crash",
-    "usage_count": 282,
+    "move_id": 130,
+    "name": "Encore",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 131,
-    "move_id": 397,
-    "name": "Steel Roller",
-    "usage_count": 274,
+    "move_id": 131,
+    "name": "Endeavor",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 132,
-    "move_id": 336,
-    "name": "Revival Blessing",
-    "usage_count": 273,
+    "move_id": 132,
+    "name": "Endure",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 133,
-    "move_id": 458,
-    "name": "Volt Switch",
-    "usage_count": 268,
+    "move_id": 133,
+    "name": "Energy Ball",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 134,
-    "move_id": 188,
-    "name": "Gunk Shot",
-    "usage_count": 267,
+    "move_id": 134,
+    "name": "Entrainment",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 135,
-    "move_id": 450,
-    "name": "Triple Axel",
-    "usage_count": 266,
+    "move_id": 135,
+    "name": "Eruption",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 136,
-    "move_id": 413,
-    "name": "Sunny Day",
-    "usage_count": 256,
+    "move_id": 136,
+    "name": "Expanding Force",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 137,
-    "move_id": 117,
-    "name": "Drill Run",
-    "usage_count": 255,
+    "move_id": 137,
+    "name": "Explosion",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 138,
-    "move_id": 169,
-    "name": "Foul Play",
-    "usage_count": 248,
+    "move_id": 138,
+    "name": "Extrasensory",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 139,
-    "move_id": 170,
-    "name": "Freeze-Dry",
-    "usage_count": 244,
+    "move_id": 139,
+    "name": "Extreme Speed",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 140,
-    "move_id": 366,
-    "name": "Shell Smash",
-    "usage_count": 243,
+    "move_id": 140,
+    "name": "Facade",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 141,
-    "move_id": 416,
-    "name": "Superpower",
-    "usage_count": 236,
+    "move_id": 141,
+    "name": "Fake Out",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 142,
-    "move_id": 39,
-    "name": "Bitter Blade",
-    "usage_count": 231,
+    "move_id": 142,
+    "name": "Fake Tears",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 143,
-    "move_id": 323,
-    "name": "Quick Guard",
-    "usage_count": 231,
+    "move_id": 143,
+    "name": "Feather Dance",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 144,
-    "move_id": 346,
-    "name": "Sacred Sword",
-    "usage_count": 231,
+    "move_id": 144,
+    "name": "Feint",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 145,
-    "move_id": 317,
-    "name": "Psycho Cut",
-    "usage_count": 220,
+    "move_id": 145,
+    "name": "Fell Stinger",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 146,
-    "move_id": 71,
-    "name": "Clangorous Soul",
-    "usage_count": 218,
+    "move_id": 146,
+    "name": "Fickle Beam",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 147,
-    "move_id": 209,
-    "name": "Hydro Pump",
-    "usage_count": 213,
+    "move_id": 147,
+    "name": "Fiery Dance",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 148,
-    "move_id": 55,
-    "name": "Bug Buzz",
-    "usage_count": 197,
+    "move_id": 148,
+    "name": "Final Gambit",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 149,
-    "move_id": 303,
-    "name": "Poltergeist",
-    "usage_count": 196,
+    "move_id": 149,
+    "name": "Fire Blast",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 150,
-    "move_id": 441,
-    "name": "Toxic",
-    "usage_count": 192,
+    "move_id": 150,
+    "name": "Fire Fang",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 151,
-    "move_id": 147,
-    "name": "Fiery Dance",
-    "usage_count": 188,
+    "move_id": 151,
+    "name": "Fire Punch",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 152,
-    "move_id": 309,
-    "name": "Power Trip",
-    "usage_count": 180,
+    "move_id": 152,
+    "name": "Fire Spin",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 153,
-    "move_id": 100,
-    "name": "Disable",
-    "usage_count": 169,
+    "move_id": 153,
+    "name": "First Impression",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 154,
-    "move_id": 58,
-    "name": "Bullet Punch",
-    "usage_count": 157,
+    "move_id": 154,
+    "name": "Fissure",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 155,
-    "move_id": 224,
-    "name": "Infestation",
-    "usage_count": 156,
+    "move_id": 155,
+    "name": "Flame Charge",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 156,
-    "move_id": 214,
-    "name": "Ice Fang",
-    "usage_count": 154,
+    "move_id": 156,
+    "name": "Flamethrower",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 157,
-    "move_id": 319,
-    "name": "Psyshock",
-    "usage_count": 152,
+    "move_id": 157,
+    "name": "Flare Blitz",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 158,
-    "move_id": 475,
-    "name": "X-Scissor",
-    "usage_count": 150,
+    "move_id": 158,
+    "name": "Flash Cannon",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 159,
-    "move_id": 30,
-    "name": "Baneful Bunker",
-    "usage_count": 148,
+    "move_id": 159,
+    "name": "Fling",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 160,
-    "move_id": 411,
-    "name": "Substitute",
-    "usage_count": 147,
+    "move_id": 160,
+    "name": "Flip Turn",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 161,
-    "move_id": 295,
-    "name": "Phantom Force",
-    "usage_count": 145,
+    "move_id": 161,
+    "name": "Flower Trick",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 162,
-    "move_id": 52,
-    "name": "Brick Break",
-    "usage_count": 142,
+    "move_id": 162,
+    "name": "Fly",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 163,
-    "move_id": 226,
-    "name": "Iron Defense",
-    "usage_count": 140,
+    "move_id": 163,
+    "name": "Flying Press",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 164,
-    "move_id": 325,
-    "name": "Rage Fist",
-    "usage_count": 136,
+    "move_id": 164,
+    "name": "Focus Blast",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 165,
-    "move_id": 66,
-    "name": "Charm",
-    "usage_count": 132,
+    "move_id": 165,
+    "name": "Focus Energy",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 166,
-    "move_id": 337,
-    "name": "Rising Voltage",
-    "usage_count": 130,
+    "move_id": 166,
+    "name": "Focus Punch",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 167,
-    "move_id": 1,
-    "name": "Accelerock",
-    "usage_count": 129,
+    "move_id": 167,
+    "name": "Follow Me",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 168,
-    "move_id": 149,
-    "name": "Fire Blast",
-    "usage_count": 127,
+    "move_id": 168,
+    "name": "Forest's Curse",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 169,
-    "move_id": 180,
-    "name": "Grass Knot",
-    "usage_count": 127,
+    "move_id": 169,
+    "name": "Foul Play",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 170,
-    "move_id": 304,
-    "name": "Population Bomb",
-    "usage_count": 126,
+    "move_id": 170,
+    "name": "Freeze-Dry",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 171,
-    "move_id": 287,
-    "name": "Overdrive",
-    "usage_count": 125,
+    "move_id": 171,
+    "name": "Frenzy Plant",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 172,
-    "move_id": 338,
-    "name": "Roar",
-    "usage_count": 115,
+    "move_id": 172,
+    "name": "Frost Breath",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 173,
-    "move_id": 414,
-    "name": "Super Fang",
-    "usage_count": 112,
+    "move_id": 173,
+    "name": "Future Sight",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 174,
-    "move_id": 129,
-    "name": "Electroweb",
-    "usage_count": 111,
+    "move_id": 174,
+    "name": "Gastro Acid",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 175,
-    "move_id": 118,
-    "name": "Drum Beating",
-    "usage_count": 109,
+    "move_id": 175,
+    "name": "Giga Drain",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 176,
-    "move_id": 7,
-    "name": "After You",
-    "usage_count": 107,
+    "move_id": 176,
+    "name": "Giga Impact",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 177,
-    "move_id": 312,
-    "name": "Psych Up",
-    "usage_count": 107,
+    "move_id": 177,
+    "name": "Gigaton Hammer",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 178,
-    "move_id": 433,
-    "name": "Thunder Punch",
-    "usage_count": 107,
+    "move_id": 178,
+    "name": "Glaive Rush",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 179,
-    "move_id": 402,
-    "name": "Stone Axe",
-    "usage_count": 105,
+    "move_id": 179,
+    "name": "Glare",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 180,
-    "move_id": 396,
-    "name": "Steel Beam",
-    "usage_count": 102,
+    "move_id": 180,
+    "name": "Grass Knot",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 181,
-    "move_id": 192,
-    "name": "Haze",
-    "usage_count": 101,
+    "move_id": 181,
+    "name": "Grassy Glide",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 182,
-    "move_id": 238,
-    "name": "Leaf Blade",
-    "usage_count": 99,
+    "move_id": 182,
+    "name": "Grassy Terrain",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 183,
-    "move_id": 32,
-    "name": "Baton Pass",
-    "usage_count": 95,
+    "move_id": 183,
+    "name": "Grav Apple",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 184,
-    "move_id": 48,
-    "name": "Boomburst",
-    "usage_count": 95,
+    "move_id": 184,
+    "name": "Gravity",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 185,
-    "move_id": 195,
-    "name": "Heal Pulse",
-    "usage_count": 93,
+    "move_id": 185,
+    "name": "Growth",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 186,
-    "move_id": 10,
-    "name": "Air Slash",
-    "usage_count": 92,
+    "move_id": 186,
+    "name": "Guard Split",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 187,
-    "move_id": 371,
-    "name": "Skill Swap",
-    "usage_count": 92,
+    "move_id": 187,
+    "name": "Guard Swap",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 188,
-    "move_id": 12,
-    "name": "Ally Switch",
-    "usage_count": 89,
+    "move_id": 188,
+    "name": "Gunk Shot",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 189,
-    "move_id": 231,
-    "name": "King's Shield",
-    "usage_count": 89,
+    "move_id": 189,
+    "name": "Gyro Ball",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 190,
-    "move_id": 315,
-    "name": "Psychic Noise",
-    "usage_count": 89,
+    "move_id": 190,
+    "name": "Hammer Arm",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 191,
-    "move_id": 154,
-    "name": "Fissure",
-    "usage_count": 88,
+    "move_id": 191,
+    "name": "Hard Press",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 192,
-    "move_id": 400,
-    "name": "Stockpile",
-    "usage_count": 88,
+    "move_id": 192,
+    "name": "Haze",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 193,
-    "move_id": 88,
-    "name": "Crunch",
-    "usage_count": 87,
+    "move_id": 193,
+    "name": "Head Smash",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 194,
-    "move_id": 148,
-    "name": "Final Gambit",
-    "usage_count": 86,
+    "move_id": 194,
+    "name": "Headlong Rush",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 195,
-    "move_id": 218,
-    "name": "Ice Spinner",
-    "usage_count": 85,
+    "move_id": 195,
+    "name": "Heal Pulse",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 196,
-    "move_id": 134,
-    "name": "Entrainment",
-    "usage_count": 83,
+    "move_id": 196,
+    "name": "Healing Wish",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 197,
-    "move_id": 354,
-    "name": "Scorching Sands",
-    "usage_count": 82,
+    "move_id": 197,
+    "name": "Heat Crash",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 198,
-    "move_id": 199,
-    "name": "Heavy Slam",
-    "usage_count": 81,
+    "move_id": 198,
+    "name": "Heat Wave",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 199,
-    "move_id": 463,
-    "name": "Waterfall",
-    "usage_count": 80,
+    "move_id": 199,
+    "name": "Heavy Slam",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 200,
-    "move_id": 261,
-    "name": "Meteor Assault",
-    "usage_count": 78,
+    "move_id": 200,
+    "name": "Helping Hand",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 201,
-    "move_id": 310,
-    "name": "Power Whip",
-    "usage_count": 78,
+    "move_id": 201,
+    "name": "Hex",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 202,
-    "move_id": 379,
-    "name": "Sludge Wave",
-    "usage_count": 78,
+    "move_id": 202,
+    "name": "High Horsepower",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 203,
-    "move_id": 406,
-    "name": "Strength Sap",
-    "usage_count": 78,
+    "move_id": 203,
+    "name": "High Jump Kick",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 204,
-    "move_id": 456,
-    "name": "Vacuum Wave",
-    "usage_count": 77,
+    "move_id": 204,
+    "name": "Horn Drill",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 205,
-    "move_id": 161,
-    "name": "Flower Trick",
-    "usage_count": 76,
+    "move_id": 205,
+    "name": "Horn Leech",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 206,
-    "move_id": 386,
-    "name": "Soak",
-    "usage_count": 74,
+    "move_id": 206,
+    "name": "Howl",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 207,
-    "move_id": 248,
-    "name": "Lumina Crash",
-    "usage_count": 73,
+    "move_id": 207,
+    "name": "Hurricane",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 208,
-    "move_id": 384,
-    "name": "Snipe Shot",
-    "usage_count": 73,
+    "move_id": 208,
+    "name": "Hydro Cannon",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 209,
-    "move_id": 431,
-    "name": "Thunder",
-    "usage_count": 72,
+    "move_id": 209,
+    "name": "Hydro Pump",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 210,
-    "move_id": 434,
-    "name": "Thunder Wave",
-    "usage_count": 70,
+    "move_id": 210,
+    "name": "Hyper Beam",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 211,
-    "move_id": 101,
-    "name": "Discharge",
-    "usage_count": 69,
+    "move_id": 211,
+    "name": "Hyper Voice",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 212,
-    "move_id": 403,
-    "name": "Stone Edge",
-    "usage_count": 69,
+    "move_id": 212,
+    "name": "Hypnosis",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 213,
-    "move_id": 250,
-    "name": "Mach Punch",
-    "usage_count": 67,
+    "move_id": 213,
+    "name": "Ice Beam",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 214,
-    "move_id": 345,
-    "name": "Round",
-    "usage_count": 67,
+    "move_id": 214,
+    "name": "Ice Fang",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 215,
-    "move_id": 142,
-    "name": "Fake Tears",
-    "usage_count": 66,
+    "move_id": 215,
+    "name": "Ice Hammer",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 216,
-    "move_id": 203,
-    "name": "High Jump Kick",
-    "usage_count": 66,
+    "move_id": 216,
+    "name": "Ice Punch",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 217,
-    "move_id": 302,
-    "name": "Pollen Puff",
-    "usage_count": 63,
+    "move_id": 217,
+    "name": "Ice Shard",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 218,
-    "move_id": 151,
-    "name": "Fire Punch",
-    "usage_count": 62,
+    "move_id": 218,
+    "name": "Ice Spinner",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 219,
-    "move_id": 190,
-    "name": "Hammer Arm",
-    "usage_count": 61,
+    "move_id": 219,
+    "name": "Icicle Crash",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 220,
-    "move_id": 380,
-    "name": "Smack Down",
-    "usage_count": 61,
+    "move_id": 220,
+    "name": "Icicle Spear",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 221,
-    "move_id": 478,
-    "name": "Zen Headbutt",
-    "usage_count": 60,
+    "move_id": 221,
+    "name": "Icy Wind",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 222,
-    "move_id": 11,
-    "name": "Alluring Voice",
-    "usage_count": 59,
+    "move_id": 222,
+    "name": "Imprison",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 223,
-    "move_id": 40,
-    "name": "Bitter Malice",
-    "usage_count": 59,
+    "move_id": 223,
+    "name": "Infernal Parade",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 224,
-    "move_id": 177,
-    "name": "Gigaton Hammer",
-    "usage_count": 59,
+    "move_id": 224,
+    "name": "Infestation",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 225,
-    "move_id": 241,
-    "name": "Leech Seed",
-    "usage_count": 59,
+    "move_id": 225,
+    "name": "Instruct",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 226,
-    "move_id": 321,
-    "name": "Quash",
-    "usage_count": 59,
+    "move_id": 226,
+    "name": "Iron Defense",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 227,
-    "move_id": 113,
-    "name": "Dragon Tail",
-    "usage_count": 56,
+    "move_id": 227,
+    "name": "Iron Head",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 228,
-    "move_id": 263,
-    "name": "Meteor Mash",
-    "usage_count": 55,
+    "move_id": 228,
+    "name": "Iron Tail",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 229,
-    "move_id": 417,
-    "name": "Surf",
-    "usage_count": 55,
+    "move_id": 229,
+    "name": "Jaw Lock",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 230,
-    "move_id": 459,
-    "name": "Volt Tackle",
-    "usage_count": 55,
+    "move_id": 230,
+    "name": "Jet Punch",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 231,
-    "move_id": 405,
-    "name": "Storm Throw",
-    "usage_count": 54,
+    "move_id": 231,
+    "name": "King's Shield",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 232,
-    "move_id": 54,
-    "name": "Bug Bite",
-    "usage_count": 53,
+    "move_id": 232,
+    "name": "Knock Off",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 233,
-    "move_id": 46,
-    "name": "Body Slam",
-    "usage_count": 51,
+    "move_id": 233,
+    "name": "Kowtow Cleave",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 234,
-    "move_id": 316,
-    "name": "Psychic Terrain",
-    "usage_count": 50,
+    "move_id": 234,
+    "name": "Lash Out",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 235,
-    "move_id": 352,
-    "name": "Scale Shot",
-    "usage_count": 50,
+    "move_id": 235,
+    "name": "Last Resort",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 236,
-    "move_id": 165,
-    "name": "Focus Energy",
-    "usage_count": 49,
+    "move_id": 236,
+    "name": "Last Respects",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 237,
-    "move_id": 215,
-    "name": "Ice Hammer",
-    "usage_count": 49,
+    "move_id": 237,
+    "name": "Lava Plume",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 238,
-    "move_id": 34,
-    "name": "Beat Up",
-    "usage_count": 48,
+    "move_id": 238,
+    "name": "Leaf Blade",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 239,
-    "move_id": 96,
-    "name": "Destiny Bond",
-    "usage_count": 46,
+    "move_id": 239,
+    "name": "Leaf Storm",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 240,
-    "move_id": 184,
-    "name": "Gravity",
-    "usage_count": 46,
+    "move_id": 240,
+    "name": "Leech Life",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 241,
-    "move_id": 469,
-    "name": "Wild Charge",
-    "usage_count": 46,
+    "move_id": 241,
+    "name": "Leech Seed",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 242,
-    "move_id": 107,
-    "name": "Dragon Cheer",
-    "usage_count": 45,
+    "move_id": 242,
+    "name": "Life Dew",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 243,
-    "move_id": 194,
-    "name": "Headlong Rush",
-    "usage_count": 45,
+    "move_id": 243,
+    "name": "Light of Ruin",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 244,
-    "move_id": 460,
-    "name": "Water Pulse",
-    "usage_count": 45,
+    "move_id": 244,
+    "name": "Light Screen",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 245,
-    "move_id": 16,
-    "name": "Aqua Cutter",
-    "usage_count": 43,
+    "move_id": 245,
+    "name": "Liquidation",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 246,
-    "move_id": 110,
-    "name": "Dragon Darts",
-    "usage_count": 43,
+    "move_id": 246,
+    "name": "Low Kick",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 247,
-    "move_id": 225,
-    "name": "Instruct",
-    "usage_count": 42,
+    "move_id": 247,
+    "name": "Low Sweep",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 248,
-    "move_id": 320,
-    "name": "Pyro Ball",
-    "usage_count": 42,
+    "move_id": 248,
+    "name": "Lumina Crash",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 249,
-    "move_id": 404,
-    "name": "Stored Power",
-    "usage_count": 42,
+    "move_id": 249,
+    "name": "Lunge",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 250,
-    "move_id": 51,
-    "name": "Breaking Swipe",
-    "usage_count": 41,
+    "move_id": 250,
+    "name": "Mach Punch",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 251,
-    "move_id": 36,
-    "name": "Belly Drum",
-    "usage_count": 40,
+    "move_id": 251,
+    "name": "Magic Powder",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 252,
-    "move_id": 112,
-    "name": "Dragon Rush",
-    "usage_count": 40,
+    "move_id": 252,
+    "name": "Magic Room",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 253,
-    "move_id": 235,
-    "name": "Last Resort",
-    "usage_count": 39,
+    "move_id": 253,
+    "name": "Magnet Rise",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 254,
-    "move_id": 90,
-    "name": "Curse",
-    "usage_count": 38,
+    "move_id": 254,
+    "name": "Make It Rain",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 255,
-    "move_id": 150,
-    "name": "Fire Fang",
-    "usage_count": 37,
+    "move_id": 255,
+    "name": "Matcha Gotcha",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 256,
-    "move_id": 220,
-    "name": "Icicle Spear",
-    "usage_count": 37,
+    "move_id": 256,
+    "name": "Mega Kick",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 257,
-    "move_id": 265,
-    "name": "Minimize",
-    "usage_count": 37,
+    "move_id": 257,
+    "name": "Megahorn",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 258,
-    "move_id": 444,
-    "name": "Transform",
-    "usage_count": 37,
+    "move_id": 258,
+    "name": "Memento",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 259,
-    "move_id": 163,
-    "name": "Flying Press",
-    "usage_count": 35,
+    "move_id": 259,
+    "name": "Metal Burst",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 260,
-    "move_id": 454,
-    "name": "Upper Hand",
-    "usage_count": 35,
+    "move_id": 260,
+    "name": "Metal Sound",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 261,
-    "move_id": 138,
-    "name": "Extrasensory",
-    "usage_count": 34,
+    "move_id": 261,
+    "name": "Meteor Assault",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 262,
-    "move_id": 251,
-    "name": "Magic Powder",
-    "usage_count": 34,
+    "move_id": 262,
+    "name": "Meteor Beam",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 263,
-    "move_id": 230,
-    "name": "Jet Punch",
-    "usage_count": 33,
+    "move_id": 263,
+    "name": "Meteor Mash",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 264,
-    "move_id": 286,
-    "name": "Outrage",
-    "usage_count": 32,
+    "move_id": 264,
+    "name": "Milk Drink",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 265,
-    "move_id": 415,
-    "name": "Supercell Slam",
-    "usage_count": 32,
+    "move_id": 265,
+    "name": "Minimize",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 266,
-    "move_id": 196,
-    "name": "Healing Wish",
-    "usage_count": 31,
+    "move_id": 266,
+    "name": "Mirror Coat",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 267,
-    "move_id": 208,
-    "name": "Hydro Cannon",
-    "usage_count": 31,
+    "move_id": 267,
+    "name": "Misty Explosion",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 268,
-    "move_id": 290,
-    "name": "Parabolic Charge",
-    "usage_count": 31,
+    "move_id": 268,
+    "name": "Misty Terrain",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 269,
-    "move_id": 339,
-    "name": "Rock Blast",
-    "usage_count": 31,
+    "move_id": 269,
+    "name": "Moonblast",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 270,
-    "move_id": 363,
-    "name": "Shed Tail",
-    "usage_count": 31,
+    "move_id": 270,
+    "name": "Moonlight",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 271,
-    "move_id": 3,
-    "name": "Acid Spray",
-    "usage_count": 30,
+    "move_id": 271,
+    "name": "Morning Sun",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 272,
-    "move_id": 131,
-    "name": "Endeavor",
-    "usage_count": 30,
+    "move_id": 272,
+    "name": "Mortal Spin",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 273,
-    "move_id": 374,
-    "name": "Slack Off",
-    "usage_count": 30,
+    "move_id": 273,
+    "name": "Mountain Gale",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 274,
-    "move_id": 38,
-    "name": "Bite",
-    "usage_count": 29,
+    "move_id": 274,
+    "name": "Mud Shot",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 275,
-    "move_id": 390,
-    "name": "Speed Swap",
-    "usage_count": 29,
+    "move_id": 275,
+    "name": "Mud-Slap",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 276,
-    "move_id": 63,
-    "name": "Ceaseless Edge",
-    "usage_count": 28,
+    "move_id": 276,
+    "name": "Muddy Water",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 277,
-    "move_id": 449,
-    "name": "Triple Arrows",
-    "usage_count": 28,
+    "move_id": 277,
+    "name": "Mystical Fire",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 278,
-    "move_id": 31,
-    "name": "Barb Barrage",
-    "usage_count": 26,
+    "move_id": 278,
+    "name": "Nasty Plot",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 279,
-    "move_id": 257,
-    "name": "Megahorn",
-    "usage_count": 26,
+    "move_id": 279,
+    "name": "Night Daze",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 280,
-    "move_id": 451,
-    "name": "Trop Kick",
-    "usage_count": 26,
+    "move_id": 280,
+    "name": "Night Shade",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 281,
-    "move_id": 59,
-    "name": "Bullet Seed",
-    "usage_count": 25,
+    "move_id": 281,
+    "name": "Night Slash",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 282,
-    "move_id": 249,
-    "name": "Lunge",
-    "usage_count": 25,
+    "move_id": 282,
+    "name": "No Retreat",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 283,
-    "move_id": 367,
-    "name": "Shelter",
-    "usage_count": 25,
+    "move_id": 283,
+    "name": "Noble Roar",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 284,
-    "move_id": 370,
-    "name": "Sing",
-    "usage_count": 25,
+    "move_id": 284,
+    "name": "Nuzzle",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 285,
-    "move_id": 426,
-    "name": "Temper Flare",
-    "usage_count": 25,
+    "move_id": 285,
+    "name": "Octolock",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 286,
-    "move_id": 432,
-    "name": "Thunder Fang",
-    "usage_count": 25,
+    "move_id": 286,
+    "name": "Outrage",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 287,
-    "move_id": 23,
-    "name": "Assurance",
-    "usage_count": 24,
+    "move_id": 287,
+    "name": "Overdrive",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 288,
-    "move_id": 94,
-    "name": "Decorate",
-    "usage_count": 24,
+    "move_id": 288,
+    "name": "Overheat",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 289,
-    "move_id": 206,
-    "name": "Howl",
-    "usage_count": 24,
+    "move_id": 289,
+    "name": "Pain Split",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 290,
-    "move_id": 234,
-    "name": "Lash Out",
-    "usage_count": 24,
+    "move_id": 290,
+    "name": "Parabolic Charge",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 291,
-    "move_id": 60,
-    "name": "Burn Up",
-    "usage_count": 23,
+    "move_id": 291,
+    "name": "Parting Shot",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 292,
-    "move_id": 201,
-    "name": "Hex",
-    "usage_count": 23,
+    "move_id": 292,
+    "name": "Payback",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 293,
-    "move_id": 292,
-    "name": "Payback",
-    "usage_count": 23,
+    "move_id": 293,
+    "name": "Perish Song",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 294,
-    "move_id": 42,
-    "name": "Blaze Kick",
-    "usage_count": 21,
+    "move_id": 294,
+    "name": "Petal Blizzard",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 295,
-    "move_id": 228,
-    "name": "Iron Tail",
-    "usage_count": 21,
+    "move_id": 295,
+    "name": "Phantom Force",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 296,
-    "move_id": 284,
-    "name": "Nuzzle",
-    "usage_count": 21,
+    "move_id": 296,
+    "name": "Pin Missile",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 297,
-    "move_id": 327,
-    "name": "Raging Bull",
-    "usage_count": 21,
+    "move_id": 297,
+    "name": "Play Rough",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 298,
-    "move_id": 439,
-    "name": "Torch Song",
-    "usage_count": 21,
+    "move_id": 298,
+    "name": "Pluck",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 299,
-    "move_id": 6,
-    "name": "Aerial Ace",
-    "usage_count": 20,
+    "move_id": 299,
+    "name": "Poison Fang",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 300,
-    "move_id": 375,
-    "name": "Slash",
-    "usage_count": 20,
+    "move_id": 300,
+    "name": "Poison Jab",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 301,
-    "move_id": 461,
-    "name": "Water Shuriken",
-    "usage_count": 20,
+    "move_id": 301,
+    "name": "Poison Powder",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 302,
-    "move_id": 65,
-    "name": "Charge Beam",
-    "usage_count": 19,
+    "move_id": 302,
+    "name": "Pollen Puff",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 303,
-    "move_id": 80,
-    "name": "Cosmic Power",
-    "usage_count": 19,
+    "move_id": 303,
+    "name": "Poltergeist",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 304,
-    "move_id": 176,
-    "name": "Giga Impact",
-    "usage_count": 19,
+    "move_id": 304,
+    "name": "Population Bomb",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 305,
-    "move_id": 395,
-    "name": "Stealth Rock",
-    "usage_count": 19,
+    "move_id": 305,
+    "name": "Pounce",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 306,
-    "move_id": 67,
-    "name": "Chilling Water",
-    "usage_count": 18,
+    "move_id": 306,
+    "name": "Power Gem",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 307,
-    "move_id": 179,
-    "name": "Glare",
-    "usage_count": 18,
+    "move_id": 307,
+    "name": "Power Split",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 308,
-    "move_id": 191,
-    "name": "Hard Press",
-    "usage_count": 18,
+    "move_id": 308,
+    "name": "Power Trick",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 309,
-    "move_id": 285,
-    "name": "Octolock",
-    "usage_count": 18,
+    "move_id": 309,
+    "name": "Power Trip",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 310,
-    "move_id": 330,
-    "name": "Razor Shell",
-    "usage_count": 18,
+    "move_id": 310,
+    "name": "Power Whip",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 311,
-    "move_id": 182,
-    "name": "Grassy Terrain",
-    "usage_count": 17,
+    "move_id": 311,
+    "name": "Protect",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 312,
-    "move_id": 353,
-    "name": "Scary Face",
-    "usage_count": 17,
+    "move_id": 312,
+    "name": "Psych Up",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 313,
-    "move_id": 436,
-    "name": "Tickle",
-    "usage_count": 17,
+    "move_id": 313,
+    "name": "Psychic",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 314,
-    "move_id": 421,
-    "name": "Synthesis",
-    "usage_count": 16,
+    "move_id": 314,
+    "name": "Psychic Fangs",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 315,
-    "move_id": 443,
-    "name": "Trailblaze",
-    "usage_count": 16,
+    "move_id": 315,
+    "name": "Psychic Noise",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 316,
-    "move_id": 116,
-    "name": "Drill Peck",
-    "usage_count": 15,
+    "move_id": 316,
+    "name": "Psychic Terrain",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 317,
-    "move_id": 155,
-    "name": "Flame Charge",
-    "usage_count": 15,
+    "move_id": 317,
+    "name": "Psycho Cut",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 318,
-    "move_id": 266,
-    "name": "Mirror Coat",
-    "usage_count": 15,
+    "move_id": 318,
+    "name": "Psyshield Bash",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 319,
-    "move_id": 140,
-    "name": "Facade",
-    "usage_count": 14,
+    "move_id": 319,
+    "name": "Psyshock",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 320,
-    "move_id": 268,
-    "name": "Misty Terrain",
-    "usage_count": 14,
+    "move_id": 320,
+    "name": "Pyro Ball",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 321,
-    "move_id": 289,
-    "name": "Pain Split",
-    "usage_count": 14,
+    "move_id": 321,
+    "name": "Quash",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 322,
-    "move_id": 398,
-    "name": "Steel Wing",
-    "usage_count": 14,
+    "move_id": 322,
+    "name": "Quick Attack",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 323,
-    "move_id": 189,
-    "name": "Gyro Ball",
-    "usage_count": 13,
+    "move_id": 323,
+    "name": "Quick Guard",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 324,
-    "move_id": 428,
-    "name": "Thief",
-    "usage_count": 13,
+    "move_id": 324,
+    "name": "Quiver Dance",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 325,
-    "move_id": 68,
-    "name": "Chilly Reception",
-    "usage_count": 12,
+    "move_id": 325,
+    "name": "Rage Fist",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 326,
-    "move_id": 78,
-    "name": "Copycat",
-    "usage_count": 12,
+    "move_id": 326,
+    "name": "Rage Powder",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 327,
-    "move_id": 86,
-    "name": "Cross Chop",
-    "usage_count": 12,
+    "move_id": 327,
+    "name": "Raging Bull",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 328,
-    "move_id": 87,
-    "name": "Cross Poison",
-    "usage_count": 12,
+    "move_id": 328,
+    "name": "Rain Dance",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 329,
-    "move_id": 137,
-    "name": "Explosion",
-    "usage_count": 12,
+    "move_id": 329,
+    "name": "Rapid Spin",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 330,
-    "move_id": 223,
-    "name": "Infernal Parade",
-    "usage_count": 12,
+    "move_id": 330,
+    "name": "Razor Shell",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 331,
-    "move_id": 237,
-    "name": "Lava Plume",
-    "usage_count": 12,
+    "move_id": 331,
+    "name": "Recover",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 332,
-    "move_id": 270,
-    "name": "Moonlight",
-    "usage_count": 12,
+    "move_id": 332,
+    "name": "Recycle",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 333,
-    "move_id": 356,
-    "name": "Seed Bomb",
-    "usage_count": 12,
+    "move_id": 333,
+    "name": "Reflect",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 334,
-    "move_id": 364,
-    "name": "Sheer Cold",
-    "usage_count": 12,
+    "move_id": 334,
+    "name": "Rest",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 335,
-    "move_id": 372,
-    "name": "Skitter Smack",
-    "usage_count": 12,
+    "move_id": 335,
+    "name": "Reversal",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 336,
-    "move_id": 467,
-    "name": "Whirlwind",
-    "usage_count": 12,
+    "move_id": 336,
+    "name": "Revival Blessing",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 337,
-    "move_id": 5,
-    "name": "Acupressure",
-    "usage_count": 11,
+    "move_id": 337,
+    "name": "Rising Voltage",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 338,
-    "move_id": 9,
-    "name": "Air Cutter",
-    "usage_count": 11,
+    "move_id": 338,
+    "name": "Roar",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 339,
-    "move_id": 159,
-    "name": "Fling",
-    "usage_count": 11,
+    "move_id": 339,
+    "name": "Rock Blast",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 340,
-    "move_id": 197,
-    "name": "Heat Crash",
-    "usage_count": 11,
+    "move_id": 340,
+    "name": "Rock Slide",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 341,
-    "move_id": 296,
-    "name": "Pin Missile",
-    "usage_count": 11,
+    "move_id": 341,
+    "name": "Rock Tomb",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 342,
-    "move_id": 318,
-    "name": "Psyshield Bash",
-    "usage_count": 11,
+    "move_id": 342,
+    "name": "Rock Wrecker",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 343,
-    "move_id": 369,
-    "name": "Simple Beam",
-    "usage_count": 11,
+    "move_id": 343,
+    "name": "Role Play",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 344,
-    "move_id": 445,
-    "name": "Tri Attack",
-    "usage_count": 11,
+    "move_id": 344,
+    "name": "Roost",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 345,
-    "move_id": 8,
-    "name": "Agility",
-    "usage_count": 10,
+    "move_id": 345,
+    "name": "Round",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 346,
-    "move_id": 19,
-    "name": "Aqua Step",
-    "usage_count": 10,
+    "move_id": 346,
+    "name": "Sacred Sword",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 347,
-    "move_id": 61,
-    "name": "Burning Jealousy",
-    "usage_count": 10,
+    "move_id": 347,
+    "name": "Safeguard",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 348,
-    "move_id": 120,
-    "name": "Dynamic Punch",
-    "usage_count": 10,
+    "move_id": 348,
+    "name": "Salt Cure",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 349,
-    "move_id": 146,
-    "name": "Fickle Beam",
-    "usage_count": 10,
+    "move_id": 349,
+    "name": "Sand Tomb",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 350,
-    "move_id": 183,
-    "name": "Grav Apple",
-    "usage_count": 10,
+    "move_id": 350,
+    "name": "Sandstorm",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 351,
-    "move_id": 442,
-    "name": "Toxic Spikes",
-    "usage_count": 10,
+    "move_id": 351,
+    "name": "Scald",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 352,
-    "move_id": 471,
-    "name": "Wish",
-    "usage_count": 10,
+    "move_id": 352,
+    "name": "Scale Shot",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 353,
-    "move_id": 26,
-    "name": "Aura Wheel",
-    "usage_count": 9,
+    "move_id": 353,
+    "name": "Scary Face",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 354,
-    "move_id": 35,
-    "name": "Belch",
-    "usage_count": 9,
+    "move_id": 354,
+    "name": "Scorching Sands",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 355,
-    "move_id": 205,
-    "name": "Horn Leech",
-    "usage_count": 9,
+    "move_id": 355,
+    "name": "Screech",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 356,
-    "move_id": 247,
-    "name": "Low Sweep",
-    "usage_count": 9,
+    "move_id": 356,
+    "name": "Seed Bomb",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 357,
-    "move_id": 258,
-    "name": "Memento",
-    "usage_count": 9,
+    "move_id": 357,
+    "name": "Seismic Toss",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 358,
-    "move_id": 259,
-    "name": "Metal Burst",
-    "usage_count": 9,
+    "move_id": 358,
+    "name": "Self-Destruct",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 359,
-    "move_id": 334,
-    "name": "Rest",
-    "usage_count": 9,
+    "move_id": 359,
+    "name": "Shadow Ball",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 360,
-    "move_id": 389,
-    "name": "Sparkling Aria",
-    "usage_count": 9,
+    "move_id": 360,
+    "name": "Shadow Claw",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 361,
-    "move_id": 418,
-    "name": "Swagger",
-    "usage_count": 9,
+    "move_id": 361,
+    "name": "Shadow Punch",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 362,
-    "move_id": 438,
-    "name": "Topsy-Turvy",
-    "usage_count": 9,
+    "move_id": 362,
+    "name": "Shadow Sneak",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 363,
-    "move_id": 479,
-    "name": "Zing Zap",
-    "usage_count": 9,
+    "move_id": 363,
+    "name": "Shed Tail",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 364,
-    "move_id": 29,
-    "name": "Baby-Doll Eyes",
-    "usage_count": 8,
+    "move_id": 364,
+    "name": "Sheer Cold",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 365,
-    "move_id": 33,
-    "name": "Beak Blast",
-    "usage_count": 8,
+    "move_id": 365,
+    "name": "Shell Side Arm",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 366,
-    "move_id": 69,
-    "name": "Circle Throw",
-    "usage_count": 8,
+    "move_id": 366,
+    "name": "Shell Smash",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 367,
-    "move_id": 77,
-    "name": "Confuse Ray",
-    "usage_count": 8,
+    "move_id": 367,
+    "name": "Shelter",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 368,
-    "move_id": 172,
-    "name": "Frost Breath",
-    "usage_count": 8,
+    "move_id": 368,
+    "name": "Shift Gear",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 369,
-    "move_id": 274,
-    "name": "Mud Shot",
-    "usage_count": 8,
+    "move_id": 369,
+    "name": "Simple Beam",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 370,
-    "move_id": 348,
-    "name": "Salt Cure",
-    "usage_count": 8,
+    "move_id": 370,
+    "name": "Sing",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 371,
-    "move_id": 358,
-    "name": "Self-Destruct",
-    "usage_count": 8,
+    "move_id": 371,
+    "name": "Skill Swap",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 372,
-    "move_id": 407,
-    "name": "String Shot",
-    "usage_count": 8,
+    "move_id": 372,
+    "name": "Skitter Smack",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 373,
-    "move_id": 20,
-    "name": "Aqua Tail",
-    "usage_count": 7,
+    "move_id": 373,
+    "name": "Sky Attack",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 374,
-    "move_id": 28,
-    "name": "Avalanche",
-    "usage_count": 7,
+    "move_id": 374,
+    "name": "Slack Off",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 375,
-    "move_id": 81,
-    "name": "Cotton Guard",
-    "usage_count": 7,
+    "move_id": 375,
+    "name": "Slash",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 376,
-    "move_id": 125,
-    "name": "Electric Terrain",
-    "usage_count": 7,
+    "move_id": 376,
+    "name": "Sleep Powder",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 377,
-    "move_id": 394,
-    "name": "Spirit Shackle",
-    "usage_count": 7,
+    "move_id": 377,
+    "name": "Sleep Talk",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 378,
-    "move_id": 2,
-    "name": "Acid Armor",
-    "usage_count": 6,
+    "move_id": 378,
+    "name": "Sludge Bomb",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 379,
-    "move_id": 57,
-    "name": "Bulldoze",
-    "usage_count": 6,
+    "move_id": 379,
+    "name": "Sludge Wave",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 380,
-    "move_id": 72,
-    "name": "Clear Smog",
-    "usage_count": 6,
+    "move_id": 380,
+    "name": "Smack Down",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 381,
-    "move_id": 143,
-    "name": "Feather Dance",
-    "usage_count": 6,
+    "move_id": 381,
+    "name": "Smart Strike",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 382,
-    "move_id": 264,
-    "name": "Milk Drink",
-    "usage_count": 6,
+    "move_id": 382,
+    "name": "Snap Trap",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 383,
-    "move_id": 280,
-    "name": "Night Shade",
-    "usage_count": 6,
+    "move_id": 383,
+    "name": "Snarl",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 384,
-    "move_id": 282,
-    "name": "No Retreat",
-    "usage_count": 6,
+    "move_id": 384,
+    "name": "Snipe Shot",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 385,
-    "move_id": 347,
-    "name": "Safeguard",
-    "usage_count": 6,
+    "move_id": 385,
+    "name": "Snowscape",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 386,
-    "move_id": 349,
-    "name": "Sand Tomb",
-    "usage_count": 6,
+    "move_id": 386,
+    "name": "Soak",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 387,
-    "move_id": 350,
-    "name": "Sandstorm",
-    "usage_count": 6,
+    "move_id": 387,
+    "name": "Solar Beam",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 388,
-    "move_id": 455,
-    "name": "Uproar",
-    "usage_count": 6,
+    "move_id": 388,
+    "name": "Solar Blade",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 389,
-    "move_id": 95,
-    "name": "Defog",
-    "usage_count": 5,
+    "move_id": 389,
+    "name": "Sparkling Aria",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 390,
-    "move_id": 145,
-    "name": "Fell Stinger",
-    "usage_count": 5,
+    "move_id": 390,
+    "name": "Speed Swap",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 391,
-    "move_id": 252,
-    "name": "Magic Room",
-    "usage_count": 5,
+    "move_id": 391,
+    "name": "Spikes",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 392,
-    "move_id": 260,
-    "name": "Metal Sound",
-    "usage_count": 5,
+    "move_id": 392,
+    "name": "Spiky Shield",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 393,
-    "move_id": 267,
-    "name": "Misty Explosion",
-    "usage_count": 5,
+    "move_id": 393,
+    "name": "Spirit Break",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 394,
-    "move_id": 308,
-    "name": "Power Trick",
-    "usage_count": 5,
+    "move_id": 394,
+    "name": "Spirit Shackle",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 395,
-    "move_id": 332,
-    "name": "Recycle",
-    "usage_count": 5,
+    "move_id": 395,
+    "name": "Stealth Rock",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 396,
-    "move_id": 355,
-    "name": "Screech",
-    "usage_count": 5,
+    "move_id": 396,
+    "name": "Steel Beam",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 397,
-    "move_id": 365,
-    "name": "Shell Side Arm",
-    "usage_count": 5,
+    "move_id": 397,
+    "name": "Steel Roller",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 398,
-    "move_id": 388,
-    "name": "Solar Blade",
-    "usage_count": 5,
+    "move_id": 398,
+    "name": "Steel Wing",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 399,
     "move_id": 399,
     "name": "Sticky Web",
-    "usage_count": 5,
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 400,
-    "move_id": 410,
-    "name": "Stun Spore",
-    "usage_count": 5,
+    "move_id": 400,
+    "name": "Stockpile",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 401,
-    "move_id": 457,
-    "name": "Venoshock",
-    "usage_count": 5,
+    "move_id": 401,
+    "name": "Stomping Tantrum",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 402,
-    "move_id": 473,
-    "name": "Worry Seed",
-    "usage_count": 5,
+    "move_id": 402,
+    "name": "Stone Axe",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 403,
-    "move_id": 84,
-    "name": "Court Change",
-    "usage_count": 4,
+    "move_id": 403,
+    "name": "Stone Edge",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 404,
-    "move_id": 123,
-    "name": "Eerie Impulse",
-    "usage_count": 4,
+    "move_id": 404,
+    "name": "Stored Power",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 405,
-    "move_id": 127,
-    "name": "Electro Ball",
-    "usage_count": 4,
+    "move_id": 405,
+    "name": "Storm Throw",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 406,
-    "move_id": 166,
-    "name": "Focus Punch",
-    "usage_count": 4,
+    "move_id": 406,
+    "name": "Strength Sap",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 407,
-    "move_id": 262,
-    "name": "Meteor Beam",
-    "usage_count": 4,
+    "move_id": 407,
+    "name": "String Shot",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 408,
-    "move_id": 271,
-    "name": "Morning Sun",
-    "usage_count": 4,
+    "move_id": 408,
+    "name": "Struggle Bug",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 409,
-    "move_id": 272,
-    "name": "Mortal Spin",
-    "usage_count": 4,
+    "move_id": 409,
+    "name": "Stuff Cheeks",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 410,
-    "move_id": 298,
-    "name": "Pluck",
-    "usage_count": 4,
+    "move_id": 410,
+    "name": "Stun Spore",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 411,
-    "move_id": 377,
-    "name": "Sleep Talk",
-    "usage_count": 4,
+    "move_id": 411,
+    "name": "Substitute",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 412,
-    "move_id": 381,
-    "name": "Smart Strike",
-    "usage_count": 4,
+    "move_id": 412,
+    "name": "Sucker Punch",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 413,
-    "move_id": 409,
-    "name": "Stuff Cheeks",
-    "usage_count": 4,
+    "move_id": 413,
+    "name": "Sunny Day",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 414,
-    "move_id": 18,
-    "name": "Aqua Ring",
-    "usage_count": 3,
+    "move_id": 414,
+    "name": "Super Fang",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 415,
-    "move_id": 44,
-    "name": "Block",
-    "usage_count": 3,
+    "move_id": 415,
+    "name": "Supercell Slam",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 416,
-    "move_id": 82,
-    "name": "Cotton Spore",
-    "usage_count": 3,
+    "move_id": 416,
+    "name": "Superpower",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 417,
-    "move_id": 98,
-    "name": "Dig",
-    "usage_count": 3,
+    "move_id": 417,
+    "name": "Surf",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 418,
-    "move_id": 132,
-    "name": "Endure",
-    "usage_count": 3,
+    "move_id": 418,
+    "name": "Swagger",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 419,
-    "move_id": 152,
-    "name": "Fire Spin",
-    "usage_count": 3,
+    "move_id": 419,
+    "name": "Switcheroo",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 420,
-    "move_id": 173,
-    "name": "Future Sight",
-    "usage_count": 3,
+    "move_id": 420,
+    "name": "Swords Dance",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 421,
-    "move_id": 204,
-    "name": "Horn Drill",
-    "usage_count": 3,
+    "move_id": 421,
+    "name": "Synthesis",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 422,
-    "move_id": 279,
-    "name": "Night Daze",
-    "usage_count": 3,
+    "move_id": 422,
+    "name": "Tailwind",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 423,
-    "move_id": 335,
-    "name": "Reversal",
-    "usage_count": 3,
+    "move_id": 423,
+    "name": "Taunt",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 424,
-    "move_id": 343,
-    "name": "Role Play",
-    "usage_count": 3,
+    "move_id": 424,
+    "name": "Tearful Look",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 425,
-    "move_id": 382,
-    "name": "Snap Trap",
-    "usage_count": 3,
+    "move_id": 425,
+    "name": "Teeter Dance",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 426,
-    "move_id": 391,
-    "name": "Spikes",
-    "usage_count": 3,
+    "move_id": 426,
+    "name": "Temper Flare",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 427,
-    "move_id": 429,
-    "name": "Thrash",
-    "usage_count": 3,
+    "move_id": 427,
+    "name": "Terrain Pulse",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 428,
-    "move_id": 466,
-    "name": "Whirlpool",
-    "usage_count": 3,
+    "move_id": 428,
+    "name": "Thief",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 429,
-    "move_id": 474,
-    "name": "Wrap",
-    "usage_count": 3,
+    "move_id": 429,
+    "name": "Thrash",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 430,
-    "move_id": 13,
-    "name": "Amnesia",
-    "usage_count": 2,
+    "move_id": 430,
+    "name": "Throat Chop",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 431,
-    "move_id": 41,
-    "name": "Blast Burn",
-    "usage_count": 2,
+    "move_id": 431,
+    "name": "Thunder",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 432,
-    "move_id": 49,
-    "name": "Bounce",
-    "usage_count": 2,
+    "move_id": 432,
+    "name": "Thunder Fang",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 433,
-    "move_id": 53,
-    "name": "Brutal Swing",
-    "usage_count": 2,
+    "move_id": 433,
+    "name": "Thunder Punch",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 434,
-    "move_id": 64,
-    "name": "Charge",
-    "usage_count": 2,
+    "move_id": 434,
+    "name": "Thunder Wave",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 435,
-    "move_id": 76,
-    "name": "Comeuppance",
-    "usage_count": 2,
+    "move_id": 435,
+    "name": "Thunderbolt",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 436,
-    "move_id": 103,
-    "name": "Double Hit",
-    "usage_count": 2,
+    "move_id": 436,
+    "name": "Tickle",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 437,
-    "move_id": 124,
-    "name": "Eerie Spell",
-    "usage_count": 2,
+    "move_id": 437,
+    "name": "Tidy Up",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 438,
-    "move_id": 162,
-    "name": "Fly",
-    "usage_count": 2,
+    "move_id": 438,
+    "name": "Topsy-Turvy",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 439,
-    "move_id": 168,
-    "name": "Forest's Curse",
-    "usage_count": 2,
+    "move_id": 439,
+    "name": "Torch Song",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 440,
-    "move_id": 229,
-    "name": "Jaw Lock",
-    "usage_count": 2,
+    "move_id": 440,
+    "name": "Torment",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 441,
-    "move_id": 253,
-    "name": "Magnet Rise",
-    "usage_count": 2,
+    "move_id": 441,
+    "name": "Toxic",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 442,
-    "move_id": 273,
-    "name": "Mountain Gale",
-    "usage_count": 2,
+    "move_id": 442,
+    "name": "Toxic Spikes",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 443,
-    "move_id": 275,
-    "name": "Mud-Slap",
-    "usage_count": 2,
+    "move_id": 443,
+    "name": "Trailblaze",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 444,
-    "move_id": 294,
-    "name": "Petal Blizzard",
-    "usage_count": 2,
+    "move_id": 444,
+    "name": "Transform",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 445,
-    "move_id": 357,
-    "name": "Seismic Toss",
-    "usage_count": 2,
+    "move_id": 445,
+    "name": "Tri Attack",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 446,
-    "move_id": 373,
-    "name": "Sky Attack",
-    "usage_count": 2,
+    "move_id": 446,
+    "name": "Trick",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 447,
-    "move_id": 385,
-    "name": "Snowscape",
-    "usage_count": 2,
+    "move_id": 447,
+    "name": "Trick Room",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 448,
-    "move_id": 437,
-    "name": "Tidy Up",
-    "usage_count": 2,
+    "move_id": 448,
+    "name": "Trick-or-Treat",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 449,
-    "move_id": 15,
-    "name": "Apple Acid",
-    "usage_count": 1,
+    "move_id": 449,
+    "name": "Triple Arrows",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 450,
-    "move_id": 22,
-    "name": "Aromatic Mist",
-    "usage_count": 1,
+    "move_id": 450,
+    "name": "Triple Axel",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 451,
-    "move_id": 24,
-    "name": "Attract",
-    "usage_count": 1,
+    "move_id": 451,
+    "name": "Trop Kick",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 452,
-    "move_id": 37,
-    "name": "Bind",
-    "usage_count": 1,
+    "move_id": 452,
+    "name": "Twin Beam",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 453,
-    "move_id": 47,
-    "name": "Bone Rush",
-    "usage_count": 1,
+    "move_id": 453,
+    "name": "U-turn",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 454,
-    "move_id": 79,
-    "name": "Corrosive Gas",
-    "usage_count": 1,
+    "move_id": 454,
+    "name": "Upper Hand",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 455,
-    "move_id": 83,
-    "name": "Counter",
-    "usage_count": 1,
+    "move_id": 455,
+    "name": "Uproar",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 456,
-    "move_id": 85,
-    "name": "Crabhammer",
-    "usage_count": 1,
+    "move_id": 456,
+    "name": "Vacuum Wave",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 457,
-    "move_id": 89,
-    "name": "Crush Claw",
-    "usage_count": 1,
+    "move_id": 457,
+    "name": "Venoshock",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 458,
-    "move_id": 102,
-    "name": "Dive",
-    "usage_count": 1,
+    "move_id": 458,
+    "name": "Volt Switch",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 459,
-    "move_id": 126,
-    "name": "Electrify",
-    "usage_count": 1,
+    "move_id": 459,
+    "name": "Volt Tackle",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 460,
-    "move_id": 171,
-    "name": "Frenzy Plant",
-    "usage_count": 1,
+    "move_id": 460,
+    "name": "Water Pulse",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 461,
-    "move_id": 174,
-    "name": "Gastro Acid",
-    "usage_count": 1,
+    "move_id": 461,
+    "name": "Water Shuriken",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 462,
-    "move_id": 185,
-    "name": "Growth",
-    "usage_count": 1,
+    "move_id": 462,
+    "name": "Water Spout",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 463,
-    "move_id": 186,
-    "name": "Guard Split",
-    "usage_count": 1,
+    "move_id": 463,
+    "name": "Waterfall",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 464,
-    "move_id": 187,
-    "name": "Guard Swap",
-    "usage_count": 1,
+    "move_id": 464,
+    "name": "Wave Crash",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 465,
-    "move_id": 256,
-    "name": "Mega Kick",
-    "usage_count": 1,
+    "move_id": 465,
+    "name": "Weather Ball",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 466,
-    "move_id": 283,
-    "name": "Noble Roar",
-    "usage_count": 1,
+    "move_id": 466,
+    "name": "Whirlpool",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 467,
-    "move_id": 299,
-    "name": "Poison Fang",
-    "usage_count": 1,
+    "move_id": 467,
+    "name": "Whirlwind",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 468,
-    "move_id": 301,
-    "name": "Poison Powder",
-    "usage_count": 1,
+    "move_id": 468,
+    "name": "Wide Guard",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 469,
-    "move_id": 305,
-    "name": "Pounce",
-    "usage_count": 1,
+    "move_id": 469,
+    "name": "Wild Charge",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 470,
-    "move_id": 307,
-    "name": "Power Split",
-    "usage_count": 1,
+    "move_id": 470,
+    "name": "Will-O-Wisp",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 471,
-    "move_id": 329,
-    "name": "Rapid Spin",
-    "usage_count": 1,
+    "move_id": 471,
+    "name": "Wish",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 472,
-    "move_id": 342,
-    "name": "Rock Wrecker",
-    "usage_count": 1,
+    "move_id": 472,
+    "name": "Wood Hammer",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 473,
-    "move_id": 361,
-    "name": "Shadow Punch",
-    "usage_count": 1,
+    "move_id": 473,
+    "name": "Worry Seed",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 474,
-    "move_id": 368,
-    "name": "Shift Gear",
-    "usage_count": 1,
+    "move_id": 474,
+    "name": "Wrap",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 475,
-    "move_id": 419,
-    "name": "Switcheroo",
-    "usage_count": 1,
+    "move_id": 475,
+    "name": "X-Scissor",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 476,
-    "move_id": 424,
-    "name": "Tearful Look",
-    "usage_count": 1,
+    "move_id": 476,
+    "name": "Yawn",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 477,
-    "move_id": 425,
-    "name": "Teeter Dance",
-    "usage_count": 1,
+    "move_id": 477,
+    "name": "Zap Cannon",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 478,
-    "move_id": 440,
-    "name": "Torment",
-    "usage_count": 1,
+    "move_id": 478,
+    "name": "Zen Headbutt",
+    "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 479,
-    "move_id": 448,
-    "name": "Trick-or-Treat",
-    "usage_count": 1,
+    "move_id": 479,
+    "name": "Zing Zap",
+    "usage_count": 0,
     "regulation": "M-C"
   }
 ]
