@@ -2,15 +2,15 @@
    PokéChamp — Team Builder & Synergy Matrix Styles
    ===================================================================== */
 
-/* Hero & Presets Section */
+/* Hero Section */
 .tb-hero {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
+  align-items: center;
   flex-wrap: wrap;
   gap: 1.5rem;
-  margin-bottom: 1.5rem;
-  padding-bottom: 1.25rem;
+  margin-bottom: 1.25rem;
+  padding-bottom: 0.75rem;
   border-bottom: 1px solid var(--border-card);
 }
 
@@ -24,69 +24,8 @@
   background: linear-gradient(135deg, #ffffff 30%, #a5b4fc 70%, #6366f1 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  margin-bottom: 0.4rem;
+  margin-bottom: 0;
   letter-spacing: -0.02em;
-}
-
-.tb-subtitle {
-  color: var(--text-muted);
-  font-size: 0.95rem;
-  line-height: 1.5;
-}
-
-.tb-presets-bar {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  flex-wrap: wrap;
-  background: rgba(15, 23, 42, 0.6);
-  padding: 0.6rem 0.9rem;
-  border-radius: 12px;
-  border: 1px solid var(--border-card);
-}
-
-.preset-label {
-  font-size: 0.8rem;
-  color: var(--text-dim);
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  margin-right: 0.2rem;
-}
-
-.preset-btn {
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid var(--border-card);
-  color: var(--text-main);
-  padding: 0.4rem 0.75rem;
-  border-radius: 8px;
-  font-size: 0.82rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  font-family: inherit;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
-}
-
-.preset-btn:hover {
-  background: rgba(99, 102, 241, 0.2);
-  border-color: var(--primary);
-  color: #fff;
-  transform: translateY(-1px);
-}
-
-.btn-clear-team {
-  background: rgba(244, 63, 94, 0.1);
-  border-color: rgba(244, 63, 94, 0.25);
-  color: #fda4af;
-}
-
-.btn-clear-team:hover {
-  background: rgba(244, 63, 94, 0.25);
-  border-color: var(--accent-rose);
-  color: #fff;
 }
 
 /* 16-Char Hash Bar Card */
@@ -205,6 +144,19 @@
   background: linear-gradient(135deg, #e11d48 0%, #d97706 100%);
   box-shadow: 0 0 24px rgba(244, 63, 94, 0.65);
   transform: translateY(-2px);
+}
+
+.btn-danger-action {
+  background: rgba(244, 63, 94, 0.12);
+  border-color: rgba(244, 63, 94, 0.3);
+  color: #fda4af;
+}
+
+.btn-danger-action:hover {
+  background: rgba(244, 63, 94, 0.28);
+  border-color: var(--accent-rose);
+  color: #ffffff;
+  transform: translateY(-1px);
 }
 
 /* Team Summary Stats Ribbon */

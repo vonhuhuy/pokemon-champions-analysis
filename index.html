@@ -13,7 +13,7 @@
   <header class="header-nav">
     <div class="brand">
       <span>⚡ POKÉCHAMP</span>
-      <span class="brand-badge">Season 6 Singles Tier List</span>
+      <span class="brand-badge">Reg M-C Singles</span>
     </div>
     <nav class="page-nav">
       <a href="index.html" class="page-nav-btn active">📋 Tier List</a>
@@ -41,27 +41,27 @@
       <!-- Tier Filter Tabs -->
       <div class="tier-tabs">
         <button class="tab-btn active" data-tier="ALL">
-          <span>All Pokémon</span>
+          <span>All</span>
           <span class="brand-badge" id="count-all">262</span>
         </button>
         <button class="tab-btn tab-s" data-tier="S">
-          <span>S - Ubiquitous</span>
+          <span>S</span>
           <span class="brand-badge" id="count-s">13</span>
         </button>
         <button class="tab-btn tab-a" data-tier="A">
-          <span>A - Common</span>
+          <span>A</span>
           <span class="brand-badge" id="count-a">39</span>
         </button>
         <button class="tab-btn tab-b" data-tier="B">
-          <span>B - Played</span>
+          <span>B</span>
           <span class="brand-badge" id="count-b">65</span>
         </button>
         <button class="tab-btn tab-c" data-tier="C">
-          <span>C - Niche</span>
+          <span>C</span>
           <span class="brand-badge" id="count-c">66</span>
         </button>
         <button class="tab-btn tab-d" data-tier="D">
-          <span>D - Rare</span>
+          <span>D</span>
           <span class="brand-badge" id="count-d">79</span>
         </button>
       </div>
@@ -70,12 +70,12 @@
       <div class="filter-inputs">
         <div class="search-wrapper">
           <span class="search-icon">🔍</span>
-          <input type="text" id="search-input" class="search-input" placeholder="Search by Pokémon name, move (e.g. Earthquake), or item (e.g. Choice Scarf)...">
+          <input type="text" id="search-input" class="search-input" placeholder="Search Pokémon, move, item...">
         </div>
         <select id="sort-select" class="select-input">
-          <option value="rank-asc">Rank: Top Usage (#1 -> #262)</option>
-          <option value="bst-desc">Base Stat Total (BST: High -> Low)</option>
-          <option value="rank-desc">Rank: Bottom (#262 -> #1)</option>
+          <option value="rank-asc">Rank: Top Usage</option>
+          <option value="bst-desc">Base Stat Total (BST)</option>
+          <option value="rank-desc">Rank: Lowest Usage</option>
           <option value="name-asc">Name: A - Z</option>
         </select>
       </div>
@@ -127,7 +127,7 @@
         <!-- Panel 2: Resistance Selection Pills -->
         <div class="filter-subpanel" id="panel-resistance" style="display: none;">
           <div class="resistance-hint-text">
-            Filters Pokémon that <strong>resist</strong> or are <strong>immune</strong> (≤ 0.5× / 0×) to incoming attacks:
+            Resistances & immunities (≤ 0.5× / 0×):
           </div>
           <div class="type-pills-row" id="resistance-pills-row">
             <button type="button" class="type-btn-pill res-pill-all active" data-res="ALL">All</button>
@@ -155,7 +155,7 @@
 
       <!-- Filter Results Bar -->
       <div class="filter-status-row">
-        <span class="filter-status-text">Displaying <strong id="filter-count">262</strong> of <strong id="filter-total">262</strong> Pokémon</span>
+        <span class="filter-status-text"><strong id="filter-count">262</strong> / <strong id="filter-total">262</strong> Pokémon</span>
         <button id="clear-filters-btn" class="clear-filters-btn" style="display: none;">✕ Reset Filters</button>
       </div>
     </section>

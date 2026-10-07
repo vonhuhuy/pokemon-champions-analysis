@@ -7,7 +7,7 @@
   <meta name="description" content="Simulate competitive Pokémon 6v6 team battles. Analyzes head-to-head advantage, offensive type coverage, defensive exposure, speed tier ladder across 12 Pokémon, and ranks team member usefulness.">
   <link rel="stylesheet" href="index.css?v=2.8">
   <link rel="stylesheet" href="teambuilder.css?v=2.7">
-  <link rel="stylesheet" href="battle.css?v=3.2">
+  <link rel="stylesheet" href="battle.css?v=3.3">
 </head>
 <body>
 
@@ -41,11 +41,7 @@
     <!-- Hero Header -->
     <section class="battle-hero">
       <div class="battle-hero-text">
-        <h1 class="battle-title">💥 Battle Matchup & Team Analysis</h1>
-        <p class="battle-subtitle">
-          Pit your locked roster from the <strong>Team Builder</strong> against any opposing 6-Pokémon composition. 
-          Discover individual advantages, elemental blindspots, physical vs. special defensive pairings, and our team’s tactical utility hierarchy.
-        </p>
+        <h1 class="battle-title">Battle Analysis</h1>
       </div>
 
       <!-- Quick Action Badges -->
@@ -182,10 +178,7 @@
         <div class="battle-pane active" id="pane-rankings">
           <div class="pane-hero-intro">
             <div>
-              <h3 class="pane-title">📊 Squad Matchup Analysis</h3>
-              <p class="pane-subtitle" style="font-size:0.84rem; color:var(--text-muted); margin-top:0.25rem;">
-                Individual matchup records, key targets, and incoming threats against the opposing team.
-              </p>
+              <h3 class="pane-title">📊 Squad Matchups</h3>
             </div>
           </div>
 
@@ -198,16 +191,13 @@
             <div class="pane-hero-intro" style="margin-bottom: 1.25rem;">
               <div>
                 <h3 class="pane-title">⚡ Speed Tiers</h3>
-                <p class="pane-subtitle" style="font-size:0.84rem; color:var(--text-muted); margin-top:0.25rem;">
-                  Turn-order ladder, outspeed advantages, EV spreads, and item analysis across all 12 Pokémon.
-                </p>
               </div>
             </div>
 
             <!-- Head-to-Head Speed Matchup Breakdown Grid -->
             <div class="speed-h2h-section">
               <div class="speed-h2h-header">
-                <h4 class="sub-heading">⚔️ Our Team Outspeed Matrix vs Opponent Roster</h4>
+                <h4 class="sub-heading">Outspeed Matrix</h4>
               </div>
               <div class="speed-h2h-grid" id="speed-h2h-cards-grid">
                 <!-- Rendered via JS -->
@@ -231,13 +221,13 @@
               <div class="speed-kpi-card" id="kpi-speed-averages">
                 <span class="speed-kpi-label">Average Team Speed</span>
                 <div class="speed-kpi-val" id="val-speed-averages">—</div>
-                <span class="speed-kpi-sub" id="sub-speed-averages">Our Team vs Enemy Team</span>
+                <span class="speed-kpi-sub" id="sub-speed-averages">Our vs Enemy</span>
               </div>
 
               <div class="speed-kpi-card" id="kpi-speed-ties">
-                <span class="speed-kpi-label">Speed Ties & Clashes</span>
+                <span class="speed-kpi-label">Speed Ties</span>
                 <div class="speed-kpi-val" id="val-speed-ties">0</div>
-                <span class="speed-kpi-sub" id="sub-speed-ties">50/50 turn-order coinflips</span>
+                <span class="speed-kpi-sub" id="sub-speed-ties">50/50 Speed Ties</span>
               </div>
             </div>
 
@@ -246,7 +236,7 @@
               <div class="spreads-summary-header">
                 <div class="spreads-summary-title">
                   <span class="icon">📊</span>
-                  <h4>EV Spreads & Items (12 Pokémon)</h4>
+                  <h4>EV Spreads & Items</h4>
                 </div>
               </div>
               <div class="spreads-distribution-grid" id="speed-spreads-distribution">
@@ -258,7 +248,7 @@
             <div class="speed-ladder-card">
               <div class="speed-ladder-header">
                 <div class="speed-ladder-title-col">
-                  <h4 class="sub-heading">🏁 12-Pokémon Turn-Order Ladder</h4>
+                  <h4 class="sub-heading">Turn-Order Ladder</h4>
                 </div>
                 <div class="speed-ladder-legend">
                   <span class="legend-pill our"><span class="dot"></span> Our Team</span>
@@ -344,7 +334,7 @@
         <div class="battle-pane" id="pane-tactics">
           <div class="pane-hero-intro tactics-hero-bar">
             <div>
-              <h3 class="pane-title">🎯 AI assisted Battle Plan</h3>
+              <h3 class="pane-title">Battle Plan</h3>
             </div>
             <div class="tactics-header-controls">
               <div class="tactics-status-pill" id="tactics-status-badge">
@@ -365,9 +355,9 @@
             <!-- Initial Prompt / Call to action -->
             <div class="tactics-empty-prompt" id="tactics-initial-prompt">
               <div class="empty-prompt-icon">⚔️</div>
-              <h4>Ready to Synthesize 3v3 Battle Plan</h4>
+              <h4>Synthesize 3v3 Battle Plan</h4>
               <p>
-                Click <strong>"⚡ Generate Battle Plan"</strong> to analyze both rosters, calculate optimal Bring-3 cores, designate your 4th flex sub, expose bench liabilities, and build complete counter strategies for each enemy Pokémon.
+                Analyze rosters, calculate Bring-3 cores, designate flex subs, and build counter strategies.
               </p>
               <div class="empty-prompt-actions">
                 <button class="btn-battle-pill btn-accent-glow" id="btn-prompt-generate">⚡ Generate Battle Plan</button>
@@ -406,7 +396,6 @@
           <span class="modal-icon">➕</span>
           <div class="modal-title-text-group">
             <h3>Add Enemy Pokémon (Slot <span id="picker-target-slot-num">1</span> of 6)</h3>
-            <p class="picker-modal-subtitle">Pick Pokémon to populate slots · Screen stays open until all 6 are chosen</p>
           </div>
         </div>
         <button class="modal-close-btn" id="btn-close-picker" title="Close picker">✕</button>
@@ -483,7 +472,7 @@
 
       <div class="modal-body-content">
         <p class="modal-desc">
-          Enter a shareable <strong>teamhash</strong> generated from the PokéChamp Team Builder to test a different team roster:
+          Enter a shareable teamhash to load:
         </p>
 
         <div class="hash-input-group">
@@ -492,7 +481,7 @@
         </div>
 
         <div class="modal-quick-presets">
-          <span class="quick-label">Or load a meta preset:</span>
+          <span class="quick-label">Presets:</span>
           <button class="btn-preset-mini" data-preset="garchomp-z">Mega Garchomp Z</button>
           <button class="btn-preset-mini" data-preset="salamence">Mega Salamence</button>
           <button class="btn-preset-mini" data-preset="mimikyu">Mimikyu Core</button>
@@ -537,7 +526,7 @@
 
       <div class="modal-body-content">
         <p class="modal-desc">
-          Paste a shareable teamhash to load an exact enemy composition:
+          Paste a teamhash to load:
         </p>
 
         <div class="hash-input-group">
@@ -585,7 +574,6 @@
           <span class="modal-icon">🤖</span>
           <div class="modal-title-text-group">
             <h3>Gemini AI Coach Settings</h3>
-            <p class="picker-modal-subtitle">Power Battle Plan with Google Gemini reasoning</p>
           </div>
         </div>
         <button class="modal-close-btn" id="btn-close-gemini-modal">✕</button>
@@ -596,7 +584,7 @@
           <span class="sec-icon">🔒</span>
           <div>
             <strong>Client-Side & Zero-Logging:</strong>
-            <span>Your key is stored strictly in your browser's <code>localStorage</code>. Requests are sent directly from your browser to Google's official Gemini API. PokéChamp never stores or sees your key.</span>
+            <span>Key stored in browser <code>localStorage</code> only. Sent directly to Google's API.</span>
           </div>
         </div>
 
@@ -611,10 +599,10 @@
         <div class="key-form-group">
           <label for="select-gemini-model">Gemini Model</label>
           <select id="select-gemini-model" class="key-model-select">
-            <option value="gemini-3.1-flash-lite" selected>Gemini 3.1 Flash-Lite (Recommended · Fast & Active)</option>
+            <option value="gemini-3.1-flash-lite" selected>Gemini 3.1 Flash-Lite (Fastest · Recommended)</option>
+            <option value="gemini-3.6-flash">Gemini 3.6 Flash (Tactical Analysis)</option>
             <option value="gemini-3.5-flash">Gemini 3.5 Flash (Deep reasoning)</option>
-            <option value="gemini-3.6-flash">Gemini 3.6 Flash (Advanced tactical analysis)</option>
-            <option value="gemini-3.8-flash">Gemini 3.8 Flash (Latest Flagship)</option>
+            <option value="gemini-3.8-flash">Gemini 3.8 Flash (High Google traffic / Slow)</option>
           </select>
         </div>
 
@@ -644,6 +632,6 @@
   <!-- Scripts -->
   <script src="proto/team_serializer.js?v=3.0"></script>
   <script src="type-tooltip.js"></script>
-  <script src="battle.js?v=3.6"></script>
+  <script src="battle.js?v=3.8"></script>
 </body>
 </html>

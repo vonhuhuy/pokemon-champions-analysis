@@ -2,6 +2,102 @@
 
 This log records major technical decisions, architectural shifts, and important handoff notes for future agent sessions.
 
+### [2026-10-07] Remove Presets Strip from Team Builder
+- **Objective**: Remove the presets bar (`PRESETS: [🏆 S-Tier Core] [🌧️ Rain Offense] [🧱 Bulky Balance] [⚡ Hyper Offense] [✕ Clear]`) from the Team Builder header to provide a cleaner layout, and relocate the `✕ Clear` button directly into the `hash-actions` bar.
+- **Files Touched**:
+  - [teambuilder.html](file:///Users/HVo/workspace/github-huy/pokechamp/teambuilder.html)
+  - [teambuilder.css](file:///Users/HVo/workspace/github-huy/pokechamp/teambuilder.css)
+  - [teambuilder.js](file:///Users/HVo/workspace/github-huy/pokechamp/teambuilder.js)
+- **Key Decisions**:
+  - **Hero Header Cleanup**: Removed `<div class="tb-presets-bar">` from [teambuilder.html](file:///Users/HVo/workspace/github-huy/pokechamp/teambuilder.html), streamlining `.tb-hero` to only display the clean `🛡️ Team Builder` title.
+  - **Relocate Clear Button**: Moved `#btn-clear-team` into `.hash-actions` as a stylized `.btn-danger-action` button alongside `Test in Battle`, `Copy Hash`, `Share Link`, `Import Hash`, and `Showdown`.
+  - **State Default**: Removed initial starter preset fallback on empty team state in `teambuilder.js`, rendering empty roster slots cleanly.
+
+---
+
+### [2026-10-07] Universal Pokémon Sprite Slug Resolution Engine & Dex Fallback
+- **Objective**: Fix missing and broken Pokémon sprite icons across Tier List, Counter Analysis, Team Builder, and Battle Analysis pages. Ensure 100% of Pokémon, regional variants, forms, and breeds resolve valid sprites.
+- **Files Touched**:
+  - [app.js](file:///Users/HVo/workspace/github-huy/pokechamp/app.js)
+  - [counter.js](file:///Users/HVo/workspace/github-huy/pokechamp/counter.js)
+  - [counter.css](file:///Users/HVo/workspace/github-huy/pokechamp/counter.css)
+  - [teambuilder.js](file:///Users/HVo/workspace/github-huy/pokechamp/teambuilder.js)
+  - [battle.js](file:///Users/HVo/workspace/github-huy/pokechamp/battle.js)
+- **Key Decisions**:
+  - **Slug Resolution Enhancement**: Updated `getPokemonSlug(name)` across all JS files to properly match both brackets `[...]` and parentheses `(...)` for regional forms (`-alola`, `-hisui`, `-galar`, `-paldea`), gender forms (`indeedee-f`, `basculegion-f`, `meowstic-f`), Paldean Tauros breeds (`tauros-paldeablaze`, `tauros-paldeaaqua`, `tauros-paldeacombat`), Rotom appliance forms (`rotom-wash`, `rotom-heat`, `rotom-mow`, `rotom-frost`, `rotom-fan`), Lycanroc forms (`lycanroc-dusk`, `lycanroc-midnight`), Gourgeist sizes (`gourgeist-super`, `gourgeist-small`, `gourgeist-large`), and hyphenated name exceptions (`kommoo`, `typenull`, `hooh`, `porygonz`).
+  - **Counter Analysis Sprites**: Added `getPokemonSlug` and `getSpriteUrl` to [counter.js](file:///Users/HVo/workspace/github-huy/pokechamp/counter.js). Integrated mini sprite thumbnails into the autocomplete dropdown (`.ac-item-sprite`) and full sprite art into the selected Pokémon preview cards (`.preview-card-sprite`). Added corresponding styles to [counter.css](file:///Users/HVo/workspace/github-huy/pokechamp/counter.css).
+  - **Universal Fallback Chains**: Replaced generic opacity-reducing `onerror` handlers across [teambuilder.js](file:///Users/HVo/workspace/github-huy/pokechamp/teambuilder.js) and [battle.js](file:///Users/HVo/workspace/github-huy/pokechamp/battle.js) with Showdown Dex sprite fallbacks (`https://play.pokemonshowdown.com/sprites/dex/${getPokemonSlug(name)}.png`), ensuring icons never render as broken image squares.
+
+---
+
+### [2026-10-07] Global Informative Text & Bloat Trimming
+- **Objective**: Audit and trim bloated informative text, long explanatory subtitles, redundant labels, and tutorial paragraphs across all PokéChamp pages to make features self-explanatory, sleek, and uncluttered.
+- **Files Touched**:
+  - [index.html](file:///Users/HVo/workspace/github-huy/pokechamp/index.html)
+  - [app.js](file:///Users/HVo/workspace/github-huy/pokechamp/app.js)
+  - [counter.html](file:///Users/HVo/workspace/github-huy/pokechamp/counter.html)
+  - [counter.css](file:///Users/HVo/workspace/github-huy/pokechamp/counter.css)
+  - [teambuilder.html](file:///Users/HVo/workspace/github-huy/pokechamp/teambuilder.html)
+  - [teambuilder.js](file:///Users/HVo/workspace/github-huy/pokechamp/teambuilder.js)
+  - [battle.html](file:///Users/HVo/workspace/github-huy/pokechamp/battle.html)
+  - [battle.js](file:///Users/HVo/workspace/github-huy/pokechamp/battle.js)
+- **Key Decisions**:
+  - **Tier List (`index.html` / `app.js`)**: Simplified tier tab labels from `S - Ubiquitous` to clean single-letter badges (`S`, `A`, `B`, `C`, `D`), trimmed search placeholder to `Search Pokémon, move, item...`, shortened sort options, tightened resistance filter copy to `Resistances & immunities (≤ 0.5× / 0×):`, streamlined counter to `X / Y Pokémon`, and condensed empty-state text.
+  - **Counter Analysis (`counter.html` / `counter.css`)**: Removed long hero subtitle, simplified card titles to `Move Coverage: A → B`, `Move Coverage: B → A`, and `Matchup Summary`, and tightened hero padding.
+  - **Team Builder (`teambuilder.html` / `teambuilder.js`)**: Removed explanatory paragraph bloat beneath each analytics pane (`Defensive Synergy`, `Offensive Coverage`, `Speed Tiers`, `Teammate Synergy`), shortened action buttons (`Share Link`, `Showdown`), removed modal subtitles and redundant pool notice prefixes (`X Pokémon available`).
+  - **Battle Analysis (`battle.html` / `battle.js`)**: Removed verbose subtitles in Squad Matchups and Speed Tiers, shortened KPI labels (`Our vs Enemy`, `50/50 Speed Ties`), trimmed Battle Plan prompt description, removed modal subtitle boilerplate, and condensed empty-state card text.
+
+---
+
+### [2026-10-07] 2-Phase Session Flow & Multi-Model Hedging for Battle Plan
+- **Objective**: Solve generation latency under the 90-second (1:30 min) competitive Team Preview timer by racing models in parallel (hedging under 28s), auto-migrating from congested endpoints, and maintaining the active conversational session for real-time in-battle follow-up coaching.
+- **Files Touched**:
+  - [battle.js](file:///Users/HVo/workspace/github-huy/pokechamp/battle.js)
+  - [battle.html](file:///Users/HVo/workspace/github-huy/pokechamp/battle.html)
+  - [battle.css](file:///Users/HVo/workspace/github-huy/pokechamp/battle.css)
+- **Key Decisions**:
+  - **Multi-Model Parallel Racing (Hedging under 28s)**: Implemented `fetchGeminiBattlePlanHedging()` to race `gemini-3.8-flash`, `gemini-3.6-flash`, and `gemini-3.1-flash-lite` concurrently with `thinkingBudget: 0`. It picks the highest tier successful model upon completion or locks in the best response when the 28s deadline arrives.
+  - **Auto-Migration Away from 503 Outage**: Google's servers for `gemini-3.8-flash` are currently experiencing 503 high-demand errors (hanging 57s before failing). Added auto-migration in `GEMINI_CONFIG.getModel()` to default to `gemini-3.1-flash-lite` while racing all available candidates safely.
+  - **Live In-Battle Coach (Phase 2 Session Continuity)**: Preserved `activeBattleSession` with multi-turn `history: [...]` in memory. Added Section 4 in the Battle Plan tab with quick scenario chips (Turn 1-3 Sequencing, Defensive Tera Adaptation, Hazard Management, Safe Switch Paths) and an interactive input toolbar that converses with the model in real time using match context.
+  - **Deterministic Heuristic Safety Net**: Maintained the offline `generateHeuristicBattlePlan` and `generateHeuristicCoachAdvice` fallbacks if all models fail or API key is absent.
+
+---
+
+### [2026-10-07] Simplify Battle Page Hero Header
+- **Objective**: Simplify the top title to `Battle Analysis` and eliminate the verbose descriptive paragraph for a cleaner, modern layout.
+- **Files Touched**:
+  - [battle.html](file:///Users/HVo/workspace/github-huy/pokechamp/battle.html)
+  - [battle.css](file:///Users/HVo/workspace/github-huy/pokechamp/battle.css)
+- **Key Decisions**:
+  - Replaced `💥 Battle Matchup & Team Analysis` with concise `Battle Analysis`.
+  - Removed the multi-line explanation paragraph beneath the title and reset `.battle-title` bottom margin to create compact alignment with the summary metrics strip.
+
+---
+
+### [2026-10-07] Enemy Team Persistence in Battle Page
+- **Objective**: Persist the enemy team across page reloads and accidental refreshes in browser `localStorage`, retaining full builds (moves, items, abilities, EV spreads, tera types) until the user explicitly clicks the "✕ Clear" button.
+- **Files Touched**:
+  - [battle.js](file:///Users/HVo/workspace/github-huy/pokechamp/battle.js)
+  - [battle.html](file:///Users/HVo/workspace/github-huy/pokechamp/battle.html)
+- **Key Decisions**:
+  - **Storage Synchronization**: Implemented `saveEnemyTeamToStorage()` which synchronizes `enemySlots` to `pokechamp_enemy_team_full` and `pokechamp_enemy_hash` in `localStorage`. Hooked it into `recalculateBattle()` to ensure full reactive coverage whenever Pokémon are added, modified, or removed.
+  - **Accidental Refresh Recovery**: Updated `initRosters()` to check for saved enemy roster in `localStorage` on page load, restoring complete custom builds.
+  - **Explicit Clear Teardown**: Updated the `#btn-clear-enemy-team` listener to clear `localStorage` keys and prune any stale `?enemyhash=` from the browser address bar via `history.replaceState`.
+
+---
+
+### [2026-10-07] Dynamic Visibility for Gemini API Key Buttons
+- **Objective**: Hide the "Connect Gemini AI Key" prompt button and header settings button when an API key is already configured, while preserving seamless access to settings via the status badge pill.
+- **Files Touched**:
+  - [battle.html](file:///Users/HVo/workspace/github-huy/pokechamp/battle.html)
+  - [battle.js](file:///Users/HVo/workspace/github-huy/pokechamp/battle.js)
+  - [battle.css](file:///Users/HVo/workspace/github-huy/pokechamp/battle.css)
+- **Key Decisions**:
+  - **Dynamic Button Toggle**: Updated `updateTacticsStatusBadge()` in [battle.js](file:///Users/HVo/workspace/github-huy/pokechamp/battle.js) to set `display: none` on `#btn-prompt-setup-key` and `#btn-open-gemini-modal` whenever `GEMINI_CONFIG.getKey()` is present, keeping only `⚡ Generate Battle Plan` in the call-to-action prompt.
+  - **Status Badge as Settings Trigger**: Added pointer cursor and click event listener to `#tactics-status-badge` (`● AI Coach (Gemini ...)`), enabling users to click the status pill directly at any time to inspect, modify, or clear their API key.
+
+---
+
 ### [2026-10-06] Decouple Usage Counts from Base Moves, Items, and Abilities Tables
 - **Objective**: Purify base `moves`, `items`, and `abilities` tables into immutable, canonical game catalogs ordered strictly alphabetically, and split volatile competitive usage statistics into dedicated usage tables (`moves_usage`, `items_usage`, `abilities_usage`).
 - **Files Touched**:

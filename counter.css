@@ -1,7 +1,7 @@
 /* Hero Section */
 .counter-hero {
   text-align: center;
-  padding: 3rem 2rem 2rem;
+  padding: 2rem 2rem 1.25rem;
 }
 
 .counter-title {
@@ -10,7 +10,7 @@
   background: linear-gradient(135deg, #f43f5e, #a5b4fc, #06b6d4);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  margin-bottom: 0.75rem;
+  margin-bottom: 0;
 }
 
 .counter-subtitle {
@@ -97,6 +97,14 @@
   background: rgba(99, 102, 241, 0.2);
 }
 
+.ac-item-sprite {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+  image-rendering: pixelated;
+  flex-shrink: 0;
+}
+
 .ac-item-rank {
   font-family: 'JetBrains Mono', monospace;
   font-size: 0.7rem;
@@ -155,18 +163,52 @@
   width: 100%;
 }
 
+.preview-card-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.preview-sprite-frame {
+  width: 64px;
+  height: 64px;
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid var(--border-card);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+}
+
+.preview-card-sprite {
+  width: 58px;
+  height: 58px;
+  object-fit: contain;
+  image-rendering: pixelated;
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.4));
+}
+
+.preview-card-title-group {
+  flex: 1;
+  min-width: 0;
+}
+
 .preview-card-name {
-  font-size: 1.6rem;
+  font-size: 1.4rem;
   font-weight: 800;
   color: #fff;
-  margin-bottom: 0.25rem;
+  margin-bottom: 0.2rem;
+  line-height: 1.2;
 }
 
 .preview-card-meta {
-  font-size: 0.75rem;
+  font-size: 0.72rem;
   color: var(--text-dim);
   font-family: 'JetBrains Mono', monospace;
-  margin-bottom: 0.75rem;
+  margin-bottom: 0.25rem;
 }
 
 /* Stat Rows & Groups */

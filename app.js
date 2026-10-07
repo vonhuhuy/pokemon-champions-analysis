@@ -569,32 +569,82 @@ function setupEventListeners() {
 // =====================================================================
 function getPokemonSlug(name) {
   if (!name) return '';
-  const clean = name.toLowerCase();
+  let clean = name.toLowerCase().trim();
+
+  // Special names with hyphens that Showdown combines
   if (clean === 'kommo-o') return 'kommoo';
-  
-  const rotomMatch = name.match(/^(Wash|Heat|Mow|Frost|Fan)\s+Rotom$/i);
-  if (rotomMatch) return 'rotom-' + rotomMatch[1].toLowerCase();
+  if (clean === 'hakamo-o') return 'hakamoo';
+  if (clean === 'jangmo-o') return 'jangmoo';
+  if (clean === 'type: null') return 'typenull';
+  if (clean === 'ho-oh') return 'hooh';
+  if (clean === 'porygon-z') return 'porygonz';
 
-  let slug = clean
-    .replace(' [alolan form]', '-alola')
-    .replace(' [hisuian form]', '-hisui')
-    .replace(' [galarian form]', '-galar')
-    .replace(' [female]', '-f')
-    .replace(' [low key form]', '-lowkey')
-    .replace(' [family of four]', '')
-    .replace(' [dusk form]', '-dusk')
-    .replace(' [midnight form]', '-midnight')
-    .replace(' [yellow plumage]', '-yellow')
-    .replace(' [fancy pattern]', '-fancy')
-    .replace(' [jumbo variety]', '-super')
-    .replace(' [large variety]', '-large')
-    .replace(' [small variety]', '-small')
-    .replace('tauros [paldean form (blaze breed)]', 'tauros-paldeablaze')
-    .replace('tauros [paldean form (aqua breed)]', 'tauros-paldeaaqua')
-    .replace('tauros [paldean form (combat breed)]', 'tauros-paldeacombat')
-    .replace(/['. ]/g, '');
+  // Mega Evolutions
+  const megaXMatch = clean.match(/^mega\s+(.+)\s+x$/i);
+  if (megaXMatch) return `${megaXMatch[1].replace(/[^a-z0-9]/g, '')}-megax`;
+  const megaYMatch = clean.match(/^mega\s+(.+)\s+y$/i);
+  if (megaYMatch) return `${megaYMatch[1].replace(/[^a-z0-9]/g, '')}-megay`;
+  const megaMatch = clean.match(/^mega\s+(.+)$/i);
+  if (megaMatch) return `${megaMatch[1].replace(/[^a-z0-9]/g, '')}-mega`;
 
-  return slug;
+  // Rotom forms: "Rotom (Wash Rotom)", "Wash Rotom", "Rotom-Wash", etc.
+  const rotomParenMatch = clean.match(/^rotom\s*[\(\[]\s*(wash|heat|mow|frost|fan)\s*(?:rotom)?\s*[\)\]]$/i);
+  if (rotomParenMatch) return `rotom-${rotomParenMatch[1].toLowerCase()}`;
+  const rotomPrefixMatch = clean.match(/^(wash|heat|mow|frost|fan)\s+rotom$/i);
+  if (rotomPrefixMatch) return `rotom-${rotomPrefixMatch[1].toLowerCase()}`;
+
+  // Tauros Paldean Breeds
+  if (clean.includes('blaze breed') || clean.includes('paldeablaze')) return 'tauros-paldeablaze';
+  if (clean.includes('aqua breed') || clean.includes('paldeaaqua')) return 'tauros-paldeaaqua';
+  if (clean.includes('combat breed') || clean.includes('paldeacombat')) return 'tauros-paldeacombat';
+
+  // Standard Regional Forms & Sub-forms (both brackets [...] and parentheses (...))
+  clean = clean
+    .replace(/[\(\[]\s*alolan\s+form\s*[\)\]]/gi, '-alola')
+    .replace(/[\(\[]\s*hisuian\s+form\s*[\)\]]/gi, '-hisui')
+    .replace(/[\(\[]\s*galarian\s+form\s*[\)\]]/gi, '-galar')
+    .replace(/[\(\[]\s*paldean\s+form\s*[\)\]]/gi, '-paldea')
+    .replace(/[\(\[]\s*female\s*[\)\]]/gi, '-f')
+    .replace(/[\(\[]\s*low\s*key\s+form\s*[\)\]]/gi, '-lowkey')
+    .replace(/[\(\[]\s*family\s+of\s+(?:four|three)\s*[\)\]]/gi, '')
+    .replace(/[\(\[]\s*dusk\s+form\s*[\)\]]/gi, '-dusk')
+    .replace(/[\(\[]\s*midnight\s+form\s*[\)\]]/gi, '-midnight')
+    .replace(/[\(\[]\s*midday\s+form\s*[\)\]]/gi, '')
+    .replace(/[\(\[]\s*eternal\s+flower\s*[\)\]]/gi, '-eternal')
+    .replace(/[\(\[]\s*fancy\s+pattern\s*[\)\]]/gi, '-fancy')
+    .replace(/[\(\[]\s*(?:jumbo|super)\s+variety\s*[\)\]]/gi, '-super')
+    .replace(/[\(\[]\s*large\s+variety\s*[\)\]]/gi, '-large')
+    .replace(/[\(\[]\s*small\s+variety\s*[\)\]]/gi, '-small')
+    .replace(/[\(\[]\s*yellow\s+plumage\s*[\)\]]/gi, '-yellow')
+    .replace(/[\(\[]\s*blue\s+plumage\s*[\)\]]/gi, '-blue')
+    .replace(/[\(\[]\s*white\s+plumage\s*[\)\]]/gi, '-white')
+    .replace(/[\(\[]\s*rapid\s*strike\s*(?:style)?\s*[\)\]]/gi, '-rapidstrike')
+    .replace(/[\(\[]\s*single\s*strike\s*(?:style)?\s*[\)\]]/gi, '')
+    .replace(/[\(\[]\s*wellspring\s*(?:mask)?\s*[\)\]]/gi, '-wellspring')
+    .replace(/[\(\[]\s*hearthflame\s*(?:mask)?\s*[\)\]]/gi, '-hearthflame')
+    .replace(/[\(\[]\s*cornerstone\s*(?:mask)?\s*[\)\]]/gi, '-cornerstone')
+    .replace(/[\(\[]\s*teal\s*(?:mask)?\s*[\)\]]/gi, '')
+    .replace(/[\(\[]\s*hero\s+form\s*[\)\]]/gi, '-hero')
+    .replace(/[\(\[]\s*terastal\s*(?:form)?\s*[\)\]]/gi, '-terastal')
+    .replace(/[\(\[]\s*stellar\s*(?:form)?\s*[\)\]]/gi, '-stellar')
+    .replace(/[\(\[]\s*shadow\s*rider\s*[\)\]]/gi, '-shadow')
+    .replace(/[\(\[]\s*ice\s*rider\s*[\)\]]/gi, '-ice')
+    .replace(/[\(\[]\s*therian\s*(?:form|forme)?\s*[\)\]]/gi, '-therian')
+    .replace(/[\(\[]\s*origin\s*(?:form|forme)?\s*[\)\]]/gi, '-origin')
+    .replace(/[\(\[]\s*sky\s*(?:form|forme)?\s*[\)\]]/gi, '-sky')
+    .replace(/[\(\[]\s*resolute\s*(?:form|forme)?\s*[\)\]]/gi, '-resolute')
+    .replace(/[\(\[]\s*pirouette\s*(?:form|forme)?\s*[\)\]]/gi, '-pirouette')
+    .replace(/[\(\[]\s*blade\s*(?:form|forme)?\s*[\)\]]/gi, '-blade')
+    .replace(/[\(\[]\s*school\s*(?:form|forme)?\s*[\)\]]/gi, '-school')
+    .replace(/[\(\[]\s*dusk\s*mane\s*[\)\]]/gi, '-duskmane')
+    .replace(/[\(\[]\s*dawn\s*wings\s*[\)\]]/gi, '-dawnwings')
+    .replace(/[\(\[]\s*black\s*(?:kyurem)?\s*[\)\]]/gi, '-black')
+    .replace(/[\(\[]\s*white\s*(?:kyurem)?\s*[\)\]]/gi, '-white');
+
+  return clean
+    .replace(/['’.:]/g, '')
+    .replace(/[\(\)\[\]]/g, '')
+    .replace(/\s+/g, '');
 }
 
 function getPokemonSpriteUrl(name) {
@@ -602,6 +652,8 @@ function getPokemonSpriteUrl(name) {
   if (!slug) return '';
   return `https://play.pokemonshowdown.com/sprites/gen5/${slug}.png`;
 }
+
+const getSpriteUrl = getPokemonSpriteUrl;
 
 // Color scale for base stats matching competitive databases (Smogon/Game8)
 function getStatBarColor(val) {
@@ -827,13 +879,13 @@ function render() {
   if (filtered.length === 0) {
     grid.innerHTML = `
       <div class="empty-filter-state">
-        <div style="font-size: 3rem; margin-bottom: 0.5rem;">🔍</div>
-        <h3>No Pokémon match your search filters</h3>
-        <p style="font-size: 0.9rem; margin-top: 0.5rem; color: var(--text-dim);">
-          Try searching with a different name, move, item, or clearing your active filters.
+        <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">🔍</div>
+        <h3>No Pokémon Found</h3>
+        <p style="font-size: 0.88rem; margin-top: 0.35rem; color: var(--text-dim);">
+          Try adjusting your search or active filters.
         </p>
-        <button onclick="document.getElementById('clear-filters-btn').click()" style="margin-top: 1rem; background: var(--primary); color: #fff; border: none; padding: 0.6rem 1.25rem; border-radius: 10px; cursor: pointer; font-weight: 600;">
-          Clear All Filters
+        <button onclick="document.getElementById('clear-filters-btn').click()" style="margin-top: 0.85rem; background: var(--primary); color: #fff; border: none; padding: 0.55rem 1.15rem; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 0.85rem;">
+          Clear Filters
         </button>
       </div>
     `;

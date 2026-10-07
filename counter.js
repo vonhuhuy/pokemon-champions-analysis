@@ -32,6 +32,93 @@ let megaDB = {};
 let selectedA = null;
 let selectedB = null;
 
+// Pokémon Sprite & Slug Resolution
+function getPokemonSlug(name) {
+  if (!name) return '';
+  let clean = name.toLowerCase().trim();
+
+  // Special names with hyphens that Showdown combines
+  if (clean === 'kommo-o') return 'kommoo';
+  if (clean === 'hakamo-o') return 'hakamoo';
+  if (clean === 'jangmo-o') return 'jangmoo';
+  if (clean === 'type: null') return 'typenull';
+  if (clean === 'ho-oh') return 'hooh';
+  if (clean === 'porygon-z') return 'porygonz';
+
+  // Mega Evolutions
+  const megaXMatch = clean.match(/^mega\s+(.+)\s+x$/i);
+  if (megaXMatch) return `${megaXMatch[1].replace(/[^a-z0-9]/g, '')}-megax`;
+  const megaYMatch = clean.match(/^mega\s+(.+)\s+y$/i);
+  if (megaYMatch) return `${megaYMatch[1].replace(/[^a-z0-9]/g, '')}-megay`;
+  const megaMatch = clean.match(/^mega\s+(.+)$/i);
+  if (megaMatch) return `${megaMatch[1].replace(/[^a-z0-9]/g, '')}-mega`;
+
+  // Rotom forms
+  const rotomParenMatch = clean.match(/^rotom\s*[\(\[]\s*(wash|heat|mow|frost|fan)\s*(?:rotom)?\s*[\)\]]$/i);
+  if (rotomParenMatch) return `rotom-${rotomParenMatch[1].toLowerCase()}`;
+  const rotomPrefixMatch = clean.match(/^(wash|heat|mow|frost|fan)\s+rotom$/i);
+  if (rotomPrefixMatch) return `rotom-${rotomPrefixMatch[1].toLowerCase()}`;
+
+  // Tauros Paldean Breeds
+  if (clean.includes('blaze breed') || clean.includes('paldeablaze')) return 'tauros-paldeablaze';
+  if (clean.includes('aqua breed') || clean.includes('paldeaaqua')) return 'tauros-paldeaaqua';
+  if (clean.includes('combat breed') || clean.includes('paldeacombat')) return 'tauros-paldeacombat';
+
+  // Standard Regional Forms & Sub-forms
+  clean = clean
+    .replace(/[\(\[]\s*alolan\s+form\s*[\)\]]/gi, '-alola')
+    .replace(/[\(\[]\s*hisuian\s+form\s*[\)\]]/gi, '-hisui')
+    .replace(/[\(\[]\s*galarian\s+form\s*[\)\]]/gi, '-galar')
+    .replace(/[\(\[]\s*paldean\s+form\s*[\)\]]/gi, '-paldea')
+    .replace(/[\(\[]\s*female\s*[\)\]]/gi, '-f')
+    .replace(/[\(\[]\s*low\s*key\s+form\s*[\)\]]/gi, '-lowkey')
+    .replace(/[\(\[]\s*family\s+of\s+(?:four|three)\s*[\)\]]/gi, '')
+    .replace(/[\(\[]\s*dusk\s+form\s*[\)\]]/gi, '-dusk')
+    .replace(/[\(\[]\s*midnight\s+form\s*[\)\]]/gi, '-midnight')
+    .replace(/[\(\[]\s*midday\s+form\s*[\)\]]/gi, '')
+    .replace(/[\(\[]\s*eternal\s+flower\s*[\)\]]/gi, '-eternal')
+    .replace(/[\(\[]\s*fancy\s+pattern\s*[\)\]]/gi, '-fancy')
+    .replace(/[\(\[]\s*(?:jumbo|super)\s+variety\s*[\)\]]/gi, '-super')
+    .replace(/[\(\[]\s*large\s+variety\s*[\)\]]/gi, '-large')
+    .replace(/[\(\[]\s*small\s+variety\s*[\)\]]/gi, '-small')
+    .replace(/[\(\[]\s*yellow\s+plumage\s*[\)\]]/gi, '-yellow')
+    .replace(/[\(\[]\s*blue\s+plumage\s*[\)\]]/gi, '-blue')
+    .replace(/[\(\[]\s*white\s+plumage\s*[\)\]]/gi, '-white')
+    .replace(/[\(\[]\s*rapid\s*strike\s*(?:style)?\s*[\)\]]/gi, '-rapidstrike')
+    .replace(/[\(\[]\s*single\s*strike\s*(?:style)?\s*[\)\]]/gi, '')
+    .replace(/[\(\[]\s*wellspring\s*(?:mask)?\s*[\)\]]/gi, '-wellspring')
+    .replace(/[\(\[]\s*hearthflame\s*(?:mask)?\s*[\)\]]/gi, '-hearthflame')
+    .replace(/[\(\[]\s*cornerstone\s*(?:mask)?\s*[\)\]]/gi, '-cornerstone')
+    .replace(/[\(\[]\s*teal\s*(?:mask)?\s*[\)\]]/gi, '')
+    .replace(/[\(\[]\s*hero\s+form\s*[\)\]]/gi, '-hero')
+    .replace(/[\(\[]\s*terastal\s*(?:form)?\s*[\)\]]/gi, '-terastal')
+    .replace(/[\(\[]\s*stellar\s*(?:form)?\s*[\)\]]/gi, '-stellar')
+    .replace(/[\(\[]\s*shadow\s*rider\s*[\)\]]/gi, '-shadow')
+    .replace(/[\(\[]\s*ice\s*rider\s*[\)\]]/gi, '-ice')
+    .replace(/[\(\[]\s*therian\s*(?:form|forme)?\s*[\)\]]/gi, '-therian')
+    .replace(/[\(\[]\s*origin\s*(?:form|forme)?\s*[\)\]]/gi, '-origin')
+    .replace(/[\(\[]\s*sky\s*(?:form|forme)?\s*[\)\]]/gi, '-sky')
+    .replace(/[\(\[]\s*resolute\s*(?:form|forme)?\s*[\)\]]/gi, '-resolute')
+    .replace(/[\(\[]\s*pirouette\s*(?:form|forme)?\s*[\)\]]/gi, '-pirouette')
+    .replace(/[\(\[]\s*blade\s*(?:form|forme)?\s*[\)\]]/gi, '-blade')
+    .replace(/[\(\[]\s*school\s*(?:form|forme)?\s*[\)\]]/gi, '-school')
+    .replace(/[\(\[]\s*dusk\s*mane\s*[\)\]]/gi, '-duskmane')
+    .replace(/[\(\[]\s*dawn\s*wings\s*[\)\]]/gi, '-dawnwings')
+    .replace(/[\(\[]\s*black\s*(?:kyurem)?\s*[\)\]]/gi, '-black')
+    .replace(/[\(\[]\s*white\s*(?:kyurem)?\s*[\)\]]/gi, '-white');
+
+  return clean
+    .replace(/['’.:]/g, '')
+    .replace(/[\(\)\[\]]/g, '')
+    .replace(/\s+/g, '');
+}
+
+function getSpriteUrl(name) {
+  const slug = getPokemonSlug(name);
+  if (!slug) return '';
+  return `https://play.pokemonshowdown.com/sprites/gen5/${slug}.png`;
+}
+
 // ---- Type Effectiveness Chart (Attacking → Defending) ----
 const TYPE_CHART = {
   Normal:   { Rock: 0.5, Ghost: 0, Steel: 0.5 },
@@ -736,11 +823,27 @@ function renderPreview(pokemon, side) {
     </div>
   ` : '';
 
+  const slug = getPokemonSlug(pokemon.name);
+  const spriteUrl = getSpriteUrl(pokemon.name);
+
   return `
     <div class="preview-card">
-      <div class="preview-card-meta">RANK #${pokemon.rank} · ${pokemon.tier_label}</div>
-      <div class="preview-card-name">${pokemon.name}</div>
-      <div class="type-badges" style="margin-bottom: 0.5rem;">${typeHtml}</div>
+      <div class="preview-card-header">
+        <div class="preview-sprite-frame">
+          <img src="${spriteUrl}" 
+               alt="${pokemon.name}" 
+               class="preview-card-sprite" 
+               loading="lazy" 
+               width="64" 
+               height="64" 
+               onerror="this.onerror=null; this.src='https://play.pokemonshowdown.com/sprites/dex/${slug}.png';">
+        </div>
+        <div class="preview-card-title-group">
+          <div class="preview-card-meta">RANK #${pokemon.rank} · ${pokemon.tier_label}</div>
+          <div class="preview-card-name">${pokemon.name}</div>
+          <div class="type-badges" style="margin-bottom: 0.25rem;">${typeHtml}</div>
+        </div>
+      </div>
       <div style="font-size: 0.78rem; color: var(--text-dim); margin-bottom: 0.25rem;">
         Top Item: <strong style="color: var(--text-muted);">${topItem}</strong>
         ${speedInfo.note ? `<span style="margin-left:0.5rem; color:#38bdf8;">(${speedInfo.note})</span>` : ''}
@@ -772,9 +875,12 @@ function setupAutocomplete(inputId, listId, side) {
     if (!matches.length) { list.classList.remove('open'); return; }
 
     matches.forEach((p, i) => {
+      const pSlug = getPokemonSlug(p.name);
+      const pSprite = getSpriteUrl(p.name);
       const div = document.createElement('div');
       div.className = 'ac-item';
       div.innerHTML = `
+        <img src="${pSprite}" class="ac-item-sprite" alt="" loading="lazy" onerror="this.onerror=null; this.src='https://play.pokemonshowdown.com/sprites/dex/${pSlug}.png';">
         <span class="ac-item-rank">#${p.rank}</span>
         <span class="ac-item-name">${p.name}</span>
         <span class="ac-item-tier ac-tier-${p.tier.toLowerCase()}">${p.tier}</span>

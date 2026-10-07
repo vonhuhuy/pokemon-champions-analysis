@@ -37,20 +37,10 @@
   <!-- Main Container -->
   <main class="container">
     
-    <!-- Hero & Serialization Bar -->
+    <!-- Hero Section -->
     <section class="tb-hero">
       <div class="tb-hero-left">
         <h1 class="tb-title">🛡️ Team Builder</h1>
-      </div>
-
-      <!-- Quick Preset & Team Actions -->
-      <div class="tb-presets-bar">
-        <span class="preset-label">Quick Presets:</span>
-        <button class="preset-btn" data-preset="meta-s">🏆 S-Tier Core</button>
-        <button class="preset-btn" data-preset="rain">🌧️ Rain Offense</button>
-        <button class="preset-btn" data-preset="balance">🧱 Bulky Balance</button>
-        <button class="preset-btn" data-preset="hyper">⚡ Hyper Offense</button>
-        <button class="preset-btn btn-clear-team" id="btn-clear-team">✕ Clear</button>
       </div>
     </section>
 
@@ -74,13 +64,16 @@
           <span>📋</span> Copy Hash
         </button>
         <button id="btn-copy-link" class="btn-hash-action btn-primary-action" title="Copy full shareable URL with teamhash">
-          <span>🔗</span> Share Team Link
+          <span>🔗</span> Share Link
         </button>
         <button id="btn-import-hash" class="btn-hash-action" title="Import a shareable teamhash">
           <span>📥</span> Import Hash
         </button>
         <button id="btn-export-showdown" class="btn-hash-action" title="Export to Pokémon Showdown format">
-          <span>⚔️</span> Showdown Text
+          <span>⚔️</span> Showdown
+        </button>
+        <button id="btn-clear-team" class="btn-hash-action btn-danger-action" title="Clear all team slots">
+          <span>✕</span> Clear
         </button>
       </div>
     </section>
@@ -116,14 +109,13 @@
       <div class="tab-pane active" id="pane-defensive">
         <div class="pane-header">
           <div>
-            <h3>Team Defensive Synergy & Vulnerabilities</h3>
-            <p>Analyzes defensive weaknesses (2x, 4x), resistances (0.5x, 0.25x), and immunities (0x) across all 18 elemental types.</p>
+            <h3>Defensive Synergy</h3>
           </div>
           <div class="tera-toggle-wrap">
             <label class="toggle-label">
               <input type="checkbox" id="toggle-apply-tera">
               <span class="toggle-slider"></span>
-              <span class="toggle-text">Preview Active Tera Types</span>
+              <span class="toggle-text">Active Tera Types</span>
             </label>
           </div>
         </div>
@@ -141,8 +133,7 @@
       <div class="tab-pane" id="pane-offensive">
         <div class="pane-header">
           <div>
-            <h3>Offensive Coverage Breakdown</h3>
-            <p>Checks how many opponent types can be struck for super-effective (2×) damage by your team's moveset (STAB and coverage moves).</p>
+            <h3>Offensive Coverage</h3>
           </div>
           <div id="coverage-score-pill" class="coverage-score-pill">
             0 / 18 Types Covered
@@ -157,8 +148,7 @@
       <div class="tab-pane" id="pane-speed">
         <div class="pane-header">
           <div>
-            <h3>Meta Speed Tier Ladder</h3>
-            <p>Compares your team's actual Level 50 Speed stats alongside pivotal Meta benchmark speed tiers (accounting for Mega Evolutions, EV spreads, and Choice Scarf).</p>
+            <h3>Speed Tiers</h3>
           </div>
         </div>
         <div class="speed-ladder-wrap" id="speed-ladder-wrap">
@@ -170,8 +160,7 @@
       <div class="tab-pane" id="pane-teammates">
         <div class="pane-header">
           <div>
-            <h3>Data-Driven Teammate Recommendations</h3>
-            <p>Calculates highest meta synergy partners based on battle ladder usage data for your currently chosen Pokémon.</p>
+            <h3>Teammate Synergy</h3>
           </div>
         </div>
         <div class="teammates-recommend-grid" id="teammates-recommend-grid">
@@ -188,7 +177,6 @@
       <div class="picker-header">
         <div>
           <h2 id="picker-title">Select Pokémon for Slot 1</h2>
-          <p class="picker-subtitle">Choose from 262 competitive singles Pokémon</p>
         </div>
         <button class="modal-close-btn" id="picker-close">✕</button>
       </div>
@@ -253,7 +241,7 @@
         <!-- Mode Content: RESISTANCE Filter (18 elemental pills) -->
         <div class="picker-subpanel picker-resistance-subpanel" id="picker-resistance-panel" style="display: none;">
           <div class="picker-res-hint-row">
-            <span class="picker-res-hint-text">Filters Pokémon that <strong>resist</strong> or are <strong>immune</strong> (≤ 0.5× / 0×) to incoming attacks:</span>
+            <span class="picker-res-hint-text">Resistances & immunities (≤ 0.5× / 0×):</span>
           </div>
           <div class="picker-resistance-pills">
             <button class="res-pill-btn active" data-res="ALL">ALL</button>
@@ -282,7 +270,7 @@
         <div class="picker-subpanel picker-move-subpanel" id="picker-move-panel" style="display: none;">
           <div class="picker-move-search-wrap">
             <span class="search-icon">⚔️</span>
-            <input type="text" id="picker-move-input" class="search-input" placeholder="Search move (e.g. Stealth Rock, Knock Off, U-turn)..." autocomplete="off">
+            <input type="text" id="picker-move-input" class="search-input" placeholder="Search move..." autocomplete="off">
             <button class="picker-move-clear-btn" id="picker-move-clear" title="Clear move filter" style="display: none;">✕</button>
           </div>
           <div class="picker-move-dropdown" id="picker-move-dropdown" style="display: none;"></div>
@@ -294,7 +282,7 @@
 
         <!-- Pool notice banner -->
         <div class="picker-pool-notice" id="picker-pool-notice">
-          Showing tier-list pool — <span id="picker-pool-count">262</span> Pokémon available
+          <span id="picker-pool-count">262</span> Pokémon available
         </div>
       </div>
 
@@ -312,7 +300,7 @@
         <h3>📥 Import Team Hash</h3>
         <button class="modal-close-btn" id="import-close">✕</button>
       </div>
-      <p class="dialog-desc">Enter any shareable <code>teamhash</code> to load the team:</p>
+      <p class="dialog-desc">Enter <code>teamhash</code> to load:</p>
       <div class="dialog-input-wrap">
         <input type="text" id="import-hash-input" class="dialog-input" placeholder="e.g. paste teamhash here" maxlength="128" autocomplete="off" spellcheck="false">
       </div>
@@ -330,7 +318,7 @@
         <h3>⚔️ Pokémon Showdown Team Export</h3>
         <button class="modal-close-btn" id="showdown-close">✕</button>
       </div>
-      <p class="dialog-desc">Copy and paste this team into Pokémon Showdown Teambuilder:</p>
+      <p class="dialog-desc">Pokémon Showdown format:</p>
       <textarea id="showdown-textarea" class="showdown-textarea" readonly></textarea>
       <div class="dialog-footer">
         <button class="btn-cancel" id="btn-showdown-close">Close</button>

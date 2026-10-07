@@ -182,7 +182,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   } else if (savedHash && savedHash !== '0000000000000000') {
     loadTeamFromHash(savedHash);
   } else {
-    loadPreset('starter', false);
+    renderAll();
   }
 });
 
@@ -213,32 +213,82 @@ async function loadDatabase() {
 
 function getPokemonSlug(name) {
   if (!name) return '';
-  const clean = name.toLowerCase();
+  let clean = name.toLowerCase().trim();
+
+  // Special names with hyphens that Showdown combines
   if (clean === 'kommo-o') return 'kommoo';
-  
-  const rotomMatch = name.match(/^(Wash|Heat|Mow|Frost|Fan)\s+Rotom$/i);
-  if (rotomMatch) return 'rotom-' + rotomMatch[1].toLowerCase();
+  if (clean === 'hakamo-o') return 'hakamoo';
+  if (clean === 'jangmo-o') return 'jangmoo';
+  if (clean === 'type: null') return 'typenull';
+  if (clean === 'ho-oh') return 'hooh';
+  if (clean === 'porygon-z') return 'porygonz';
 
-  let slug = clean
-    .replace(' [alolan form]', '-alola')
-    .replace(' [hisuian form]', '-hisui')
-    .replace(' [galarian form]', '-galar')
-    .replace(' [female]', '-f')
-    .replace(' [low key form]', '-lowkey')
-    .replace(' [family of four]', '')
-    .replace(' [dusk form]', '-dusk')
-    .replace(' [midnight form]', '-midnight')
-    .replace(' [yellow plumage]', '-yellow')
-    .replace(' [fancy pattern]', '-fancy')
-    .replace(' [jumbo variety]', '-super')
-    .replace(' [large variety]', '-large')
-    .replace(' [small variety]', '-small')
-    .replace('tauros [paldean form (blaze breed)]', 'tauros-paldeablaze')
-    .replace('tauros [paldean form (aqua breed)]', 'tauros-paldeaaqua')
-    .replace('tauros [paldean form (combat breed)]', 'tauros-paldeacombat')
-    .replace(/['. ]/g, '');
+  // Mega Evolutions
+  const megaXMatch = clean.match(/^mega\s+(.+)\s+x$/i);
+  if (megaXMatch) return `${megaXMatch[1].replace(/[^a-z0-9]/g, '')}-megax`;
+  const megaYMatch = clean.match(/^mega\s+(.+)\s+y$/i);
+  if (megaYMatch) return `${megaYMatch[1].replace(/[^a-z0-9]/g, '')}-megay`;
+  const megaMatch = clean.match(/^mega\s+(.+)$/i);
+  if (megaMatch) return `${megaMatch[1].replace(/[^a-z0-9]/g, '')}-mega`;
 
-  return slug;
+  // Rotom forms: "Rotom (Wash Rotom)", "Wash Rotom", "Rotom-Wash", etc.
+  const rotomParenMatch = clean.match(/^rotom\s*[\(\[]\s*(wash|heat|mow|frost|fan)\s*(?:rotom)?\s*[\)\]]$/i);
+  if (rotomParenMatch) return `rotom-${rotomParenMatch[1].toLowerCase()}`;
+  const rotomPrefixMatch = clean.match(/^(wash|heat|mow|frost|fan)\s+rotom$/i);
+  if (rotomPrefixMatch) return `rotom-${rotomPrefixMatch[1].toLowerCase()}`;
+
+  // Tauros Paldean Breeds
+  if (clean.includes('blaze breed') || clean.includes('paldeablaze')) return 'tauros-paldeablaze';
+  if (clean.includes('aqua breed') || clean.includes('paldeaaqua')) return 'tauros-paldeaaqua';
+  if (clean.includes('combat breed') || clean.includes('paldeacombat')) return 'tauros-paldeacombat';
+
+  // Standard Regional Forms & Sub-forms (both brackets [...] and parentheses (...))
+  clean = clean
+    .replace(/[\(\[]\s*alolan\s+form\s*[\)\]]/gi, '-alola')
+    .replace(/[\(\[]\s*hisuian\s+form\s*[\)\]]/gi, '-hisui')
+    .replace(/[\(\[]\s*galarian\s+form\s*[\)\]]/gi, '-galar')
+    .replace(/[\(\[]\s*paldean\s+form\s*[\)\]]/gi, '-paldea')
+    .replace(/[\(\[]\s*female\s*[\)\]]/gi, '-f')
+    .replace(/[\(\[]\s*low\s*key\s+form\s*[\)\]]/gi, '-lowkey')
+    .replace(/[\(\[]\s*family\s+of\s+(?:four|three)\s*[\)\]]/gi, '')
+    .replace(/[\(\[]\s*dusk\s+form\s*[\)\]]/gi, '-dusk')
+    .replace(/[\(\[]\s*midnight\s+form\s*[\)\]]/gi, '-midnight')
+    .replace(/[\(\[]\s*midday\s+form\s*[\)\]]/gi, '')
+    .replace(/[\(\[]\s*eternal\s+flower\s*[\)\]]/gi, '-eternal')
+    .replace(/[\(\[]\s*fancy\s+pattern\s*[\)\]]/gi, '-fancy')
+    .replace(/[\(\[]\s*(?:jumbo|super)\s+variety\s*[\)\]]/gi, '-super')
+    .replace(/[\(\[]\s*large\s+variety\s*[\)\]]/gi, '-large')
+    .replace(/[\(\[]\s*small\s+variety\s*[\)\]]/gi, '-small')
+    .replace(/[\(\[]\s*yellow\s+plumage\s*[\)\]]/gi, '-yellow')
+    .replace(/[\(\[]\s*blue\s+plumage\s*[\)\]]/gi, '-blue')
+    .replace(/[\(\[]\s*white\s+plumage\s*[\)\]]/gi, '-white')
+    .replace(/[\(\[]\s*rapid\s*strike\s*(?:style)?\s*[\)\]]/gi, '-rapidstrike')
+    .replace(/[\(\[]\s*single\s*strike\s*(?:style)?\s*[\)\]]/gi, '')
+    .replace(/[\(\[]\s*wellspring\s*(?:mask)?\s*[\)\]]/gi, '-wellspring')
+    .replace(/[\(\[]\s*hearthflame\s*(?:mask)?\s*[\)\]]/gi, '-hearthflame')
+    .replace(/[\(\[]\s*cornerstone\s*(?:mask)?\s*[\)\]]/gi, '-cornerstone')
+    .replace(/[\(\[]\s*teal\s*(?:mask)?\s*[\)\]]/gi, '')
+    .replace(/[\(\[]\s*hero\s+form\s*[\)\]]/gi, '-hero')
+    .replace(/[\(\[]\s*terastal\s*(?:form)?\s*[\)\]]/gi, '-terastal')
+    .replace(/[\(\[]\s*stellar\s*(?:form)?\s*[\)\]]/gi, '-stellar')
+    .replace(/[\(\[]\s*shadow\s*rider\s*[\)\]]/gi, '-shadow')
+    .replace(/[\(\[]\s*ice\s*rider\s*[\)\]]/gi, '-ice')
+    .replace(/[\(\[]\s*therian\s*(?:form|forme)?\s*[\)\]]/gi, '-therian')
+    .replace(/[\(\[]\s*origin\s*(?:form|forme)?\s*[\)\]]/gi, '-origin')
+    .replace(/[\(\[]\s*sky\s*(?:form|forme)?\s*[\)\]]/gi, '-sky')
+    .replace(/[\(\[]\s*resolute\s*(?:form|forme)?\s*[\)\]]/gi, '-resolute')
+    .replace(/[\(\[]\s*pirouette\s*(?:form|forme)?\s*[\)\]]/gi, '-pirouette')
+    .replace(/[\(\[]\s*blade\s*(?:form|forme)?\s*[\)\]]/gi, '-blade')
+    .replace(/[\(\[]\s*school\s*(?:form|forme)?\s*[\)\]]/gi, '-school')
+    .replace(/[\(\[]\s*dusk\s*mane\s*[\)\]]/gi, '-duskmane')
+    .replace(/[\(\[]\s*dawn\s*wings\s*[\)\]]/gi, '-dawnwings')
+    .replace(/[\(\[]\s*black\s*(?:kyurem)?\s*[\)\]]/gi, '-black')
+    .replace(/[\(\[]\s*white\s*(?:kyurem)?\s*[\)\]]/gi, '-white');
+
+  return clean
+    .replace(/['’.:]/g, '')
+    .replace(/[\(\)\[\]]/g, '')
+    .replace(/\s+/g, '');
 }
 
 function getSpriteUrl(name) {
@@ -666,7 +716,7 @@ function renderTeamSlots() {
           <!-- Left Column: Poke Info & Moves -->
           <div class="slot-left-col">
             <div class="slot-header-block" data-tooltip-type="pokemon-roster" data-slot-idx="${idx}">
-              <img src="${getSpriteUrl(p.name)}" alt="${p.name}" class="slot-poke-sprite" onerror="this.style.opacity='0.4'">
+              <img src="${getSpriteUrl(p.name)}" alt="${p.name}" class="slot-poke-sprite" onerror="this.onerror=null; this.src='https://play.pokemonshowdown.com/sprites/dex/${getPokemonSlug(p.name)}.png';">
               <div class="slot-header-info">
                 <div class="slot-card-name" title="${p.name}">${p.name}</div>
                 <div class="slot-meta-chip" onclick="openDrawer(${idx}, 'items')" title="Change Item">
@@ -766,7 +816,7 @@ function renderDrawerContent() {
     <!-- Drawer Header -->
     <div class="drawer-header">
       <div class="drawer-header-left">
-        <img src="${getSpriteUrl(p.name)}" alt="${p.name}" class="drawer-poke-sprite" onerror="this.style.opacity='0.4'">
+        <img src="${getSpriteUrl(p.name)}" alt="${p.name}" class="drawer-poke-sprite" onerror="this.onerror=null; this.src='https://play.pokemonshowdown.com/sprites/dex/${getPokemonSlug(p.name)}.png';">
         <div>
           <div class="drawer-poke-name">${p.name}</div>
           <div style="margin-top: 0.2rem;">${typesHtml}</div>
@@ -1197,7 +1247,7 @@ function renderSpreadModal() {
       <!-- Header -->
       <div class="spread-header">
         <div class="spread-header-left">
-          <img src="${getSpriteUrl(p.name)}" alt="${p.name}" class="spread-poke-sprite" onerror="this.style.opacity='0.4'">
+          <img src="${getSpriteUrl(p.name)}" alt="${p.name}" class="spread-poke-sprite" onerror="this.onerror=null; this.src='https://play.pokemonshowdown.com/sprites/dex/${getPokemonSlug(p.name)}.png';">
           <span class="spread-poke-name">${p.name}</span>
         </div>
         <button class="btn-spread-done" onclick="closeSpreadModal()">Done</button>
@@ -1849,7 +1899,7 @@ function renderQuickAddSuggestions() {
         const reasonsTooltip = cand.reasons.join(' • ');
         return `
           <div class="quick-add-card" title="${reasonsTooltip}">
-            <img src="${getSpriteUrl(p.name)}" alt="${p.name}" class="quick-add-sprite" onerror="this.style.opacity='0.4'">
+            <img src="${getSpriteUrl(p.name)}" alt="${p.name}" class="quick-add-sprite" onerror="this.onerror=null; this.src='https://play.pokemonshowdown.com/sprites/dex/${getPokemonSlug(p.name)}.png';">
             <div class="quick-add-info">
               <div class="quick-add-name" title="${p.name}">${p.name}</div>
               <div class="quick-add-types">
@@ -1900,7 +1950,7 @@ function renderTeammateRecommendations() {
         <div>
           <div class="teammate-top">
             <div class="teammate-header-left">
-              <img src="${getSpriteUrl(p.name)}" alt="${p.name}" class="teammate-sprite" onerror="this.style.opacity='0.4'">
+              <img src="${getSpriteUrl(p.name)}" alt="${p.name}" class="teammate-sprite" onerror="this.onerror=null; this.src='https://play.pokemonshowdown.com/sprites/dex/${getPokemonSlug(p.name)}.png';">
               <div>
                 <span class="teammate-name">${p.name}</span>
                 <div style="display: flex; gap: 0.3rem; margin-top: 0.2rem;">
@@ -2139,13 +2189,13 @@ function renderPickerList() {
   if (poolNotice) {
     if (pickerResistances.size > 0) {
       const resList = Array.from(pickerResistances).join(', ');
-      poolNotice.innerHTML = `Showing tier-list pool — <span id="picker-pool-count">${filtered.length}</span> Pokémon resisting <strong>${resList}</strong> (≤ 0.5× / 0×)`;
+      poolNotice.innerHTML = `<span id="picker-pool-count">${filtered.length}</span> Pokémon resisting <strong>${resList}</strong> (≤ 0.5× / 0×)`;
     } else if (pickerMove) {
-      poolNotice.innerHTML = `Showing tier-list pool — <span id="picker-pool-count">${filtered.length}</span> Pokémon learning <strong>${pickerMove}</strong>`;
+      poolNotice.innerHTML = `<span id="picker-pool-count">${filtered.length}</span> Pokémon learning <strong>${pickerMove}</strong>`;
     } else if (pickerType !== 'ALL') {
-      poolNotice.innerHTML = `Showing tier-list pool — <span id="picker-pool-count">${filtered.length}</span> <strong>${pickerType}</strong>-type Pokémon`;
+      poolNotice.innerHTML = `<span id="picker-pool-count">${filtered.length}</span> <strong>${pickerType}</strong>-type Pokémon`;
     } else {
-      poolNotice.innerHTML = `Showing tier-list pool — <span id="picker-pool-count">${filtered.length}</span> Pokémon available`;
+      poolNotice.innerHTML = `<span id="picker-pool-count">${filtered.length}</span> Pokémon available`;
     }
   } else {
     const countBadge = document.getElementById('picker-pool-count');
@@ -2186,7 +2236,7 @@ function renderPickerList() {
 
         <!-- Left: Pokémon Sprite + Info -->
         <div class="picker-card-left">
-          <img src="${getSpriteUrl(p.name)}" alt="${p.name}" class="picker-poke-sprite" loading="lazy" onerror="this.style.opacity='0.3'">
+          <img src="${getSpriteUrl(p.name)}" alt="${p.name}" class="picker-poke-sprite" loading="lazy" onerror="this.onerror=null; this.src='https://play.pokemonshowdown.com/sprites/dex/${getPokemonSlug(p.name)}.png';">
           <div class="picker-card-info">
             <div class="picker-card-title-row">
               <span class="picker-poke-title">${p.name}</span>
@@ -2263,14 +2313,6 @@ function generateShowdownText() {
 // =====================================================================
 
 function setupUIEventListeners() {
-  // Presets
-  document.querySelectorAll('.preset-btn[data-preset]').forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      const preset = e.currentTarget.dataset.preset;
-      loadPreset(preset);
-    });
-  });
-
   const clearBtn = document.getElementById('btn-clear-team');
   if (clearBtn) clearBtn.addEventListener('click', clearTeam);
 
@@ -2843,7 +2885,7 @@ function buildPokemonRosterTooltipHtml(slotIdx) {
   return `
     <div class="tb-tip-header">
       <div class="tb-tip-title-box">
-        <img src="${getSpriteUrl(p.name)}" alt="${p.name}" class="tb-tip-poke-avatar">
+        <img src="${getSpriteUrl(p.name)}" alt="${p.name}" class="tb-tip-poke-avatar" onerror="this.onerror=null; this.src='https://play.pokemonshowdown.com/sprites/dex/${getPokemonSlug(p.name)}.png';">
         <div class="tb-tip-title-col">
           <div class="tb-tip-main-label">${p.name}</div>
           <div class="tb-tip-sub-label">Roster Member Effectiveness & Attack Coverage</div>
@@ -2927,7 +2969,7 @@ function buildDefensiveMatrixTooltipHtml(type) {
       return `
         <div class="tb-poke-breakdown-row">
           <div class="tb-poke-row-left">
-            <img src="${item.sprite}" alt="${item.name}" class="tb-poke-mini-sprite" onerror="this.style.opacity='0.4'">
+            <img src="${item.sprite}" alt="${item.name}" class="tb-poke-mini-sprite" onerror="this.onerror=null; this.src='https://play.pokemonshowdown.com/sprites/dex/${getPokemonSlug(item.name)}.png';">
             <span class="tb-poke-name">${item.name}</span>
             <div class="tb-poke-type-badges">
               ${item.types.map(t => `<span class="type-badge type-${t}">${t}</span>`).join('')}
@@ -3015,7 +3057,7 @@ function buildOffensiveStabTooltipHtml(targetType) {
       return `
         <div class="tb-dealer-row">
           <div class="tb-poke-row-left">
-            <img src="${d.sprite}" alt="${d.pokemon}" class="tb-poke-mini-sprite" onerror="this.style.opacity='0.4'">
+            <img src="${d.sprite}" alt="${d.pokemon}" class="tb-poke-mini-sprite" onerror="this.onerror=null; this.src='https://play.pokemonshowdown.com/sprites/dex/${getPokemonSlug(d.pokemon)}.png';">
             <span class="tb-poke-name">${d.pokemon}</span>
             <div style="margin-left: 0.4rem; display: inline-flex; flex-wrap: wrap; gap: 0.35rem; align-items: center;">${movesHtml}</div>
           </div>
