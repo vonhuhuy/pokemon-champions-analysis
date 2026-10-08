@@ -58,12 +58,12 @@ function pokemonResistsType(p, attackingType) {
 
 const TYPE_COLORS = {
   Normal: '#94a3b8',
-  Fire: '#f97316',
+  Fire: '#ea3829',
   Water: '#38bdf8',
   Electric: '#eab308',
   Grass: '#22c55e',
   Ice: '#67e8f9',
-  Fighting: '#ef4444',
+  Fighting: '#c22e28',
   Poison: '#a855f7',
   Ground: '#d97706',
   Flying: '#818cf8',
@@ -89,11 +89,52 @@ function getMoveType(moveName, fallbackPoke) {
 }
 
 function getItemSpriteUrl(itemName) {
+  if (typeof window !== 'undefined' && window.getItemSpriteUrl && window.getItemSpriteUrl !== getItemSpriteUrl) {
+    return window.getItemSpriteUrl(itemName);
+  }
   if (!itemName || itemName === 'None' || itemName === 'No Item' || itemName === 'N/A') return '';
-  const slug = itemName.toLowerCase().trim()
+  const clean = itemName.trim().replace('’', "'");
+  if (typeof CUSTOM_ITEM_ICONS !== 'undefined' && CUSTOM_ITEM_ICONS[clean]) {
+    return CUSTOM_ITEM_ICONS[clean].zoneUrl;
+  }
+  if (clean === "King's Rock") {
+    return 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/kings-rock.png';
+  }
+  const slug = clean.toLowerCase()
     .replace(/\s+z$/i, '')
     .replace(/[^a-z0-9]+/g, '-');
   return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/${slug}.png`;
+}
+
+function handleItemIconError(img, itemName) {
+  if (typeof window !== 'undefined' && window.handleItemIconError && window.handleItemIconError !== handleItemIconError) {
+    return window.handleItemIconError(img, itemName);
+  }
+  if (!img || !itemName) return;
+  const clean = (itemName || '').trim().replace('’', "'");
+  const step = parseInt(img.dataset.fallbackStep || '0', 10);
+  img.dataset.fallbackStep = String(step + 1);
+
+  if (step === 0) {
+    if (typeof CUSTOM_ITEM_ICONS !== 'undefined' && CUSTOM_ITEM_ICONS[clean] && CUSTOM_ITEM_ICONS[clean].fallback) {
+      img.src = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/${CUSTOM_ITEM_ICONS[clean].fallback}.png`;
+      return;
+    }
+    const sdSlug = clean.toLowerCase().replace(/[^a-z0-9]+/g, '');
+    img.src = `https://play.pokemonshowdown.com/sprites/itemicons/${sdSlug}.png`;
+    return;
+  }
+
+  if (step === 1) {
+    const isMega = clean.endsWith('ite') || clean.endsWith('ite X') || clean.endsWith('ite Y') || clean.endsWith('ite Z') || clean.endsWith('inite');
+    if (isMega) {
+      img.src = 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/charizardite-y.png';
+      return;
+    }
+  }
+
+  img.onerror = null;
+  img.style.display = 'none';
 }
 
 const TYPE_ICONS = {
@@ -246,7 +287,7 @@ function buildRichTooltipHtml(type, name, extraType) {
             <span>Held Item</span>
           </div>
         </div>
-        ${itemSprite ? `<img src="${itemSprite}" alt="" style="width: 44px; height: 44px; object-fit: contain; image-rendering: pixelated; margin-top: 4px;" onerror="this.style.display='none'">` : ''}
+        ${itemSprite ? `<img src="${itemSprite}" alt="" style="width: 44px; height: 44px; object-fit: contain; image-rendering: pixelated; margin-top: 4px;" onerror="handleItemIconError(this, '${(name || '').replace(/'/g, "\\'")}')">` : ''}
       </div>
       <div class="rich-tip-card">
         <div class="rich-tip-desc">${desc}</div>
@@ -963,7 +1004,7 @@ function render() {
               </span>
               <span class="meta-build-item ${topItem === 'None' ? 'meta-item-none' : ''}" data-tooltip-type="item" data-tooltip-name="${topItem}">
                 ${topItem !== 'None' ? `
-                  <img src="${getItemSpriteUrl(topItem)}" alt="" class="meta-item-icon" onerror="this.style.display='none'">
+                  <img src="${getItemSpriteUrl(topItem)}" alt="" class="meta-item-icon" onerror="handleItemIconError(this, '${(topItem || '').replace(/'/g, "\\'")}')">
                   <span class="meta-item-text">${topItem}</span>
                 ` : `
                   <span class="meta-item-icon-dim">🎒</span>
@@ -1149,7 +1190,7 @@ function openModal(rank) {
             return `
               <div class="breakdown-card-item" data-tooltip-type="item" data-tooltip-name="${i.name}">
                 <div class="breakdown-item-left">
-                  <img src="${iconUrl}" alt="" class="item-icon-mini" onerror="this.style.display='none'">
+                  <img src="${iconUrl}" alt="" class="item-icon-mini" onerror="handleItemIconError(this, '${(i.name || '').replace(/'/g, "\\'")}')">
                   <span class="breakdown-item-name">${i.name}</span>
                 </div>
                 <span class="breakdown-item-usage">${i.usage || ''}</span>

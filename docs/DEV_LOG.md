@@ -2,6 +2,166 @@
 
 This log records major technical decisions, architectural shifts, and important handoff notes for future agent sessions.
 
+### [2026-10-07] Slot Card Layout Alignment & Long Pokémon Name Formatting
+- **Objective**: Fix alignment blowout on Team Builder cards (`teambuilder.html`) where long Pokémon names like `Slowking (Galarian Form)` (and other regional/form variants) expanded the left column track, squeezed the right stats column down to ~80px (completely cutting off the 3rd final stat column `187, 84, 114...`), pushed the vertical dividing line out of sync with other cards, and caused the name to collide with the absolute top-right type badges (`[POISON] [PSYCHIC]`).
+- **Root Cause**:
+  - In [teambuilder.css](file:///Users/HVo/workspace/github-huy/pokechamp/teambuilder.css), `.slot-card-body-2col` used `grid-template-columns: 1.4fr 1fr;` without track min-width limits.
+  - `.slot-left-col` lacked `min-width: 0;` and `overflow: hidden;`, causing CSS Grid min-content blowout on long strings.
+  - The right stats column `.slot-right-col` was set to flexible `1fr` rather than a fixed dedicated width, meaning any expansion on the left subtracted width from the stats. Since the 6 stat rows need ~124px (Stat Label + EV Input + Calculated Final Stat), squishing it to ~80px hid the 3rd stat column.
+  - In [teambuilder.js](file:///Users/HVo/workspace/github-huy/pokechamp/teambuilder.js), long names like `Slowking (Galarian Form)` (24 chars) and `Tauros (Paldean Form (Combat Breed))` (36 chars) were printed raw in a single `1.25rem` heading without form segmentation.
+- **Architectural Solution**:
+  - **Fixed Stable Stats Column**: In [teambuilder.css](file:///Users/HVo/workspace/github-huy/pokechamp/teambuilder.css), updated `.slot-card-body-2col` to `grid-template-columns: minmax(0, 1fr) 130px;` and set `.slot-right-col` to `min-width: 130px; width: 130px; flex-shrink: 0;`. This guarantees that all 6 cards have 100% pixel-identical vertical dividing lines and all 3 stat columns are always visible and aligned.
+  - **Grid Track Safety**: In `.team-grid`, updated track sizing to `repeat(3, minmax(0, 1fr))` across breakpoints to prevent grid track blowout. Added `min-width: 0; overflow: hidden;` to `.slot-left-col`, `.slot-header-block`, and `.slot-header-info`.
+  - **Clean Form Name Formatting**: Added `formatCardPokemonName(fullName)` in [teambuilder.js](file:///Users/HVo/workspace/github-huy/pokechamp/teambuilder.js), which cleanly breaks long form names into base name (`.slot-name-main`, bold white) and form descriptor (`.slot-name-sub`, e.g. `(Galarian)`, `(Paldean Combat)`, `(Wash)` in semi-bold slate `#94a3b8`).
+  - **Responsive Font & Truncation**: `.slot-card-name` styled with flex baseline layout, `max-width: 100%`, and ellipsis safety so base names never clip, form tags gracefully truncate if space is tight, and full database names remain intact in `title="${p.name}"`.
+- **Files Touched**:
+  - [teambuilder.css](file:///Users/HVo/workspace/github-huy/pokechamp/teambuilder.css)
+  - [teambuilder.js](file:///Users/HVo/workspace/github-huy/pokechamp/teambuilder.js)
+  - [docs/ACTIVE_TASKS.md](file:///Users/HVo/workspace/github-huy/pokechamp/docs/ACTIVE_TASKS.md)
+  - [docs/DEV_LOG.md](file:///Users/HVo/workspace/github-huy/pokechamp/docs/DEV_LOG.md)
+
+---
+
+### [2026-10-07] Flagship Model Preference Retention & Peak-Time Auto Fallback
+- **Objective**: Ensure the user can keep their chosen best model (`gemini-3.8-flash` or `gemini-3.6-flash`) for maximum reasoning and tactical depth, while maintaining `gemini-3.1-flash-lite` as an instant seamless fallback during peak-time quota limits (HTTP 429/503).
+- **Root Cause of Fallback Lock**:
+  - `GEMINI_CONFIG.getModel()` had previously forced an auto-migration that rewrote `localStorage` to `gemini-3.1-flash-lite` whenever 3.8/3.6 was selected.
+  - Candidate lists filtered out models containing `3.8` or `3.6`.
+  - The racing mechanism sorted strictly by `durationMs`, so even if `gemini-3.8-flash` succeeded, the lightweight `gemini-3.1-flash-lite` always stole the selection because it responded first.
+- **Architectural Solution**:
+  - **Preference Respect**: `GEMINI_CONFIG.getModel()` now faithfully preserves the user's selected model across sessions, defaulting to `gemini-3.8-flash`.
+  - **Prioritized Model Racing**:
+    - When the preferred model is a flagship (`gemini-3.8-flash` or `3.6-flash`), it races concurrently with `gemini-3.1-flash-lite`.
+    - **Preferred Model Priority**: If the flagship model succeeds, **it always wins**, giving the user the highest quality analysis.
+    - **Zero-Latency Peak Fallback**: If the flagship model hits HTTP 429 or 503 (which Google returns in <400ms), `gemini-3.1-flash-lite` immediately resolves without delay.
+    - **Interactive Chat Recovery**: In `sendCoachFollowUp`, if a follow-up query hits 429/503 on the flagship model, it automatically retries with `gemini-3.1-flash-lite`.
+  - **Settings & Testing Transparency**:
+    - Updated `<select id="select-gemini-model">` in [battle.html](file:///Users/HVo/workspace/github-huy/pokechamp/battle.html) and [teambuilder.html](file:///Users/HVo/workspace/github-huy/pokechamp/teambuilder.html) to show `Gemini 3.8 Flash (Flagship · Highest Reasoning · Best Strategy)`.
+    - Updated "Test Connection" to clearly explain if a key is valid but the flagship is temporarily at quota while fallback is active.
+- **Files Touched**:
+  - [battle.js](file:///Users/HVo/workspace/github-huy/pokechamp/battle.js)
+  - [battle.html](file:///Users/HVo/workspace/github-huy/pokechamp/battle.html)
+  - [teambuilder.js](file:///Users/HVo/workspace/github-huy/pokechamp/teambuilder.js)
+  - [teambuilder.html](file:///Users/HVo/workspace/github-huy/pokechamp/teambuilder.html)
+
+---
+
+### [2026-10-07] Fix ReferenceError in renderBattlePlanResults Masked as Gemini Timeout
+- **Objective**: Fix issue where `⚡ Generate Battle Plan` failed with the toast *"Gemini models timed out / busy: instant fallback to Matchup Engine"* even when `gemini-3.1-flash-lite` returned HTTP 200 in 4.2 seconds.
+- **Root Cause**:
+  - In [battle.js](file:///Users/HVo/workspace/github-huy/pokechamp/battle.js) line 3322 (inside `initBattleTrackerState`), `getTeamHash(ourSlots)` was called to generate the session hash ID. However, `getTeamHash` is not a defined function in `battle.js` (they are stored as module-level global variables `ourHash` and `enemyHash`).
+  - This raised an unhandled `ReferenceError: getTeamHash is not defined` inside `renderBattlePlanResults`.
+  - Because `renderBattlePlanResults` was invoked inside the `try` block of `executeBattlePlanGeneration`, the `ReferenceError` was caught by the catch block, triggering the generic timeout toast: `Gemini models timed out / busy: instant fallback to Matchup Engine.`.
+  - Furthermore, the catch block's fallback attempt also called `renderBattlePlanResults(heuristicPlan, false)`, hitting the exact same `ReferenceError` and failing silently.
+- **Fixes Applied**:
+  - In [battle.js](file:///Users/HVo/workspace/github-huy/pokechamp/battle.js): Replaced `getTeamHash(ourSlots)` with `const currentSessionId = \`${ourHash}_${enemyHash}\`;`.
+  - Decoupled `renderBattlePlanResults` from the API network `try-catch` block so rendering errors are isolated and clearly surfaced.
+  - Enhanced error toast logging to display actual error details (`AI generation issue: ${err.message}`) instead of falsely masking JavaScript errors as API timeouts.
+  - Verified via node simulation that `renderBattlePlanResults` renders cleanly without errors.
+
+---
+
+### [2026-10-07] Universal Item Icon Resolution Engine & Custom Mega Stone Fallback
+- **Objective**: Fix missing/broken icon for Raichunite Y and extend coverage to all 161 competitive held items across Battle, Team Builder, and Pokédex pages.
+- **Root Cause Identified**:
+  - `getItemSpriteUrl()` previously hardcoded URLs to `raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/${slug}.png`.
+  - Mainline PokeAPI only contains official Game Freak Gen 1–9 items; all 39 custom/Regulation M-C Mega Stones (`Raichunite Y`, `Raichunite X`, `Baxcalibrite`, `Garchompite Z`, `Lucarionite Z`, `Greninjite`, `Starminite`, etc.) 404ed on PokeAPI.
+  - Furthermore, `<img>` tags in `battle.js` lacked `onerror` recovery, showing broken image boxes in the UI.
+- **Fixes Applied**:
+  - Created centralized [item-sprites.js](file:///Users/HVo/workspace/github-huy/pokechamp/item-sprites.js) with `CUSTOM_ITEM_ICONS` registry mapping all 39 custom Mega Stones directly to high-res Pokemon Zone asset URLs (`ui_ItemIcon_02_XXXX.webp`).
+  - Added multi-phase `handleItemIconError(img, itemName)` fallback chain:
+    1. Thematic official PokeAPI Mega Stone (e.g. `Raichunite Y` -> `ampharosite`, `Raichunite X` -> `manectite`).
+    2. Showdown itemicons CDN mirror.
+    3. Universal Mega Stone fallback (`charizardite-y.png`).
+    4. Clean graceful hiding (0% chance of broken image placeholder).
+  - Fixed special item slugs (`King's Rock` -> `kings-rock`, `Poison Barb` -> `poison-barb`).
+  - Added missing `Poison Barb` to [items_database.json](file:///Users/HVo/workspace/github-huy/pokechamp/data/items_database.json).
+  - Updated [battle.html](file:///Users/HVo/workspace/github-huy/pokechamp/battle.html), [teambuilder.html](file:///Users/HVo/workspace/github-huy/pokechamp/teambuilder.html), [index.html](file:///Users/HVo/workspace/github-huy/pokechamp/index.html), [battle.js](file:///Users/HVo/workspace/github-huy/pokechamp/battle.js), [teambuilder.js](file:///Users/HVo/workspace/github-huy/pokechamp/teambuilder.js), and [app.js](file:///Users/HVo/workspace/github-huy/pokechamp/app.js).
+
+---
+
+### [2026-10-07] Fix AI Battle Plan & Teammate Analysis Timeouts & Model Quotas
+- **Objective**: Diagnose and resolve why AI Battle Plan analysis and Teammate Coach were timing out or failing across sessions.
+- **Root Cause Identified**:
+  - Live API testing revealed `gemini-3.8-flash` and `gemini-3.6-flash` were returning **HTTP 429: Quota Exceeded**, while `gemini-3.7-flash` returned **503: High demand**.
+  - `fetchGeminiBattlePlanHedging` in [battle.js](file:///Users/HVo/workspace/github-huy/pokechamp/battle.js) had `defaultHierarchy = ['gemini-3.8-flash', 'gemini-3.6-flash', 'gemini-3.1-flash-lite']`. Because Rank 0 (`gemini-3.8-flash`) failed with 429, the promise race condition waited for all requests to settle or the 28s timeout to fire, stalling user requests.
+  - Furthermore, launching concurrent requests to models with exhausted quotas triggered burst rate limits on the entire key.
+  - In contrast, live testing verified **`gemini-3.1-flash-lite` succeeded consistently with status 200 in ~4.2 seconds**.
+- **Fixes Applied**:
+  - **Auto-Migration of Stale 429 Models**: Updated `GEMINI_CONFIG.getModel()` in both [battle.js](file:///Users/HVo/workspace/github-huy/pokechamp/battle.js) and [teambuilder.js](file:///Users/HVo/workspace/github-huy/pokechamp/teambuilder.js) to migrate users away from quota-exhausted models (`3.8`, `3.6`, `3.5`, `3.7`) to `gemini-3.1-flash-lite`.
+  - **Early-Return Race Condition**: Updated `fetchGeminiBattlePlanHedging` to prioritize `gemini-3.1-flash-lite` and resolve immediately upon receiving the first valid parsed plan, dropping generation time from 28s+ down to ~4.2s.
+  - **Timeout Protection**: Added per-request `AbortController` timeouts (18s) to prevent hanging sockets.
+  - **UI Select Options**: Updated `#select-gemini-model` in [battle.html](file:///Users/HVo/workspace/github-huy/pokechamp/battle.html) and [teambuilder.html](file:///Users/HVo/workspace/github-huy/pokechamp/teambuilder.html) to label `gemini-3.1-flash-lite` as the verified high-quota recommended option.
+
+---
+
+### [2026-10-07] Team Builder Action Stack Split & Button Renaming
+- **Objective**: Split the action button stack in the Team Builder Hash Bar into two distinct, structured sets:
+  - **Set 1 (Team Lifecycle & Operations)**: Renamed "Test in Battle" to "Send to Battle" (`#btn-battle-analysis`) and grouped with "Clear" (`#btn-clear-team`).
+  - **Set 2 (Serialization & Sharing Tools)**: "Copy Hash", "Share Link", "Import Hash", and "Showdown".
+- **Files Touched**:
+  - [teambuilder.html](file:///Users/HVo/workspace/github-huy/pokechamp/teambuilder.html)
+  - [teambuilder.css](file:///Users/HVo/workspace/github-huy/pokechamp/teambuilder.css)
+- **Key Decisions**:
+  - Structured into `.hash-action-set.action-set-team` and `.hash-action-set.action-set-share` separated by a sleek vertical divider `.hash-action-divider`.
+  - Prevents erratic single-button wrapping and cleanly decouples team execution/reset actions from sharing and export operations.
+
+---
+
+### [2026-10-07] Fire Type Color Palette Refinement to Blazing Red
+- **Objective**: Transition Fire type badges, move tags, filter pills, and ambient glows from dull orange / orange-juice tones (`#f97316` / `#ee8130`) to an unmistakable, vibrant blazing flame red (`#ea3829`) while keeping Fighting type distinctly differentiated in dark brick red (`#c22e28`).
+- **Files Touched**:
+  - [index.css](file:///Users/HVo/workspace/github-huy/pokechamp/index.css)
+  - [index.html](file:///Users/HVo/workspace/github-huy/pokechamp/index.html)
+  - [teambuilder.html](file:///Users/HVo/workspace/github-huy/pokechamp/teambuilder.html)
+  - [teambuilder.js](file:///Users/HVo/workspace/github-huy/pokechamp/teambuilder.js)
+  - [battle.html](file:///Users/HVo/workspace/github-huy/pokechamp/battle.html)
+  - [battle.js](file:///Users/HVo/workspace/github-huy/pokechamp/battle.js)
+  - [counter.js](file:///Users/HVo/workspace/github-huy/pokechamp/counter.js)
+  - [app.js](file:///Users/HVo/workspace/github-huy/pokechamp/app.js)
+  - [type-tooltip.js](file:///Users/HVo/workspace/github-huy/pokechamp/type-tooltip.js)
+- **Key Decisions**:
+  - Selected `#ea3829` (high-contrast vibrant flame red) across `.type-Fire`, `--pill-color`, `TYPE_COLORS.Fire`, and ambient glows `rgba(234, 56, 41, 0.45)`.
+  - Harmonized Fighting across all JS dictionaries to `#c22e28` (brick martial red) so Fire and Fighting remain easily distinguishable.
+
+---
+
+### [2026-10-07] Live In-Battle Board State Tracker & Contextual AI Coach
+- **Objective**: Implement a live in-battle board state tracker directly integrated with the interactive Input Bar and Live AI Coach in the Battle Plan tab:
+  1. Input / chips to select our 3 Pokémon lined up (from our 6 preview slots).
+  2. Input / controls to select active battlers on the field for both our side and opponent's side, keeping track of revealed opponent Pokémon across the battle session.
+  3. Controls to mark when Pokémon get taken out / fainted on both sides, updating real-time casualties and scoreboard (e.g. 3v3 -> remaining alive).
+  4. Automatically inject the live board state into all follow-up queries sent to the Gemini AI Coach and heuristic engine, and display dynamic context-aware scenario prompt chips.
+- **Files Touched**:
+  - [battle.js](file:///Users/HVo/workspace/github-huy/pokechamp/battle.js)
+  - [battle.css](file:///Users/HVo/workspace/github-huy/pokechamp/battle.css)
+- **Key Decisions**:
+  - **State Architecture**: Created `battleTrackerState` storing `sessionId`, `ourBrought` (up to 3), `ourActive`, `ourFainted`, `enemyBrought` (revealed roster), `enemyActive`, and `enemyFainted`.
+  - **Session Preservation**: State is keyed to `${ourHash}_${enemyHash}` so toggles and fainted casualties are preserved when navigating between tabs.
+  - **DOM Stability**: `updateBattleTrackerDOM()` updates tracker sub-components without destroying or clearing `#coach-messages-thread`, keeping chat history intact across switches and casualty updates.
+  - **Context-Aware Prompts & Model Injection**:
+    - `getBattleStateContextString()` automatically prepends `[LIVE IN-BATTLE BOARD STATE: ...]` to all follow-up user turns pushed to `activeBattleSession.history`.
+    - Message thread displays user messages with an inline duel context badge (e.g., `[Garchomp vs Urshifu-Rapid-Strike]`).
+    - Dynamic quick prompt chips automatically suggest tailored moves and switch-in plays based on who is currently on the field.
+    - Heuristic engine fallback evaluates the active duel from `lastCalculatedMatrix` to provide accurate speed comparisons and STAB/pivot advice offline.
+
+---
+
+### [2026-10-07] AI-Assisted Teammate Recommendations & Replacement Engine
+- **Objective**: Rework the Teammates tab in Team Builder into an AI-assisted and data-driven coach that prioritizes S-Tier & A-Tier meta staples, evaluates offensive type coverage holes, defensive weaknesses (immunities/resistances), and Physical vs Special nature balance, recommends 4 optimal competitive moves, provides strategic justifications, recommends replacements with tactical reasons when the team is full (6/6), and recommends the next slot when the team is incomplete (< 6).
+- **Files Touched**:
+  - [teambuilder.html](file:///Users/HVo/workspace/github-huy/pokechamp/teambuilder.html)
+  - [teambuilder.css](file:///Users/HVo/workspace/github-huy/pokechamp/teambuilder.css)
+  - [teambuilder.js](file:///Users/HVo/workspace/github-huy/pokechamp/teambuilder.js)
+- **Key Decisions**:
+  - **Tier Priority & Balance Scoring**: Candidates are weighted heavily by meta tier (`S` > `A` > `B`) and usage rank. The engine evaluates defensive compounded weaknesses (`criticalWeakTypes`), team offensive coverage gaps (`uncoveredDefenders`), and team Physical vs Special balance (`needsSpecial` / `needsPhysical`), boosting candidates that resolve these bottlenecks.
+  - **Optimal 4-Move Selector**: `pickRecommendedMoves(p, uncoveredDefenders, teamBalance)` picks 4 competitive moves (Primary STAB 1, Secondary STAB 2, Coverage move super-effective into missing defender types, and signature utility/setup/priority/recovery moves).
+  - **Full Team (6/6) Replacement Engine**: `evaluateBestReplacementSlot(p, filledSlots, ...)` dynamically identifies which current team member has the highest role redundancy, shares compounded weaknesses, or represents an upgrade to S-Tier, generates a concise tactical replacement reason, and enables one-click replacement via `.btn-replace-action`.
+  - **Incomplete Team (< 6) Next Slot Guidance**: Displays target slot banner (`➕ Recommended for Slot X`) and allows one-click addition with complete default competitive build and 4 recommended moves via `.btn-add-action`.
+  - **Gemini AI Coach Integration**: Implemented `GEMINI_CONFIG`, `#modal-gemini-key` settings modal, and `consultGeminiTeammateCoach()` using model hedging with fast fallback to heuristic recommendations, keeping `teambuilder.js` 100% functional offline or without an API key.
+
+---
+
 ### [2026-10-07] Remove Presets Strip from Team Builder
 - **Objective**: Remove the presets bar (`PRESETS: [🏆 S-Tier Core] [🌧️ Rain Offense] [🧱 Bulky Balance] [⚡ Hyper Offense] [✕ Clear]`) from the Team Builder header to provide a cleaner layout, and relocate the `✕ Clear` button directly into the `hash-actions` bar.
 - **Files Touched**:

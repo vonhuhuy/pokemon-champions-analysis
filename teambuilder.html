@@ -57,24 +57,33 @@
       </div>
 
       <div class="hash-actions">
-        <a id="btn-battle-analysis" href="battle.html" class="btn-hash-action btn-battle-action" title="Test team against an opponent in Battle">
-          <span>💥</span> Test in Battle
-        </a>
-        <button id="btn-copy-hash" class="btn-hash-action" title="Copy teamhash key">
-          <span>📋</span> Copy Hash
-        </button>
-        <button id="btn-copy-link" class="btn-hash-action btn-primary-action" title="Copy full shareable URL with teamhash">
-          <span>🔗</span> Share Link
-        </button>
-        <button id="btn-import-hash" class="btn-hash-action" title="Import a shareable teamhash">
-          <span>📥</span> Import Hash
-        </button>
-        <button id="btn-export-showdown" class="btn-hash-action" title="Export to Pokémon Showdown format">
-          <span>⚔️</span> Showdown
-        </button>
-        <button id="btn-clear-team" class="btn-hash-action btn-danger-action" title="Clear all team slots">
-          <span>✕</span> Clear
-        </button>
+        <!-- Set 1: Send to Battle & Clearing -->
+        <div class="hash-action-set action-set-team">
+          <a id="btn-battle-analysis" href="battle.html" class="btn-hash-action btn-battle-action" title="Send team to Battle Analysis">
+            <span>💥</span> Send to Battle
+          </a>
+          <button id="btn-clear-team" class="btn-hash-action btn-danger-action" title="Clear all team slots">
+            <span>✕</span> Clear
+          </button>
+        </div>
+
+        <div class="hash-action-divider" aria-hidden="true"></div>
+
+        <!-- Set 2: Hash & Showdown Serialization -->
+        <div class="hash-action-set action-set-share">
+          <button id="btn-copy-hash" class="btn-hash-action" title="Copy teamhash key">
+            <span>📋</span> Copy Hash
+          </button>
+          <button id="btn-copy-link" class="btn-hash-action btn-primary-action" title="Copy full shareable URL with teamhash">
+            <span>🔗</span> Share Link
+          </button>
+          <button id="btn-import-hash" class="btn-hash-action" title="Import a shareable teamhash">
+            <span>📥</span> Import Hash
+          </button>
+          <button id="btn-export-showdown" class="btn-hash-action" title="Export to Pokémon Showdown format">
+            <span>⚔️</span> Showdown
+          </button>
+        </div>
       </div>
     </section>
 
@@ -158,9 +167,21 @@
 
       <!-- Tab 4: Synergistic Teammates -->
       <div class="tab-pane" id="pane-teammates">
-        <div class="pane-header">
-          <div>
+        <div class="pane-header teammate-pane-header">
+          <div class="teammate-pane-left">
             <h3>Teammate Synergy</h3>
+            <div class="teammate-ai-status-pill" id="teammate-status-badge" title="Click to configure Gemini AI Key">
+              <span class="status-indicator-dot dot-offline"></span>
+              <span id="teammate-status-text">Heuristic Coach</span>
+            </div>
+          </div>
+          <div class="teammate-pane-controls">
+            <button class="btn-tb-pill" id="btn-teammate-open-key" title="Configure Gemini API Key" style="display:none;">
+              🔑 Connect AI Key
+            </button>
+            <button class="btn-tb-pill btn-ai-trigger" id="btn-teammate-ask-ai">
+              ⚡ Ask AI Coach
+            </button>
           </div>
         </div>
         <div class="teammates-recommend-grid" id="teammates-recommend-grid">
@@ -218,12 +239,12 @@
           <div class="picker-type-pills">
             <button class="type-pill-btn active" data-type="ALL">ALL</button>
             <button class="type-pill-btn" data-type="Normal" style="--pill-color: #94a3b8;">NORMAL</button>
-            <button class="type-pill-btn" data-type="Fire" style="--pill-color: #f97316;">FIRE</button>
+            <button class="type-pill-btn" data-type="Fire" style="--pill-color: #ea3829;">FIRE</button>
             <button class="type-pill-btn" data-type="Water" style="--pill-color: #38bdf8;">WATER</button>
             <button class="type-pill-btn" data-type="Electric" style="--pill-color: #eab308;">ELECTRIC</button>
             <button class="type-pill-btn" data-type="Grass" style="--pill-color: #22c55e;">GRASS</button>
             <button class="type-pill-btn" data-type="Ice" style="--pill-color: #06b6d4;">ICE</button>
-            <button class="type-pill-btn" data-type="Fighting" style="--pill-color: #ef4444;">FIGHTING</button>
+            <button class="type-pill-btn" data-type="Fighting" style="--pill-color: #c22e28;">FIGHTING</button>
             <button class="type-pill-btn" data-type="Poison" style="--pill-color: #a855f7;">POISON</button>
             <button class="type-pill-btn" data-type="Ground" style="--pill-color: #d97706;">GROUND</button>
             <button class="type-pill-btn" data-type="Flying" style="--pill-color: #818cf8;">FLYING</button>
@@ -246,12 +267,12 @@
           <div class="picker-resistance-pills">
             <button class="res-pill-btn active" data-res="ALL">ALL</button>
             <button class="res-pill-btn" data-res="Normal" style="--pill-color: #94a3b8;">NORMAL</button>
-            <button class="res-pill-btn" data-res="Fire" style="--pill-color: #f97316;">FIRE</button>
+            <button class="res-pill-btn" data-res="Fire" style="--pill-color: #ea3829;">FIRE</button>
             <button class="res-pill-btn" data-res="Water" style="--pill-color: #38bdf8;">WATER</button>
             <button class="res-pill-btn" data-res="Electric" style="--pill-color: #eab308;">ELECTRIC</button>
             <button class="res-pill-btn" data-res="Grass" style="--pill-color: #22c55e;">GRASS</button>
             <button class="res-pill-btn" data-res="Ice" style="--pill-color: #06b6d4;">ICE</button>
-            <button class="res-pill-btn" data-res="Fighting" style="--pill-color: #ef4444;">FIGHTING</button>
+            <button class="res-pill-btn" data-res="Fighting" style="--pill-color: #c22e28;">FIGHTING</button>
             <button class="res-pill-btn" data-res="Poison" style="--pill-color: #a855f7;">POISON</button>
             <button class="res-pill-btn" data-res="Ground" style="--pill-color: #d97706;">GROUND</button>
             <button class="res-pill-btn" data-res="Flying" style="--pill-color: #818cf8;">FLYING</button>
@@ -338,11 +359,71 @@
     <!-- Populated dynamically -->
   </div>
 
+  <!-- Gemini AI Settings Modal -->
+  <div class="modal-overlay" id="modal-gemini-key">
+    <div class="modal-card modal-key-card">
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <span class="modal-icon">🤖</span>
+          <div class="modal-title-text-group">
+            <h3>Gemini AI Coach Settings</h3>
+          </div>
+        </div>
+        <button class="modal-close-btn" id="btn-close-gemini-modal">✕</button>
+      </div>
+
+      <div class="modal-body-content key-modal-body">
+        <div class="key-security-note">
+          <span class="sec-icon">🔒</span>
+          <div>
+            <strong>Client-Side & Zero-Logging:</strong>
+            <span>Key stored in browser <code>localStorage</code> only. Sent directly to Google's API.</span>
+          </div>
+        </div>
+
+        <div class="key-form-group">
+          <label for="input-gemini-key">Google Gemini API Key</label>
+          <div class="key-input-wrapper">
+            <input type="password" id="input-gemini-key" class="dialog-input" placeholder="AIzaSy..." autocomplete="off" spellcheck="false">
+            <button type="button" class="btn-toggle-key-visibility" id="btn-toggle-key-eye" title="Toggle visibility">👁️</button>
+          </div>
+        </div>
+
+        <div class="key-form-group">
+          <label for="select-gemini-model">Gemini Model</label>
+          <select id="select-gemini-model" class="key-model-select">
+            <option value="gemini-3.8-flash" selected>Gemini 3.8 Flash (Flagship · Highest Reasoning · Best Strategy)</option>
+            <option value="gemini-3.6-flash">Gemini 3.6 Flash (High Performance · Deep Tactical)</option>
+            <option value="gemini-3.1-flash-lite">Gemini 3.1 Flash-Lite (Fastest · High Availability Fallback)</option>
+          </select>
+        </div>
+
+        <div class="key-help-box">
+          <div class="help-title">💡 How to get your API key from Google:</div>
+          <ol class="help-steps">
+            <li>Open <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer" class="help-link">Google AI Studio (aistudio.google.com) ↗</a>.</li>
+            <li>Sign in with your Google Account and click <strong>"Create API key"</strong>.</li>
+            <li>Copy the generated key and paste it above. (Free tier available).</li>
+          </ol>
+        </div>
+
+        <div class="key-test-feedback" id="key-test-feedback" style="display:none;"></div>
+      </div>
+
+      <div class="editor-modal-footer">
+        <button class="btn-tb-pill btn-danger-action" id="btn-clear-gemini-key">Remove Key</button>
+        <button class="btn-tb-pill" id="btn-test-gemini-key">🧪 Test Connection</button>
+        <button class="btn-confirm" id="btn-save-gemini-key">Save & Connect</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Toast Notification -->
   <div id="toast" class="toast"></div>
 
   <!-- Scripts -->
   <script src="proto/team_serializer.js?v=3.0"></script>
+  <script src="item-sprites.js?v=1.0"></script>
   <script src="teambuilder.js?v=3.8"></script>
   <script src="type-tooltip.js?v=3.0"></script>
 </body>

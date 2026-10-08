@@ -677,6 +677,12 @@
     "description": "A held item that allows Pinsir to Mega Evolve.",
     "icon_url": "https://assets.pokemon-zone.com/champions-assets/uicontents/scriptableobject/mdicon02/ui_ItemIcon_02_0671.webp"
   },
+  "Poison Barb": {
+    "name": "Poison Barb",
+    "desc": "Boosts the power of Poison-type moves by 20%.",
+    "description": "Boosts the power of Poison-type moves by 20%.",
+    "icon_url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/poison-barb.png"
+  },
   "Psychic Seed": {
     "name": "Psychic Seed",
     "desc": "Boosts the holder’s Sp. Def stat by 1 stage on Psychic\nTerrain. Disappears for the duration of the battle after a\nsingle use.",

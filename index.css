@@ -709,7 +709,7 @@ body {
 .frame-Ghost    { --type-glow: rgba(115, 87, 151, 0.45); }
 .frame-Grass    { --type-glow: rgba(122, 199, 76, 0.45); }
 .frame-Dark     { --type-glow: rgba(112, 87, 70, 0.45); }
-.frame-Fire     { --type-glow: rgba(238, 129, 48, 0.45); }
+.frame-Fire     { --type-glow: rgba(234, 56, 41, 0.45); }
 .frame-Electric { --type-glow: rgba(247, 208, 44, 0.45); }
 .frame-Rock     { --type-glow: rgba(182, 161, 54, 0.45); }
 .frame-Poison   { --type-glow: rgba(163, 62, 161, 0.45); }
@@ -728,7 +728,7 @@ body {
 .type-Ghost    { background: #735797; }
 .type-Grass    { background: #7ac74c; color: #111; }
 .type-Dark     { background: #705746; }
-.type-Fire     { background: #ee8130; }
+.type-Fire     { background: #ea3829; }
 .type-Electric { background: #f7d02c; color: #111; }
 .type-Rock     { background: #b6a136; }
 .type-Poison   { background: #a33ea1; }

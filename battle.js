@@ -20,12 +20,12 @@ const ALL_TYPES = [
 
 const TYPE_COLORS = {
   Normal: '#9ca3af',
-  Fire: '#f97316',
+  Fire: '#ea3829',
   Water: '#38bdf8',
   Grass: '#22c55e',
   Electric: '#eab308',
   Ice: '#06b6d4',
-  Fighting: '#ef4444',
+  Fighting: '#c22e28',
   Poison: '#a855f7',
   Ground: '#d97706',
   Flying: '#818cf8',
@@ -122,6 +122,7 @@ const STATUS_MOVE_NAMES = new Set([
 let pokemonDB = [];
 let movesDB = {};
 let megaDB = {};
+let itemsDB = {};
 
 let ourSlots = [null, null, null, null, null, null];
 let ourHash = '0000000000000000';
@@ -151,14 +152,16 @@ if (document.readyState === 'loading') {
 // Load Databases
 async function loadDatabases() {
   try {
-    const [resPoke, resMoves, resMega] = await Promise.all([
+    const [resPoke, resMoves, resMega, resItems] = await Promise.all([
       fetch('data/pokemon_singles_db.json'),
       fetch('data/moves_database.json').catch(() => null),
-      fetch('data/mega_database.json').catch(() => null)
+      fetch('data/mega_database.json').catch(() => null),
+      fetch('data/items_database.json').catch(() => null)
     ]);
     pokemonDB = await resPoke.json();
     if (resMoves) movesDB = await resMoves.json();
     if (resMega) megaDB = await resMega.json();
+    if (resItems) itemsDB = await resItems.json();
   } catch (err) {
     console.error('Failed to load databases:', err);
   }
@@ -390,11 +393,52 @@ function getSpriteUrl(name) {
 }
 
 function getItemSpriteUrl(itemName) {
+  if (typeof window !== 'undefined' && window.getItemSpriteUrl && window.getItemSpriteUrl !== getItemSpriteUrl) {
+    return window.getItemSpriteUrl(itemName);
+  }
   if (!itemName || itemName === 'No Item' || itemName === 'None' || itemName === 'N/A') return '';
-  const slug = itemName.toLowerCase().trim()
+  const clean = itemName.trim().replace('’', "'");
+  if (typeof CUSTOM_ITEM_ICONS !== 'undefined' && CUSTOM_ITEM_ICONS[clean]) {
+    return CUSTOM_ITEM_ICONS[clean].zoneUrl;
+  }
+  if (clean === "King's Rock") {
+    return 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/kings-rock.png';
+  }
+  const slug = clean.toLowerCase()
     .replace(/\s+z$/i, '')
     .replace(/[^a-z0-9]+/g, '-');
   return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/${slug}.png`;
+}
+
+function handleItemIconError(img, itemName) {
+  if (typeof window !== 'undefined' && window.handleItemIconError && window.handleItemIconError !== handleItemIconError) {
+    return window.handleItemIconError(img, itemName);
+  }
+  if (!img || !itemName) return;
+  const clean = (itemName || '').trim().replace('’', "'");
+  const step = parseInt(img.dataset.fallbackStep || '0', 10);
+  img.dataset.fallbackStep = String(step + 1);
+
+  if (step === 0) {
+    if (typeof CUSTOM_ITEM_ICONS !== 'undefined' && CUSTOM_ITEM_ICONS[clean] && CUSTOM_ITEM_ICONS[clean].fallback) {
+      img.src = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/${CUSTOM_ITEM_ICONS[clean].fallback}.png`;
+      return;
+    }
+    const sdSlug = clean.toLowerCase().replace(/[^a-z0-9]+/g, '');
+    img.src = `https://play.pokemonshowdown.com/sprites/itemicons/${sdSlug}.png`;
+    return;
+  }
+
+  if (step === 1) {
+    const isMega = clean.endsWith('ite') || clean.endsWith('ite X') || clean.endsWith('ite Y') || clean.endsWith('ite Z') || clean.endsWith('inite');
+    if (isMega) {
+      img.src = 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/charizardite-y.png';
+      return;
+    }
+  }
+
+  img.onerror = null;
+  img.style.display = 'none';
 }
 
 // Level 50 Stat Calculation
@@ -1297,7 +1341,7 @@ function renderPokemonCard(build, slotIdx, isEnemy) {
 
       <div class="slot-build-details">
         <div class="slot-build-item ${isEnemy ? 'interactive' : ''}" ${isEnemy ? `onclick="event.stopPropagation(); openEnemyEditor(${slotIdx}, 'items')"` : ''} title="Held Item: ${build.item}${isEnemy ? ' (Click to change)' : ''}">
-          ${itemIcon ? `<img src="${itemIcon}" class="slot-item-icon" alt="">` : '🎒'}
+          ${itemIcon ? `<img src="${itemIcon}" class="slot-item-icon" alt="" onerror="handleItemIconError(this, '${(build.item || '').replace(/'/g, "\\'")}')">` : '🎒'}
           <span>${build.item}</span>
         </div>
         <div class="slot-build-item ${isEnemy ? 'interactive' : ''}" ${isEnemy ? `onclick="event.stopPropagation(); openEnemyEditor(${slotIdx}, 'abilities')"` : ''} title="Ability: ${build.ability}${isEnemy ? ' (Click to change)' : ''}">
@@ -2242,16 +2286,7 @@ const GEMINI_CONFIG = {
   getKey: () => localStorage.getItem('pokechamp_gemini_key') || '',
   setKey: (key) => localStorage.setItem('pokechamp_gemini_key', key.trim()),
   clearKey: () => localStorage.removeItem('pokechamp_gemini_key'),
-  getModel: () => {
-    const m = localStorage.getItem('pokechamp_gemini_model');
-    // If user previously selected 3.8-flash (which is suffering severe Google 503 outages/hangs),
-    // automatically migrate them to the fastest reliable model: gemini-3.1-flash-lite
-    if (m === 'gemini-3.8-flash') {
-      localStorage.setItem('pokechamp_gemini_model', 'gemini-3.1-flash-lite');
-      return 'gemini-3.1-flash-lite';
-    }
-    return m || 'gemini-3.1-flash-lite';
-  },
+  getModel: () => localStorage.getItem('pokechamp_gemini_model') || 'gemini-3.8-flash',
   setModel: (m) => localStorage.setItem('pokechamp_gemini_model', m)
 };
 
@@ -2363,9 +2398,10 @@ async function executeBattlePlanGeneration() {
     if (stageTitle) stageTitle.textContent = 'Hedging Models for Rapid Selection (Under 30s)...';
     if (stageDesc) stageDesc.textContent = 'Racing flagship & fast models in parallel — picking the highest successful model';
 
+    let raceResult = null;
     try {
       const promptText = buildBattlePlanPrompt(ourSlots, enemySlots, lastCalculatedMatrix);
-      const raceResult = await fetchGeminiBattlePlanHedging(apiKey, model, promptText, (statusNote) => {
+      raceResult = await fetchGeminiBattlePlanHedging(apiKey, model, promptText, (statusNote) => {
         if (stageDesc && statusNote) stageDesc.textContent = statusNote;
       });
 
@@ -2386,13 +2422,15 @@ async function executeBattlePlanGeneration() {
         modelUsed: raceResult.model,
         durationMs: raceResult.durationMs
       };
+    } catch (err) {
+      console.warn('Gemini battle plan generation failed, falling back to Matchup Engine:', err);
+      showToast(`AI generation issue: ${err.message}. Fallback to Matchup Engine.`);
+    }
 
+    if (raceResult && battlePlanCache[cacheKey]?.plan) {
       renderBattlePlanResults(raceResult.plan, true, raceResult.model, raceResult.durationMs);
       showToast(`Battle Plan synthesized via ${raceResult.model} in ${(raceResult.durationMs / 1000).toFixed(1)}s!`);
       return;
-    } catch (err) {
-      console.warn('Gemini parallel race failed, falling back to Heuristic Engine:', err);
-      showToast('Gemini models timed out / busy: instant fallback to Matchup Engine.');
     }
   }
 
@@ -2579,110 +2617,206 @@ Respond with STRICT JSON matching:
 // Active conversational session for live in-battle follow-up coaching
 let activeBattleSession = null;
 
-async function fetchGeminiBattlePlanHedging(apiKey, preferredModel, promptText, onProgress) {
-  // Model hierarchy:
-  // Rank 0 (Top): Flagship (gemini-3.8-flash) or user's preferred
-  // Rank 1 (Mid): Deep tactical (gemini-3.6-flash)
-  // Rank 2 (Fast anchor): gemini-3.1-flash-lite
-  const defaultHierarchy = ['gemini-3.8-flash', 'gemini-3.6-flash', 'gemini-3.1-flash-lite'];
-  const candidates = preferredModel && preferredModel !== 'gemini-3.8-flash'
-    ? [preferredModel, 'gemini-3.8-flash', 'gemini-3.6-flash', 'gemini-3.1-flash-lite']
-    : defaultHierarchy;
+// Live in-battle state tracking across the battle session
+let battleTrackerState = {
+  sessionId: '',
+  ourBrought: [],
+  ourActive: '',
+  ourFainted: [],
+  enemyBrought: [],
+  enemyActive: '',
+  enemyFainted: []
+};
 
-  const modelsToRace = [...new Set(candidates.filter(Boolean))];
-  const maxBudgetMs = 28000; // Guaranteed completion under 30s
+
+async function callGeminiBattlePlanModel(apiKey, model, promptText, signal) {
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent?key=${encodeURIComponent(apiKey)}`;
+  const resp = await fetch(url, {
+    method: 'POST',
+    signal,
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      contents: [{ parts: [{ text: promptText }] }],
+      systemInstruction: {
+        parts: [{
+          text: "You are an elite competitive Pokémon Singles coach for Regulation M-C (3v3 Bring 6 Pick 3). Respond ONLY in valid, strictly formatted JSON matching the specified schema. Keep all tactical reasoning concise, sharp, and direct."
+        }]
+      },
+      generationConfig: {
+        responseMimeType: "application/json",
+        temperature: 0.2,
+        thinkingConfig: { thinkingBudget: 0 }
+      }
+    })
+  });
+
+  if (!resp.ok) {
+    const errJson = await resp.json().catch(() => ({}));
+    const status = resp.status;
+    const msg = errJson.error?.message || `HTTP ${status}`;
+    const err = new Error(msg);
+    err.status = status;
+    throw err;
+  }
+
+  const data = await resp.json();
+  const rawText = data.candidates?.[0]?.content?.parts?.[0]?.text;
+  if (!rawText) throw new Error('Empty response');
+
+  const cleanJson = rawText.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+  const plan = JSON.parse(cleanJson);
+  return { plan, rawText: cleanJson };
+}
+
+async function fetchGeminiBattlePlanHedging(apiKey, preferredModel, promptText, onProgress) {
+  const fallbackModel = 'gemini-3.1-flash-lite';
+  const targetPreferred = preferredModel || 'gemini-3.8-flash';
+  const isPreferredFallback = targetPreferred === fallbackModel;
   const t0 = Date.now();
 
-  const abortController = new AbortController();
-  const successfulResults = [];
-
-  if (onProgress) {
-    onProgress(`Racing models [${modelsToRace.join(', ')}] in parallel (max 28s budget)...`);
-  }
-
-  const racePromises = modelsToRace.map(async (model, rank) => {
+  // If user explicitly configured 3.1-flash-lite, make a direct request
+  if (isPreferredFallback) {
+    if (onProgress) onProgress(`Synthesizing Battle Plan via ${fallbackModel}...`);
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), 18000);
     try {
-      const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent?key=${encodeURIComponent(apiKey)}`;
-      const resp = await fetch(url, {
-        method: 'POST',
-        signal: abortController.signal,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: promptText }] }],
-          systemInstruction: {
-            parts: [{
-              text: "You are an elite competitive Pokémon Singles coach for Regulation M-C (3v3 Bring 6 Pick 3). Respond ONLY in valid, strictly formatted JSON matching the specified schema. Keep all tactical reasoning concise, sharp, and direct."
-            }]
-          },
-          generationConfig: {
-            responseMimeType: "application/json",
-            temperature: 0.2,
-            thinkingConfig: { thinkingBudget: 0 }
-          }
-        })
-      });
-
-      if (!resp.ok) {
-        const errJson = await resp.json().catch(() => ({}));
-        throw new Error(errJson.error?.message || `HTTP ${resp.status}`);
-      }
-
-      const data = await resp.json();
-      const rawText = data.candidates?.[0]?.content?.parts?.[0]?.text;
-      if (!rawText) throw new Error('Empty response');
-
-      const cleanJson = rawText.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
-      const plan = JSON.parse(cleanJson);
+      const res = await callGeminiBattlePlanModel(apiKey, fallbackModel, promptText, ctrl.signal);
+      clearTimeout(timer);
       const durationMs = Date.now() - t0;
-
-      const result = { model, rank, plan, rawText: cleanJson, durationMs };
-      successfulResults.push(result);
-      console.log(`[PokeChamp Race] Model ${model} finished in ${(durationMs / 1000).toFixed(1)}s (Rank ${rank})`);
-
-      if (onProgress) {
-        onProgress(`Model ${model} completed in ${(durationMs / 1000).toFixed(1)}s!`);
-      }
-      return result;
-    } catch (err) {
-      console.warn(`[PokeChamp Race] Model ${model} failed:`, err.message);
-      return null;
+      return { model: fallbackModel, plan: res.plan, rawText: res.rawText, durationMs, isFallback: false };
+    } finally {
+      clearTimeout(timer);
     }
-  });
-
-  // Racing completion condition:
-  // 1. Wait until all race promises settle, OR
-  // 2. Rank 0 (highest tier model) finishes, OR
-  // 3. 28-second hard budget timeout.
-  await new Promise((resolve) => {
-    let settled = 0;
-    const timeoutId = setTimeout(() => resolve(), maxBudgetMs);
-
-    racePromises.forEach(p => {
-      p.then(res => {
-        settled++;
-        if (res && res.rank === 0) {
-          clearTimeout(timeoutId);
-          resolve();
-        } else if (settled >= racePromises.length) {
-          clearTimeout(timeoutId);
-          resolve();
-        }
-      });
-    });
-  });
-
-  // Abort any lingering requests
-  abortController.abort();
-
-  if (successfulResults.length === 0) {
-    throw new Error('All raced Gemini models failed or timed out within 28 seconds.');
   }
 
-  // Pick highest-ranked successful model (lowest rank number = highest capability)
-  successfulResults.sort((a, b) => a.rank - b.rank);
-  const winner = successfulResults[0];
-  console.log(`[PokeChamp Race Winner] Picked ${winner.model} (Rank ${winner.rank}) in ${(winner.durationMs / 1000).toFixed(1)}s`);
-  return winner;
+  // User selected a best model (e.g. gemini-3.8-flash or gemini-3.6-flash).
+  // Race preferred best model with fallbackModel (gemini-3.1-flash-lite) in parallel:
+  // - PREFERRED MODEL ALWAYS WINS if it succeeds!
+  // - If preferred model fails (429 Quota Exceeded / 503 Busy) or times out (>16s), fallbackModel wins seamlessly.
+  if (onProgress) {
+    onProgress(`Consulting ${targetPreferred} (flagship quality) with ${fallbackModel} peak fallback...`);
+  }
+
+  return new Promise((resolve, reject) => {
+    let resolved = false;
+
+    let preferredResult = null;
+    let preferredError = null;
+    let preferredFinished = false;
+
+    let fallbackResult = null;
+    let fallbackError = null;
+    let fallbackFinished = false;
+
+    const prefCtrl = new AbortController();
+    const fallCtrl = new AbortController();
+
+    // 16s grace period: if fallback succeeded but preferred is still generating, fall back smoothly
+    const maxGraceTimer = setTimeout(() => {
+      if (!resolved && fallbackResult) {
+        resolved = true;
+        prefCtrl.abort();
+        console.log(`[PokeChamp] Preferred model (${targetPreferred}) took >16s. Resolving with fallback ${fallbackModel}.`);
+        resolve(fallbackResult);
+      }
+    }, 16000);
+
+    const overallTimeout = setTimeout(() => {
+      if (!resolved) {
+        resolved = true;
+        prefCtrl.abort();
+        fallCtrl.abort();
+        if (preferredResult) resolve(preferredResult);
+        else if (fallbackResult) resolve(fallbackResult);
+        else reject(preferredError || fallbackError || new Error('Request timed out'));
+      }
+    }, 28000);
+
+    function evaluateState() {
+      if (resolved) return;
+
+      // 1. If preferred model succeeded -> IT WINS IMMEDIATELY! (Highest quality)
+      if (preferredResult) {
+        resolved = true;
+        clearTimeout(maxGraceTimer);
+        clearTimeout(overallTimeout);
+        fallCtrl.abort();
+        console.log(`[PokeChamp] Preferred model ${targetPreferred} succeeded in ${((Date.now() - t0) / 1000).toFixed(1)}s!`);
+        resolve(preferredResult);
+        return;
+      }
+
+      // 2. If preferred model failed (e.g. 429 quota, 503 peak traffic)
+      if (preferredFinished && preferredError) {
+        if (fallbackResult) {
+          resolved = true;
+          clearTimeout(maxGraceTimer);
+          clearTimeout(overallTimeout);
+          console.log(`[PokeChamp] Preferred model ${targetPreferred} failed (${preferredError.message}). Instant fallback to ${fallbackModel} succeeded!`);
+          resolve(fallbackResult);
+          return;
+        } else if (fallbackFinished && fallbackError) {
+          resolved = true;
+          clearTimeout(maxGraceTimer);
+          clearTimeout(overallTimeout);
+          reject(new Error(`Preferred model error (${preferredError.message}), fallback error (${fallbackError.message})`));
+          return;
+        }
+      }
+
+      // 3. If both failed
+      if (fallbackFinished && fallbackError && preferredFinished && preferredError) {
+        resolved = true;
+        clearTimeout(maxGraceTimer);
+        clearTimeout(overallTimeout);
+        reject(preferredError);
+        return;
+      }
+    }
+
+    // Launch Preferred Model
+    callGeminiBattlePlanModel(apiKey, targetPreferred, promptText, prefCtrl.signal)
+      .then(res => {
+        preferredResult = {
+          model: targetPreferred,
+          plan: res.plan,
+          rawText: res.rawText,
+          durationMs: Date.now() - t0,
+          isFallback: false
+        };
+        preferredFinished = true;
+        evaluateState();
+      })
+      .catch(err => {
+        preferredError = err;
+        preferredFinished = true;
+        console.warn(`[PokeChamp] Preferred model ${targetPreferred} failed:`, err.message);
+        if (onProgress && !fallbackFinished) {
+          onProgress(`${targetPreferred} busy (${err.message}). Using peak fallback (${fallbackModel})...`);
+        }
+        evaluateState();
+      });
+
+    // Launch Fallback Model in parallel
+    callGeminiBattlePlanModel(apiKey, fallbackModel, promptText, fallCtrl.signal)
+      .then(res => {
+        fallbackResult = {
+          model: fallbackModel,
+          plan: res.plan,
+          rawText: res.rawText,
+          durationMs: Date.now() - t0,
+          isFallback: true
+        };
+        fallbackFinished = true;
+        evaluateState();
+      })
+      .catch(err => {
+        fallbackError = err;
+        fallbackFinished = true;
+        console.warn(`[PokeChamp] Fallback model ${fallbackModel} failed:`, err.message);
+        evaluateState();
+      });
+  });
 }
 
 function generateHeuristicBattlePlan(ourSlots, enemySlots, matrix) {
@@ -3308,6 +3442,32 @@ function renderBattlePlanResults(plan, isGemini, modelUsed, durationMs) {
     return b.bestScore - a.bestScore;
   });
 
+  // Initialize or maintain live battle board tracker state across session
+  const currentSessionId = `${ourHash}_${enemyHash}`;
+
+  if (!battleTrackerState || battleTrackerState.sessionId !== currentSessionId) {
+    const recommended3 = (coreList || []).map(c => c.name);
+    const availableOur = filledOur.map(s => s.pokemon.name);
+    let defaultOurBrought = recommended3.filter(name => availableOur.includes(name));
+    for (const name of availableOur) {
+      if (defaultOurBrought.length >= 3) break;
+      if (!defaultOurBrought.includes(name)) defaultOurBrought.push(name);
+    }
+    const defaultOurActive = (primaryLead?.name && defaultOurBrought.includes(primaryLead.name))
+      ? primaryLead.name
+      : (defaultOurBrought[0] || '');
+
+    battleTrackerState = {
+      sessionId: currentSessionId,
+      ourBrought: defaultOurBrought,
+      ourActive: defaultOurActive,
+      ourFainted: [],
+      enemyBrought: [],
+      enemyActive: '',
+      enemyFainted: []
+    };
+  }
+
   resultsEl.innerHTML = `
     <!-- SECTION 1: 3v3 LINEUP -->
     <div class="tactics-section-block">
@@ -3556,43 +3716,88 @@ function renderBattlePlanResults(plan, isGemini, modelUsed, durationMs) {
       </div>
     </div>
 
-    <!-- SECTION 4: LIVE IN-BATTLE COACH (SAME-SESSION CONTINUITY & FOLLOW-UP) -->
+    <!-- SECTION 4: LIVE IN-BATTLE COACH & REAL-TIME BOARD STATE TRACKER -->
     <div class="tactics-section-block in-battle-coach-block" id="in-battle-coach-section">
       <div class="tactics-section-title">
-        <span>💬 Live In-Battle Coach</span>
+        <span>💬 Live In-Battle Coach & Board State</span>
         <span class="sec-badge session-badge">${isGemini && activeBattleSession ? `Active Session · ${(modelUsed || activeBattleSession.model || 'Gemini').replace('gemini-', 'Gemini ')}` : 'Deterministic Matchup Engine'}</span>
       </div>
 
       <div class="coach-container-box">
         <p class="coach-intro-text">
-          Keep this session active during your battle. Ask real-time tactical adjustments, pivot routes, or Terastallization counters.
+          Track your live 3v3 board state in real time. Select your 3 brought Pokémon, mark active battlers on the field, and track fainted casualties to receive laser-focused tactical advice.
         </p>
+
+        <!-- LIVE IN-BATTLE STATE TRACKER -->
+        <div class="battle-tracker-card" id="battle-tracker-card">
+          <div class="tracker-top-bar">
+            <div class="tracker-top-info">
+              <span class="tracker-card-label">🎮 Live In-Battle Tracker</span>
+              <div class="tracker-matchup-pill" id="tracker-matchup-pill">
+                ${getTrackerMatchupPillHTML()}
+              </div>
+            </div>
+            <div class="tracker-top-actions">
+              <div class="tracker-scoreboard" id="tracker-scoreboard">
+                ${getTrackerScoreboardHTML()}
+              </div>
+              <button type="button" class="btn-tracker-reset" id="btn-tracker-reset" title="Reset current match casualty & field state">🔄 Reset Match</button>
+            </div>
+          </div>
+
+          <!-- Lineup Selector: Pick Our 3 to bring -->
+          <div class="tracker-lineup-selector">
+            <div class="tracker-selector-label-row">
+              <span class="selector-title">📋 Pick Our 3 Lineup:</span>
+              <span class="selector-counter" id="tracker-lineup-counter">${battleTrackerState ? battleTrackerState.ourBrought.length : 3} / 3 Selected</span>
+            </div>
+            <div class="tracker-roster-chips" id="tracker-our-selection-chips">
+              ${getTrackerOurSelectionChipsHTML()}
+            </div>
+          </div>
+
+          <!-- Dual Field & Battlers Grid -->
+          <div class="tracker-columns-grid">
+            <!-- Our Side (3 brought) -->
+            <div class="tracker-side-panel our-side">
+              <div class="tracker-panel-header">
+                <span class="panel-header-title">🛡️ Our Lineup</span>
+                <span class="panel-header-sub" id="tracker-our-alive-sub">${getOurAliveSubHTML()}</span>
+              </div>
+              <div class="tracker-battlers-list" id="tracker-our-battlers-list">
+                ${getTrackerOurBattlersListHTML()}
+              </div>
+            </div>
+
+            <!-- Enemy Side (6 preview roster, active field & revealed tracking) -->
+            <div class="tracker-side-panel enemy-side">
+              <div class="tracker-panel-header">
+                <span class="panel-header-title">⚔️ Opponent's Roster</span>
+                <span class="panel-header-sub" id="tracker-enemy-alive-sub">${getEnemyAliveSubHTML()}</span>
+              </div>
+              <div class="tracker-battlers-list" id="tracker-enemy-battlers-list">
+                ${getTrackerEnemyBattlersListHTML()}
+              </div>
+            </div>
+          </div>
+        </div>
 
         <!-- Quick Scenario Chips -->
         <div class="coach-quick-chips-wrap">
-          <span class="coach-chips-title">⚡ Quick Prompts:</span>
-          <div class="coach-chips-list">
-            <button type="button" class="coach-scenario-chip" data-prompt="Opponent opened with their primary lead. Give me the exact turn 1 to turn 3 sequencing roadmap.">⚡ Turn 1-3 Sequencing</button>
-            <button type="button" class="coach-scenario-chip" data-prompt="Opponent Terastallized defensively. How should I adjust my offensive targets and switch pivots?">🔮 Enemy Terastallized</button>
-            <button type="button" class="coach-scenario-chip" data-prompt="Opponent set up Stealth Rock or Spikes early. What is my hazard recovery play?">🛡️ Hazard Management</button>
-            <button type="button" class="coach-scenario-chip" data-prompt="Give me specific switch-in safe paths against their strongest physical and special wallbreakers.">🔄 Safe Switch Paths</button>
+          <span class="coach-chips-title">⚡ Tactical Quick Prompts:</span>
+          <div class="coach-chips-list" id="coach-quick-chips-list">
+            ${getDynamicQuickChipsHTML()}
           </div>
         </div>
 
         <!-- Coaching Thread Messages -->
         <div class="coach-messages-thread" id="coach-messages-thread">
-          <div class="coach-msg coach-msg-assistant initial-welcome">
-            <div class="coach-avatar">🧠</div>
-            <div class="coach-bubble">
-              <span class="coach-sender-tag">AI Coach (${(modelUsed || activeBattleSession?.model || 'Gemini').replace('gemini-', 'Gemini ')}):</span>
-              <p>Matchup analyzed! Your 3-man core and leads are locked. What scenario are you facing right now?</p>
-            </div>
-          </div>
+          ${getInitialCoachMessagesHTML(modelUsed)}
         </div>
 
         <!-- Interactive Question Input Bar -->
         <div class="coach-input-toolbar">
-          <input type="text" id="coach-followup-input" class="coach-input-field" placeholder="Ask AI Coach (e.g. 'Opponent led Urshifu turn 1, what move should I make?')..." autocomplete="off">
+          <input type="text" id="coach-followup-input" class="coach-input-field" placeholder="Ask AI Coach with live board context (e.g. 'What move should I click right now?')..." autocomplete="off">
           <button type="button" id="btn-coach-send-followup" class="btn-coach-send">
             <span>Ask Coach</span> ➔
           </button>
@@ -3604,10 +3809,332 @@ function renderBattlePlanResults(plan, isGemini, modelUsed, durationMs) {
   attachCoachEventListeners();
 }
 
+function getBattleStateContextString() {
+  if (!battleTrackerState) return '';
+  const ourAlive = battleTrackerState.ourBrought.filter(p => !battleTrackerState.ourFainted.includes(p));
+  const enemyAlive = battleTrackerState.enemyBrought.filter(p => !battleTrackerState.enemyFainted.includes(p));
+  const enemyFaintedCount = battleTrackerState.enemyFainted.length;
+  const enemyAliveEstimate = Math.max(0, 3 - enemyFaintedCount);
+
+  return `[LIVE IN-BATTLE BOARD STATE:
+• Our Lineup (3 brought): ${battleTrackerState.ourBrought.join(', ') || 'Not locked'}
+• Our Active on Field: ${battleTrackerState.ourActive ? `${battleTrackerState.ourActive} (Active)` : 'None'}
+• Our Fainted (${battleTrackerState.ourFainted.length}/3): ${battleTrackerState.ourFainted.join(', ') || 'None'}
+• Our Remaining Alive (${ourAlive.length}/3): ${ourAlive.join(', ') || 'None'}
+• Opponent Revealed (${battleTrackerState.enemyBrought.length}/3): ${battleTrackerState.enemyBrought.join(', ') || 'None yet'}
+• Opponent Active on Field: ${battleTrackerState.enemyActive ? `${battleTrackerState.enemyActive} (Active)` : 'Unknown / not selected'}
+• Opponent Fainted: ${battleTrackerState.enemyFainted.join(', ') || 'None'}
+• Opponent Remaining Alive (est): ${enemyAliveEstimate}/3 (Revealed Alive: ${enemyAlive.join(', ') || 'None'})]`;
+}
+
+function getTrackerMatchupPillHTML() {
+  const ourActive = battleTrackerState?.ourActive;
+  const enemyActive = battleTrackerState?.enemyActive;
+  if (ourActive && enemyActive) {
+    return `<span class="duel-label">Active Duel:</span> <strong class="duel-mon duel-our">${escapeCoachHtml(ourActive)}</strong> <span class="duel-vs">vs</span> <strong class="duel-mon duel-enemy">${escapeCoachHtml(enemyActive)}</strong>`;
+  }
+  if (ourActive) {
+    return `<span class="duel-label">Our Active:</span> <strong class="duel-mon duel-our">${escapeCoachHtml(ourActive)}</strong> <span class="duel-vs">vs</span> <span class="duel-waiting">Awaiting Opponent...</span>`;
+  }
+  return `<span class="duel-waiting">Select active Pokémon on field below</span>`;
+}
+
+function getTrackerScoreboardHTML() {
+  const ourAlive = battleTrackerState ? battleTrackerState.ourBrought.filter(p => !battleTrackerState.ourFainted.includes(p)).length : 3;
+  const enemyFaintedCount = battleTrackerState ? battleTrackerState.enemyFainted.length : 0;
+  const enemyRemaining = Math.max(0, 3 - enemyFaintedCount);
+
+  let statusClass = 'score-even';
+  let diff = ourAlive - enemyRemaining;
+  let statusText = `${ourAlive} vs ${enemyRemaining}`;
+  if (diff > 0) {
+    statusClass = 'score-advantage';
+    statusText = `Advantage (+${diff})`;
+  } else if (diff < 0) {
+    statusClass = 'score-disadvantage';
+    statusText = `Behind (${diff})`;
+  } else if (ourAlive === 0 && enemyRemaining === 0) {
+    statusText = 'Draw';
+  } else if (enemyRemaining === 0) {
+    statusText = 'Victory 🏆';
+    statusClass = 'score-victory';
+  }
+
+  return `
+    <div class="score-pills-wrap">
+      <span class="score-pill our-score">Us: <strong>${ourAlive}/3</strong></span>
+      <span class="score-vs-divider">:</span>
+      <span class="score-pill enemy-score">Them: <strong>${enemyRemaining}/3</strong></span>
+      <span class="score-status-badge ${statusClass}">${statusText}</span>
+    </div>
+  `;
+}
+
+function getOurAliveSubHTML() {
+  const ourAlive = battleTrackerState ? battleTrackerState.ourBrought.filter(p => !battleTrackerState.ourFainted.includes(p)).length : 3;
+  return `${ourAlive} / 3 Remaining`;
+}
+
+function getEnemyAliveSubHTML() {
+  const fainted = battleTrackerState ? battleTrackerState.enemyFainted.length : 0;
+  const remaining = Math.max(0, 3 - fainted);
+  const revealed = battleTrackerState ? battleTrackerState.enemyBrought.length : 0;
+  return `${remaining} / 3 Alive · ${revealed} Seen`;
+}
+
+function getTrackerOurSelectionChipsHTML() {
+  const filledOur = ourSlots.filter(Boolean);
+  return filledOur.map(s => {
+    const name = s.pokemon.name;
+    const isSelected = battleTrackerState?.ourBrought.includes(name);
+    return `
+      <button type="button" class="roster-chip-toggle ${isSelected ? 'selected' : ''}" data-action="toggle-lineup-pick" data-name="${escapeCoachHtml(name)}" title="${isSelected ? 'Click to remove from 3-man lineup' : 'Click to add to 3-man lineup'}">
+        <img src="${getSpriteUrl(name)}" class="tracker-chip-sprite" alt="${escapeCoachHtml(name)}" onerror="this.onerror=null; this.src='https://play.pokemonshowdown.com/sprites/dex/${getPokemonSlug(name)}.png';">
+        <span class="chip-name">${escapeCoachHtml(name)}</span>
+        <span class="chip-status-tag">${isSelected ? '✓ Lineup' : 'Bench'}</span>
+      </button>
+    `;
+  }).join('');
+}
+
+function getTrackerOurBattlersListHTML() {
+  if (!battleTrackerState || battleTrackerState.ourBrought.length === 0) {
+    return `<div class="tracker-empty-note">Select 3 Pokémon above to form your lineup.</div>`;
+  }
+  return battleTrackerState.ourBrought.map(name => {
+    const isActive = battleTrackerState.ourActive === name;
+    const isFainted = battleTrackerState.ourFainted.includes(name);
+
+    let statusBadge = '<span class="battler-badge badge-bench">Bench</span>';
+    if (isFainted) {
+      statusBadge = '<span class="battler-badge badge-fainted">💀 Fainted</span>';
+    } else if (isActive) {
+      statusBadge = '<span class="battler-badge badge-active">🟢 Active on Field</span>';
+    }
+
+    return `
+      <div class="tracker-battler-card ${isActive ? 'active-battler' : ''} ${isFainted ? 'fainted-battler' : ''}">
+        <div class="battler-info">
+          <img src="${getSpriteUrl(name)}" class="battler-sprite" alt="${escapeCoachHtml(name)}" onerror="this.onerror=null; this.src='https://play.pokemonshowdown.com/sprites/dex/${getPokemonSlug(name)}.png';">
+          <div class="battler-meta">
+            <span class="battler-name">${escapeCoachHtml(name)}</span>
+            ${statusBadge}
+          </div>
+        </div>
+        <div class="battler-actions">
+          ${!isFainted && !isActive ? `
+            <button type="button" class="btn-tracker-action btn-field-toggle" data-action="set-our-active" data-name="${escapeCoachHtml(name)}">
+              ⚡ Send Out
+            </button>
+          ` : (isActive && !isFainted ? `
+            <span class="active-field-indicator">In Battle</span>
+          ` : '')}
+          <button type="button" class="btn-tracker-action btn-faint-toggle ${isFainted ? 'btn-revive' : ''}" data-action="toggle-our-faint" data-name="${escapeCoachHtml(name)}">
+            ${isFainted ? '↩️ Revive' : '💀 KO'}
+          </button>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function getTrackerEnemyBattlersListHTML() {
+  const filledEnemy = enemySlots.filter(Boolean);
+  if (filledEnemy.length === 0) {
+    return `<div class="tracker-empty-note">No opponent Pokémon registered.</div>`;
+  }
+  return filledEnemy.map(s => {
+    const name = s.pokemon.name;
+    const isActive = battleTrackerState?.enemyActive === name;
+    const isFainted = battleTrackerState?.enemyFainted.includes(name);
+    const isRevealed = battleTrackerState?.enemyBrought.includes(name);
+
+    let statusBadge = '<span class="battler-badge badge-unseen">Unseen</span>';
+    if (isFainted) {
+      statusBadge = '<span class="battler-badge badge-fainted">💀 KO Taken Out</span>';
+    } else if (isActive) {
+      statusBadge = '<span class="battler-badge badge-enemy-active">⚔️ Active on Field</span>';
+    } else if (isRevealed) {
+      statusBadge = '<span class="battler-badge badge-revealed">👁️ Revealed</span>';
+    }
+
+    return `
+      <div class="tracker-battler-card enemy-card ${isActive ? 'active-battler' : ''} ${isFainted ? 'fainted-battler' : ''}">
+        <div class="battler-info">
+          <img src="${getSpriteUrl(name)}" class="battler-sprite" alt="${escapeCoachHtml(name)}" onerror="this.onerror=null; this.src='https://play.pokemonshowdown.com/sprites/dex/${getPokemonSlug(name)}.png';">
+          <div class="battler-meta">
+            <span class="battler-name">${escapeCoachHtml(name)}</span>
+            ${statusBadge}
+          </div>
+        </div>
+        <div class="battler-actions">
+          ${!isFainted && !isActive ? `
+            <button type="button" class="btn-tracker-action btn-field-toggle enemy" data-action="set-enemy-active" data-name="${escapeCoachHtml(name)}">
+              ⚔️ On Field
+            </button>
+          ` : (isActive && !isFainted ? `
+            <span class="active-field-indicator enemy-indicator">In Battle</span>
+          ` : '')}
+          <button type="button" class="btn-tracker-action btn-faint-toggle ${isFainted ? 'btn-revive' : ''}" data-action="toggle-enemy-faint" data-name="${escapeCoachHtml(name)}">
+            ${isFainted ? '↩️ Revive' : '💀 KO'}
+          </button>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function getDynamicQuickChipsHTML() {
+  const chips = [];
+  const ourActive = battleTrackerState?.ourActive;
+  const enemyActive = battleTrackerState?.enemyActive;
+  const enemyFainted = battleTrackerState?.enemyFainted || [];
+  const ourFainted = battleTrackerState?.ourFainted || [];
+
+  if (ourActive && enemyActive) {
+    chips.push({
+      label: `⚔️ Play ${ourActive} vs ${enemyActive}`,
+      prompt: `We currently have ${ourActive} on the field against opponent's ${enemyActive}. What is my best move, damage trade, or pivot play right now?`
+    });
+    chips.push({
+      label: `🔄 Safe switch for ${ourActive}`,
+      prompt: `If ${ourActive} cannot safely stay in against ${enemyActive}, which of my remaining Pokémon is the safest switch-in and why?`
+    });
+  } else if (ourActive) {
+    chips.push({
+      label: `⚡ Lead with ${ourActive}`,
+      prompt: `I am opening with ${ourActive} on the field. Give me turn 1 tempo roadmap depending on what the opponent leads.`
+    });
+  }
+
+  if (enemyActive) {
+    chips.push({
+      label: `🔮 If ${enemyActive} Terastallizes`,
+      prompt: `If opponent's ${enemyActive} Terastallizes defensively, how should I counter and adjust my offensive attacks?`
+    });
+  }
+
+  if (enemyFainted.length > 0) {
+    const lastEnemyKO = enemyFainted[enemyFainted.length - 1];
+    chips.push({
+      label: `💀 Opponent ${lastEnemyKO} KO'd`,
+      prompt: `Opponent's ${lastEnemyKO} just fainted. What should I anticipate they send out next and what is my counter-prep?`
+    });
+  }
+
+  if (ourFainted.length > 0) {
+    const lastOurKO = ourFainted[ourFainted.length - 1];
+    chips.push({
+      label: `⚠️ ${lastOurKO} Fainted: Revenge play`,
+      prompt: `Our ${lastOurKO} was taken out. Who should I send out next as my optimal revenge killer or defensive anchor?`
+    });
+  }
+
+  // Baseline strategic prompts
+  chips.push({
+    label: '⚡ Turn 1-3 Sequencing',
+    prompt: 'Opponent opened with their primary lead. Give me the exact turn 1 to turn 3 sequencing roadmap.'
+  });
+  chips.push({
+    label: '🛡️ Hazard Management',
+    prompt: 'Opponent set up Stealth Rock or Spikes early. What is my hazard recovery play?'
+  });
+  chips.push({
+    label: '🔮 Defensive Terastallization',
+    prompt: 'Opponent Terastallized defensively. How should I adjust my offensive targets and switch pivots?'
+  });
+
+  return chips.slice(0, 5).map(c => `
+    <button type="button" class="coach-scenario-chip" data-prompt="${escapeCoachHtml(c.prompt)}">${escapeCoachHtml(c.label)}</button>
+  `).join('');
+}
+
+function updateBattleTrackerDOM() {
+  const matchupPill = document.getElementById('tracker-matchup-pill');
+  if (matchupPill) matchupPill.innerHTML = getTrackerMatchupPillHTML();
+
+  const scoreboard = document.getElementById('tracker-scoreboard');
+  if (scoreboard) scoreboard.innerHTML = getTrackerScoreboardHTML();
+
+  const lineupCounter = document.getElementById('tracker-lineup-counter');
+  if (lineupCounter && battleTrackerState) {
+    lineupCounter.textContent = `${battleTrackerState.ourBrought.length} / 3 Selected`;
+  }
+
+  const chipsWrap = document.getElementById('tracker-our-selection-chips');
+  if (chipsWrap) chipsWrap.innerHTML = getTrackerOurSelectionChipsHTML();
+
+  const ourSub = document.getElementById('tracker-our-alive-sub');
+  if (ourSub) ourSub.innerHTML = getOurAliveSubHTML();
+
+  const ourList = document.getElementById('tracker-our-battlers-list');
+  if (ourList) ourList.innerHTML = getTrackerOurBattlersListHTML();
+
+  const enemySub = document.getElementById('tracker-enemy-alive-sub');
+  if (enemySub) enemySub.innerHTML = getEnemyAliveSubHTML();
+
+  const enemyList = document.getElementById('tracker-enemy-battlers-list');
+  if (enemyList) enemyList.innerHTML = getTrackerEnemyBattlersListHTML();
+
+  const quickChipsList = document.getElementById('coach-quick-chips-list');
+  if (quickChipsList) {
+    quickChipsList.innerHTML = getDynamicQuickChipsHTML();
+    quickChipsList.querySelectorAll('.coach-scenario-chip').forEach(chip => {
+      chip.onclick = () => sendCoachFollowUp(chip.dataset.prompt);
+    });
+  }
+}
+
+function getInitialCoachMessagesHTML(modelUsed) {
+  const modelName = (modelUsed || activeBattleSession?.model || 'Gemini').replace('gemini-', 'Gemini ');
+  const welcomeHtml = `
+    <div class="coach-msg coach-msg-assistant initial-welcome">
+      <div class="coach-avatar">🧠</div>
+      <div class="coach-bubble">
+        <span class="coach-sender-tag">AI Coach (${modelName}):</span>
+        <p>Matchup analyzed! Your 3-man core and leads are locked. What scenario are you facing right now?</p>
+      </div>
+    </div>
+  `;
+
+  if (activeBattleSession && Array.isArray(activeBattleSession.history) && activeBattleSession.history.length > 2) {
+    let threadHistoryHtml = welcomeHtml;
+    for (let i = 2; i < activeBattleSession.history.length; i++) {
+      const turn = activeBattleSession.history[i];
+      const text = turn.parts?.[0]?.text || '';
+      if (turn.role === 'user') {
+        const cleanText = text.replace(/\[LIVE IN-BATTLE BOARD STATE:[\s\S]*?\]\s*/i, '').replace(/\[USER IN-BATTLE QUESTION\]:\s*/i, '');
+        threadHistoryHtml += `
+          <div class="coach-msg coach-msg-user">
+            <div class="coach-avatar">👤</div>
+            <div class="coach-bubble">
+              <span class="coach-sender-tag">You:</span>
+              <p>${escapeCoachHtml(cleanText)}</p>
+            </div>
+          </div>
+        `;
+      } else {
+        threadHistoryHtml += `
+          <div class="coach-msg coach-msg-assistant">
+            <div class="coach-avatar">🧠</div>
+            <div class="coach-bubble">
+              <span class="coach-sender-tag">${escapeCoachHtml(modelName)}:</span>
+              <div class="coach-formatted-text">${formatCoachMarkdown(text)}</div>
+            </div>
+          </div>
+        `;
+      }
+    }
+    return threadHistoryHtml;
+  }
+
+  return welcomeHtml;
+}
+
 function attachCoachEventListeners() {
   const sendBtn = document.getElementById('btn-coach-send-followup');
   const inputEl = document.getElementById('coach-followup-input');
-  const chips = document.querySelectorAll('.coach-scenario-chip');
+  const quickChipsList = document.getElementById('coach-quick-chips-list');
 
   if (sendBtn && inputEl) {
     sendBtn.onclick = () => {
@@ -3621,11 +4148,122 @@ function attachCoachEventListeners() {
     };
   }
 
-  chips.forEach(chip => {
-    chip.onclick = () => {
-      sendCoachFollowUp(chip.dataset.prompt);
+  if (quickChipsList) {
+    quickChipsList.querySelectorAll('.coach-scenario-chip').forEach(chip => {
+      chip.onclick = () => {
+        sendCoachFollowUp(chip.dataset.prompt);
+      };
+    });
+  }
+
+  // Interactive In-Battle Tracker Event Delegation
+  const trackerCard = document.getElementById('battle-tracker-card');
+  if (trackerCard) {
+    trackerCard.onclick = (e) => {
+      const btn = e.target.closest('button');
+      if (!btn) return;
+
+      const action = btn.dataset.action;
+      const name = btn.dataset.name;
+
+      if (btn.id === 'btn-tracker-reset') {
+        if (!battleTrackerState) return;
+        battleTrackerState.ourFainted = [];
+        battleTrackerState.enemyFainted = [];
+        battleTrackerState.enemyBrought = [];
+        battleTrackerState.enemyActive = '';
+        if (battleTrackerState.ourBrought.length > 0) {
+          battleTrackerState.ourActive = battleTrackerState.ourBrought[0];
+        }
+        updateBattleTrackerDOM();
+        showToast('In-battle casualty and field state reset.');
+        return;
+      }
+
+      if (action === 'toggle-lineup-pick') {
+        if (!battleTrackerState) return;
+        const idx = battleTrackerState.ourBrought.indexOf(name);
+        if (idx !== -1) {
+          if (battleTrackerState.ourBrought.length > 1) {
+            battleTrackerState.ourBrought.splice(idx, 1);
+            if (battleTrackerState.ourActive === name) {
+              battleTrackerState.ourActive = battleTrackerState.ourBrought[0] || '';
+            }
+            battleTrackerState.ourFainted = battleTrackerState.ourFainted.filter(p => p !== name);
+          } else {
+            showToast('Keep at least 1 Pokémon in your 3-man lineup.');
+          }
+        } else {
+          if (battleTrackerState.ourBrought.length < 3) {
+            battleTrackerState.ourBrought.push(name);
+          } else {
+            const replaced = battleTrackerState.ourBrought[2];
+            battleTrackerState.ourBrought[2] = name;
+            if (battleTrackerState.ourActive === replaced) {
+              battleTrackerState.ourActive = name;
+            }
+            battleTrackerState.ourFainted = battleTrackerState.ourFainted.filter(p => p !== replaced);
+          }
+          if (!battleTrackerState.ourActive) {
+            battleTrackerState.ourActive = name;
+          }
+        }
+        updateBattleTrackerDOM();
+        return;
+      }
+
+      if (action === 'set-our-active') {
+        if (!battleTrackerState) return;
+        battleTrackerState.ourActive = name;
+        updateBattleTrackerDOM();
+        return;
+      }
+
+      if (action === 'toggle-our-faint') {
+        if (!battleTrackerState) return;
+        const fIdx = battleTrackerState.ourFainted.indexOf(name);
+        if (fIdx !== -1) {
+          battleTrackerState.ourFainted.splice(fIdx, 1);
+        } else {
+          battleTrackerState.ourFainted.push(name);
+          if (battleTrackerState.ourActive === name) {
+            const nextAlive = battleTrackerState.ourBrought.find(p => !battleTrackerState.ourFainted.includes(p));
+            battleTrackerState.ourActive = nextAlive || '';
+          }
+        }
+        updateBattleTrackerDOM();
+        return;
+      }
+
+      if (action === 'set-enemy-active') {
+        if (!battleTrackerState) return;
+        battleTrackerState.enemyActive = name;
+        if (!battleTrackerState.enemyBrought.includes(name)) {
+          battleTrackerState.enemyBrought.push(name);
+        }
+        updateBattleTrackerDOM();
+        return;
+      }
+
+      if (action === 'toggle-enemy-faint') {
+        if (!battleTrackerState) return;
+        const fIdx = battleTrackerState.enemyFainted.indexOf(name);
+        if (fIdx !== -1) {
+          battleTrackerState.enemyFainted.splice(fIdx, 1);
+        } else {
+          battleTrackerState.enemyFainted.push(name);
+          if (!battleTrackerState.enemyBrought.includes(name)) {
+            battleTrackerState.enemyBrought.push(name);
+          }
+          if (battleTrackerState.enemyActive === name) {
+            battleTrackerState.enemyActive = '';
+          }
+        }
+        updateBattleTrackerDOM();
+        return;
+      }
     };
-  });
+  }
 }
 
 function escapeCoachHtml(str) {
@@ -3649,16 +4287,20 @@ function formatCoachMarkdown(text) {
   return `<p>${formatted}</p>`;
 }
 
-function appendCoachMessage(threadEl, role, content, senderName) {
+function appendCoachMessage(threadEl, role, content, senderName, duelContext) {
   if (!threadEl) return;
   const msgEl = document.createElement('div');
   msgEl.className = `coach-msg coach-msg-${role}`;
 
   if (role === 'user') {
+    const duelBadge = duelContext ? `<span class="coach-msg-duel-tag">${escapeCoachHtml(duelContext)}</span>` : '';
     msgEl.innerHTML = `
       <div class="coach-avatar">👤</div>
       <div class="coach-bubble">
-        <span class="coach-sender-tag">You:</span>
+        <div class="coach-msg-header">
+          <span class="coach-sender-tag">You:</span>
+          ${duelBadge}
+        </div>
         <p>${escapeCoachHtml(content)}</p>
       </div>
     `;
@@ -3686,11 +4328,18 @@ async function sendCoachFollowUp(userQuery) {
 
   if (inputEl) inputEl.value = '';
 
-  // 1. Render User Message in thread
-  appendCoachMessage(threadEl, 'user', query);
+  const duelContext = (battleTrackerState?.ourActive && battleTrackerState?.enemyActive)
+    ? `${battleTrackerState.ourActive} vs ${battleTrackerState.enemyActive}`
+    : (battleTrackerState?.ourActive ? `On Field: ${battleTrackerState.ourActive}` : '');
+
+  // 1. Render User Message in thread with active field tag
+  appendCoachMessage(threadEl, 'user', query, null, duelContext);
+
+  const stateContext = getBattleStateContextString();
+  const fullPromptForModel = `${stateContext}\n\n[USER IN-BATTLE QUESTION]: ${query}`;
 
   if (!activeBattleSession || !activeBattleSession.apiKey) {
-    // Offline heuristic advice
+    // Offline heuristic advice using live board state & matchup engine
     const heuristicText = generateHeuristicCoachAdvice(query, ourSlots, enemySlots, lastCalculatedMatrix);
     const typingId = 'coach-typing-' + Date.now();
     const typingEl = document.createElement('div');
@@ -3709,7 +4358,7 @@ async function sendCoachFollowUp(userQuery) {
       const el = document.getElementById(typingId);
       if (el) el.remove();
       appendCoachMessage(threadEl, 'assistant', heuristicText, 'Matchup Engine');
-    }, 400);
+    }, 350);
     return;
   }
 
@@ -3730,17 +4379,18 @@ async function sendCoachFollowUp(userQuery) {
   if (sendBtn) sendBtn.disabled = true;
 
   try {
-    // Append to active session history
+    // Append to active session history with full board context
     activeBattleSession.history.push({
       role: 'user',
-      parts: [{ text: query }]
+      parts: [{ text: fullPromptForModel }]
     });
 
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(activeBattleSession.model)}:generateContent?key=${encodeURIComponent(activeBattleSession.apiKey)}`;
+    let usedModel = activeBattleSession.model || 'gemini-3.8-flash';
+    let url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(usedModel)}:generateContent?key=${encodeURIComponent(activeBattleSession.apiKey)}`;
     const ctrl = new AbortController();
     const timer = setTimeout(() => ctrl.abort(), 18000);
 
-    const resp = await fetch(url, {
+    let resp = await fetch(url, {
       method: 'POST',
       signal: ctrl.signal,
       headers: { 'Content-Type': 'application/json' },
@@ -3748,7 +4398,7 @@ async function sendCoachFollowUp(userQuery) {
         contents: activeBattleSession.history,
         systemInstruction: {
           parts: [{
-            text: "You are an elite competitive Pokémon Singles coach for Regulation M-C. Give direct, actionable battle advice in 2-4 punchy sentences. Focus on turn tempo, pivot safety, and damage trades."
+            text: "You are an elite competitive Pokémon Singles coach for Regulation M-C. Keep in mind the user's live board state (who is currently on the field, which Pokémon fainted, and remaining reserves). Give direct, actionable battle advice in 2-4 punchy sentences. Focus on turn tempo, pivot safety, and damage trades."
           }]
         },
         generationConfig: {
@@ -3758,6 +4408,29 @@ async function sendCoachFollowUp(userQuery) {
       })
     });
     clearTimeout(timer);
+
+    // If preferred flagship model hit 429/503 during interactive session, seamlessly retry with 3.1-flash-lite
+    if (!resp.ok && (resp.status === 429 || resp.status === 503) && usedModel !== 'gemini-3.1-flash-lite') {
+      console.warn(`[PokeChamp Coach] ${usedModel} hit ${resp.status}. Auto-falling back to gemini-3.1-flash-lite for chat.`);
+      usedModel = 'gemini-3.1-flash-lite';
+      const fallbackUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent?key=${encodeURIComponent(activeBattleSession.apiKey)}`;
+      resp = await fetch(fallbackUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: activeBattleSession.history,
+          systemInstruction: {
+            parts: [{
+              text: "You are an elite competitive Pokémon Singles coach for Regulation M-C. Keep in mind the user's live board state (who is currently on the field, which Pokémon fainted, and remaining reserves). Give direct, actionable battle advice in 2-4 punchy sentences. Focus on turn tempo, pivot safety, and damage trades."
+            }]
+          },
+          generationConfig: {
+            temperature: 0.3,
+            thinkingConfig: { thinkingBudget: 0 }
+          }
+        })
+      });
+    }
 
     const typingNode = document.getElementById(typingId);
     if (typingNode) typingNode.remove();
@@ -3777,7 +4450,11 @@ async function sendCoachFollowUp(userQuery) {
       parts: [{ text: replyText }]
     });
 
-    appendCoachMessage(threadEl, 'assistant', replyText, (activeBattleSession.model || 'Gemini').replace('gemini-', 'Gemini '));
+    const modelTag = usedModel !== activeBattleSession.model
+      ? `${usedModel.replace('gemini-', 'Gemini ')} (Peak Fallback)`
+      : usedModel.replace('gemini-', 'Gemini ');
+
+    appendCoachMessage(threadEl, 'assistant', replyText, modelTag);
   } catch (err) {
     const typingNode = document.getElementById(typingId);
     if (typingNode) typingNode.remove();
@@ -3791,6 +4468,56 @@ function generateHeuristicCoachAdvice(query, ourSlots, enemySlots, matrix) {
   const filledOur = ourSlots.filter(Boolean);
   const filledEnemy = enemySlots.filter(Boolean);
 
+  const ourActive = battleTrackerState?.ourActive;
+  const enemyActive = battleTrackerState?.enemyActive;
+
+  // Active duel specific analysis if both are on the field
+  if (ourActive && enemyActive) {
+    const ourMon = filledOur.find(o => o.pokemon.name.toLowerCase() === ourActive.toLowerCase());
+    const enmMon = filledEnemy.find(e => e.pokemon.name.toLowerCase() === enemyActive.toLowerCase());
+
+    if (ourMon && enmMon) {
+      const ourIdx = filledOur.indexOf(ourMon);
+      const enmIdx = filledEnemy.indexOf(enmMon);
+      const duel = matrix?.[ourIdx]?.[enmIdx];
+      const ourSpe = getEffectiveSpeed(ourMon);
+      const enmSpe = getEffectiveSpeed(enmMon);
+      const faster = ourSpe >= enmSpe;
+      const score = duel ? duel.scoreA : 0;
+
+      if (q.includes('switch') || q.includes('pivot')) {
+        const ourAlive = (battleTrackerState?.ourBrought || filledOur.map(s => s.pokemon.name))
+          .filter(p => !battleTrackerState?.ourFainted.includes(p) && p !== ourActive);
+        let bestTeammate = ourAlive[0] || 'your defensive anchor';
+        let bestScore = -999;
+        ourAlive.forEach(name => {
+          const tm = filledOur.find(o => o.pokemon.name.toLowerCase() === name.toLowerCase());
+          if (tm && matrix) {
+            const tmIdx = filledOur.indexOf(tm);
+            const tmScore = matrix[tmIdx]?.[enmIdx]?.scoreA || 0;
+            if (tmScore > bestScore) {
+              bestScore = tmScore;
+              bestTeammate = name;
+            }
+          }
+        });
+        return `Against **${enemyActive}**, ${bestTeammate} is your optimal defensive pivot (higher matchup equity). Safe-switch on an anticipated resisted hit or sacrifice chip to bring them in cleanly.`;
+      }
+
+      if (q.includes('play') || q.includes('vs') || q.includes('move') || q.includes('right now') || q.includes('turn')) {
+        if (faster && score >= 0) {
+          return `**${ourActive}** outspeeds **${enemyActive}** (Spe ${ourSpe} vs ${enmSpe}) with offensive advantage. Click your highest STAB or super-effective coverage to force damage or punish their defensive switch.`;
+        } else if (faster && score < 0) {
+          return `**${ourActive}** outspeeds **${enemyActive}** (Spe ${ourSpe} vs ${enmSpe}) but faces defensive resistance. Chip them with a pivoting move or setup hazard, or trade hits if in KO range.`;
+        } else if (!faster && score >= 0) {
+          return `**${ourActive}** is outsped by **${enemyActive}** (Spe ${ourSpe} vs ${enmSpe}) but wins the bulk trade. Absorb their incoming hit and retaliate with powerful super-effective damage.`;
+        } else {
+          return `**${ourActive}** is outsped by **${enemyActive}** (Spe ${ourSpe} vs ${enmSpe}) and has disadvantageous trades. Strongly consider switching into a defensive teammate or using defensive Terastallization to flip the matchup.`;
+        }
+      }
+    }
+  }
+
   if (q.includes('tera') || q.includes('terastalliz')) {
     return "When the opponent uses defensive Terastallization, avoid committing your primary STAB attack into their newly resisted typing. Pivot into your secondary defensive anchor to scout their coverage move, or bait them into attacking your hazard setter.";
   }
@@ -3798,11 +4525,15 @@ function generateHeuristicCoachAdvice(query, ourSlots, enemySlots, matrix) {
     return "If entry hazards are up, minimize unnecessary defensive switches. Use your fastest sweeper or highest offensive benchmark to apply immediate offensive pressure and force them onto the back foot before hazard chip accumulates.";
   }
   if (q.includes('turn 1') || q.includes('lead') || q.includes('sequencing')) {
-    const topLead = filledOur[0]?.pokemon?.name || 'Your Lead';
+    const topLead = ourActive || filledOur[0]?.pokemon?.name || 'Your Lead';
     return `On Turn 1 with ${topLead}, prioritize setting up tempo or securing speed control. If they lead a Pokémon that threatens super-effective damage, immediately execute your alternative pivot into your hard counter.`;
+  }
+  if (q.includes('faint') || q.includes('ko') || q.includes('next')) {
+    return "With a Pokémon down, preserve your remaining win condition sweeper. Keep track of which opponent Pokémon have yet to reveal their items and Tera types.";
   }
   return "Keep track of their remaining Pokémon and preserve your late-game cleaner. Check the Counterplay matrix above to identify which of your remaining squad members hard-counters their active threat.";
 }
+
 
 function renderEmptyState() {
   const statWins = document.getElementById('stat-wins-count');
@@ -4280,12 +5011,37 @@ async function testGeminiConnection(apiKey, model) {
   feedback.className = 'key-test-feedback';
   feedback.textContent = `Testing connection with ${model}...`;
 
-  const candidates = [...new Set([model, 'gemini-3.1-flash-lite', 'gemini-3.5-flash', 'gemini-3.6-flash', 'gemini-3.8-flash'])];
-  let lastErr = null;
+  const fallback = 'gemini-3.1-flash-lite';
+  let primaryErr = null;
 
-  for (const m of candidates) {
+  try {
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent?key=${encodeURIComponent(apiKey)}`;
+    const resp = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: "Respond with the word: READY" }] }],
+        generationConfig: { maxOutputTokens: 5 }
+      })
+    });
+
+    if (resp.ok) {
+      feedback.className = 'key-test-feedback success';
+      feedback.textContent = `✓ Connection verified! Active Preferred Model: ${model}`;
+      return;
+    } else {
+      const err = await resp.json().catch(() => ({}));
+      primaryErr = new Error(err.error?.message || `HTTP ${resp.status}`);
+    }
+  } catch (err) {
+    primaryErr = err;
+  }
+
+  // If preferred model hit 429/503, test fallback
+  if (model !== fallback) {
+    feedback.textContent = `${model} busy/rate-limited (${primaryErr.message}). Testing peak fallback (${fallback})...`;
     try {
-      const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(m)}:generateContent?key=${encodeURIComponent(apiKey)}`;
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(fallback)}:generateContent?key=${encodeURIComponent(apiKey)}`;
       const resp = await fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -4297,19 +5053,16 @@ async function testGeminiConnection(apiKey, model) {
 
       if (resp.ok) {
         feedback.className = 'key-test-feedback success';
-        feedback.textContent = `✓ Connection verified! Active Model: ${m}`;
+        feedback.textContent = `✓ API key is valid! Note: ${model} is currently at quota/busy (${primaryErr.message}). The app will use ${model} whenever available, and automatically fall back to ${fallback} during peak congestion.`;
         return;
-      } else {
-        const err = await resp.json().catch(() => ({}));
-        lastErr = new Error(err.error?.message || `HTTP ${resp.status}`);
       }
-    } catch (err) {
-      lastErr = err;
+    } catch (e) {
+      // both failed
     }
   }
 
   feedback.className = 'key-test-feedback error';
-  feedback.textContent = `✕ Connection failed: ${lastErr ? lastErr.message : 'Unknown error'}`;
+  feedback.textContent = `✕ Connection failed: ${primaryErr ? primaryErr.message : 'Unknown error'}`;
 }
 
 // =====================================================================
@@ -4422,7 +5175,7 @@ function renderEditorModalBody() {
     const icon = getItemSpriteUrl(it.name);
     return `
       <button class="editor-chip ${isAct ? 'active' : ''}" onclick="setEnemyItem('${it.name}')">
-        ${icon ? `<img src="${icon}" class="editor-chip-icon" alt="">` : '🎒'}
+        ${icon ? `<img src="${icon}" class="editor-chip-icon" alt="" onerror="handleItemIconError(this, '${(it.name || '').replace(/'/g, "\\'")}')">` : '🎒'}
         <span>${it.name}</span>
         <span class="editor-chip-sub">(${it.usage})</span>
       </button>
@@ -4434,7 +5187,7 @@ function renderEditorModalBody() {
     const icon = getItemSpriteUrl(itName);
     return `
       <button class="editor-chip ${isAct ? 'active' : ''}" onclick="setEnemyItem('${itName}')">
-        ${icon ? `<img src="${icon}" class="editor-chip-icon" alt="">` : '🎒'}
+        ${icon ? `<img src="${icon}" class="editor-chip-icon" alt="" onerror="handleItemIconError(this, '${(itName || '').replace(/'/g, "\\'")}')">` : '🎒'}
         <span>${itName}</span>
       </button>
     `;

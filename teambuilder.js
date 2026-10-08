@@ -22,12 +22,12 @@ const ALL_TYPES = [
 
 const TYPE_COLORS = {
   Normal: '#9ca3af',
-  Fire: '#f97316',
+  Fire: '#ea3829',
   Water: '#38bdf8',
   Grass: '#22c55e',
   Electric: '#eab308',
   Ice: '#06b6d4',
-  Fighting: '#ef4444',
+  Fighting: '#c22e28',
   Poison: '#a855f7',
   Ground: '#d97706',
   Flying: '#818cf8',
@@ -158,10 +158,24 @@ let pickerMode = 'type';
 let pickerMove = '';
 let pickerSort = 'rank-asc';
 
+// Gemini AI Coach Configuration & State
+const GEMINI_CONFIG = {
+  getKey: () => localStorage.getItem('pokechamp_gemini_key') || '',
+  setKey: (key) => localStorage.setItem('pokechamp_gemini_key', key.trim()),
+  clearKey: () => localStorage.removeItem('pokechamp_gemini_key'),
+  getModel: () => localStorage.getItem('pokechamp_gemini_model') || 'gemini-3.8-flash',
+  setModel: (m) => localStorage.setItem('pokechamp_gemini_model', m)
+};
+
+let currentTeammateRecommendations = [];
+let aiTeammateCache = null;
+let isAiTeammateLoading = false;
+
 // Initialize
 document.addEventListener('DOMContentLoaded', async () => {
   await loadDatabase();
   setupUIEventListeners();
+  updateTeammateStatusBadge();
 
   // Check if URL has ?teamhash=...
   const urlParams = new URLSearchParams(window.location.search);
@@ -187,12 +201,15 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 // Load Database
+let itemsDB = {};
+
 async function loadDatabase() {
   try {
-    const [resPoke, resMoves, resMega] = await Promise.all([
+    const [resPoke, resMoves, resMega, resItems] = await Promise.all([
       fetch('data/pokemon_singles_db.json'),
       fetch('data/moves_database.json').catch(() => null),
-      fetch('data/mega_database.json').catch(() => null)
+      fetch('data/mega_database.json').catch(() => null),
+      fetch('data/items_database.json').catch(() => null)
     ]);
     pokemonDB = await resPoke.json();
     if (resMoves) {
@@ -200,6 +217,9 @@ async function loadDatabase() {
     }
     if (resMega) {
       megaDB = await resMega.json();
+    }
+    if (resItems) {
+      itemsDB = await resItems.json();
     }
     buildCompetitiveMovesIndex();
   } catch (err) {
@@ -298,11 +318,52 @@ function getSpriteUrl(name) {
 }
 
 function getItemSpriteUrl(itemName) {
+  if (typeof window !== 'undefined' && window.getItemSpriteUrl && window.getItemSpriteUrl !== getItemSpriteUrl) {
+    return window.getItemSpriteUrl(itemName);
+  }
   if (!itemName || itemName === 'No Item' || itemName === 'None' || itemName === 'N/A') return '';
-  const slug = itemName.toLowerCase().trim()
+  const clean = itemName.trim().replace('’', "'");
+  if (typeof CUSTOM_ITEM_ICONS !== 'undefined' && CUSTOM_ITEM_ICONS[clean]) {
+    return CUSTOM_ITEM_ICONS[clean].zoneUrl;
+  }
+  if (clean === "King's Rock") {
+    return 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/kings-rock.png';
+  }
+  const slug = clean.toLowerCase()
     .replace(/\s+z$/i, '')
     .replace(/[^a-z0-9]+/g, '-');
   return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/${slug}.png`;
+}
+
+function handleItemIconError(img, itemName) {
+  if (typeof window !== 'undefined' && window.handleItemIconError && window.handleItemIconError !== handleItemIconError) {
+    return window.handleItemIconError(img, itemName);
+  }
+  if (!img || !itemName) return;
+  const clean = (itemName || '').trim().replace('’', "'");
+  const step = parseInt(img.dataset.fallbackStep || '0', 10);
+  img.dataset.fallbackStep = String(step + 1);
+
+  if (step === 0) {
+    if (typeof CUSTOM_ITEM_ICONS !== 'undefined' && CUSTOM_ITEM_ICONS[clean] && CUSTOM_ITEM_ICONS[clean].fallback) {
+      img.src = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/${CUSTOM_ITEM_ICONS[clean].fallback}.png`;
+      return;
+    }
+    const sdSlug = clean.toLowerCase().replace(/[^a-z0-9]+/g, '');
+    img.src = `https://play.pokemonshowdown.com/sprites/itemicons/${sdSlug}.png`;
+    return;
+  }
+
+  if (step === 1) {
+    const isMega = clean.endsWith('ite') || clean.endsWith('ite X') || clean.endsWith('ite Y') || clean.endsWith('ite Z') || clean.endsWith('inite');
+    if (isMega) {
+      img.src = 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/charizardite-y.png';
+      return;
+    }
+  }
+
+  img.onerror = null;
+  img.style.display = 'none';
 }
 
 // Calculate Level 50 Competitive Stat (31 IVs)
@@ -607,6 +668,22 @@ function getMoveType(moveName, fallbackPoke) {
   return 'Normal';
 }
 
+// Helper to format Pokémon names cleanly on slot cards (e.g. "Slowking (Galarian Form)" -> "Slowking" + "(Galarian)")
+function formatCardPokemonName(fullName) {
+  if (!fullName) return { main: '', sub: '', fullName: '' };
+  const m = fullName.match(/^(.*?)\s*[\(\[](.+?)[\)\]]\s*$/);
+  if (!m) {
+    return { main: fullName, sub: '', fullName };
+  }
+  const main = m[1].trim();
+  let sub = m[2].trim();
+  sub = sub.replace(/\s*\(\s*([^)]+?)\s*(?:Breed|Style|Form)?\s*\)/gi, ' $1');
+  sub = sub.replace(/\s+(?:Form|Forme|Variety|Breed)\b/gi, '');
+  const escapedMain = main.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  sub = sub.replace(new RegExp(`\\b${escapedMain}\\b`, 'gi'), '').trim();
+  return { main, sub, fullName };
+}
+
 // Render 6-Slot Grid Matching Screenshot 2 (Pikalytics Style)
 function renderTeamSlots() {
   const grid = document.getElementById('team-grid');
@@ -628,6 +705,7 @@ function renderTeamSlots() {
 
     filledCount++;
     const p = slot.pokemon;
+    const nameInfo = formatCardPokemonName(p.name);
     const bs = p.base_stats || { hp: 0, atk: 0, def: 0, spa: 0, spd: 0, spe: 0, bst: 0 };
     const nature = slot.nature || 'Serious';
     const spread = slot.spread || { hp: 0, atk: 0, def: 0, spa: 0, spd: 0, spe: 0 };
@@ -718,10 +796,13 @@ function renderTeamSlots() {
             <div class="slot-header-block" data-tooltip-type="pokemon-roster" data-slot-idx="${idx}">
               <img src="${getSpriteUrl(p.name)}" alt="${p.name}" class="slot-poke-sprite" onerror="this.onerror=null; this.src='https://play.pokemonshowdown.com/sprites/dex/${getPokemonSlug(p.name)}.png';">
               <div class="slot-header-info">
-                <div class="slot-card-name" title="${p.name}">${p.name}</div>
+                <div class="slot-card-name" title="${p.name}">
+                  <span class="slot-name-main">${nameInfo.main}</span>
+                  ${nameInfo.sub ? `<span class="slot-name-sub">(${nameInfo.sub})</span>` : ''}
+                </div>
                 <div class="slot-meta-chip" onclick="openDrawer(${idx}, 'items')" title="Change Item">
                   <span class="remove-chip-icon" onclick="event.stopPropagation(); removeSlotItem(${idx})">⊗</span>
-                  ${slot.item ? `<img src="${getItemSpriteUrl(slot.item)}" alt="" class="slot-item-icon-mini" onerror="this.style.display='none'">` : ''}
+                  ${slot.item ? `<img src="${getItemSpriteUrl(slot.item)}" alt="" class="slot-item-icon-mini" onerror="handleItemIconError(this, '${(slot.item || '').replace(/'/g, "\\'")}')">` : ''}
                   <span>${slot.item || 'No Item'}</span>
                 </div>
                 <div class="slot-meta-chip" onclick="openDrawer(${idx}, 'abilities')" title="Change Ability">
@@ -1004,7 +1085,7 @@ function renderDrawerTabBody(slot) {
         <div class="drawer-list-item" style="cursor: pointer;" onclick="drawerSelectItem('${it.name}')">
           <div class="drawer-item-top">
             <div class="drawer-item-title-wrap">
-              <img src="${getItemSpriteUrl(it.name)}" alt="" class="drawer-item-icon" onerror="this.style.display='none'">
+              <img src="${getItemSpriteUrl(it.name)}" alt="" class="drawer-item-icon" onerror="handleItemIconError(this, '${(it.name || '').replace(/'/g, "\\'")}')">
               <span class="drawer-item-name">${it.name}</span>
               <span class="drawer-item-usage">${it.usage || ''}</span>
             </div>
@@ -1661,19 +1742,259 @@ function renderSpeedLadder() {
 }
 
 // =====================================================================
-// Multi-Factor Synergistic Teammates Recommendation Engine
-// Factors:
-// 1. Whole-team co-occurrence frequency (how often they pair together)
-// 2. Defensive weakness patching (resists & immunities vs team weak types)
-// 3. Offensive STAB coverage expansion (super-effective hits on uncovered types)
-// 4. Missing moveset / utility roles (hazards, speed control, priority)
 // =====================================================================
+// AI-Assisted & Multi-Factor Synergistic Teammates Recommendation Engine
+// Factors:
+// 1. Tier List meta priority (S-Tier & A-Tier meta staples)
+// 2. Defensive weakness patching (resists & immunities vs team vulnerabilities)
+// 3. Offensive coverage expansion (super-effective hits on missing defender types)
+// 4. Physical vs Special nature balance (sweepers, wallbreakers, bulk)
+// 5. Recommended 4-move set tailored to candidate role
+// 6. Replacement logic for full teams (6/6) vs next-slot guidance (<6)
+// =====================================================================
+
+function updateTeammateStatusBadge() {
+  const badgeDot = document.querySelector('#teammate-status-badge .status-indicator-dot');
+  const badgeText = document.getElementById('teammate-status-text');
+  const btnConnect = document.getElementById('btn-teammate-open-key');
+  const statusPill = document.getElementById('teammate-status-badge');
+  if (!badgeText) return;
+
+  const key = GEMINI_CONFIG.getKey();
+  const model = GEMINI_CONFIG.getModel();
+  if (key) {
+    if (badgeDot) badgeDot.className = 'status-indicator-dot dot-online';
+    const shortModel = model.replace('gemini-', 'Gemini ');
+    badgeText.textContent = `AI Coach (${shortModel})`;
+    if (statusPill) statusPill.title = 'Click to modify Gemini API key or model settings';
+    if (btnConnect) btnConnect.style.display = 'none';
+  } else {
+    if (badgeDot) badgeDot.className = 'status-indicator-dot dot-offline';
+    badgeText.textContent = 'Heuristic Coach';
+    if (statusPill) statusPill.title = 'Click to configure Gemini API Key';
+    if (btnConnect) btnConnect.style.display = 'inline-flex';
+  }
+}
+
+function openGeminiModal() {
+  const modal = document.getElementById('modal-gemini-key');
+  const inputKey = document.getElementById('input-gemini-key');
+  const selectModel = document.getElementById('select-gemini-model');
+  const feedbackEl = document.getElementById('key-test-feedback');
+  if (inputKey) inputKey.value = GEMINI_CONFIG.getKey();
+  if (selectModel) selectModel.value = GEMINI_CONFIG.getModel();
+  if (feedbackEl) {
+    feedbackEl.style.display = 'none';
+    feedbackEl.textContent = '';
+  }
+  if (modal) modal.classList.add('open', 'active');
+}
+
+function hideGeminiModal() {
+  const modal = document.getElementById('modal-gemini-key');
+  if (modal) modal.classList.remove('open', 'active');
+}
+
+function classifyPokemonRole(p) {
+  const bs = p.base_stats || { atk: 80, spa: 80, def: 80, spd: 80, spe: 80, hp: 80 };
+  const totalBulk = (bs.hp || 80) + (bs.def || 80) + (bs.spd || 80);
+
+  if (totalBulk >= 285 || ((bs.def >= 115 || bs.spd >= 115) && bs.spe <= 85)) {
+    return { role: 'Defensive Anchor', roleClass: 'role-wall' };
+  }
+
+  const candMoves = (p.moves || []).map(m => m.name);
+  const isPivot = ['U-turn', 'Flip Turn', 'Volt Switch', 'Parting Shot', 'Chilly Reception'].some(m => candMoves.includes(m));
+  if (isPivot && (bs.spe >= 100 || bs.hp >= 95)) {
+    return { role: 'Pivot & Speed Control', roleClass: 'role-pivot' };
+  }
+
+  if ((bs.spa || 80) >= (bs.atk || 80) + 12) {
+    return {
+      role: (bs.spe >= 95) ? 'Special Sweeper' : 'Special Wallbreaker',
+      roleClass: 'role-special'
+    };
+  }
+
+  if ((bs.atk || 80) >= (bs.spa || 80) + 12) {
+    return {
+      role: (bs.spe >= 95) ? 'Physical Sweeper' : 'Physical Wallbreaker',
+      roleClass: 'role-physical'
+    };
+  }
+
+  return { role: 'Mixed Attacker', roleClass: 'role-special' };
+}
+
+function pickRecommendedMoves(p, uncoveredDefenders = [], teamBalance = {}) {
+  const candMoves = (p.moves || []);
+  if (!candMoves || candMoves.length === 0) return ['Tackle', 'Protect', 'Substitute', 'Rest'];
+
+  const bs = p.base_stats || { atk: 80, spa: 80 };
+  const isSpecial = (bs.spa || 80) > (bs.atk || 80);
+  const pTypes = p.types || [];
+
+  const selected = [];
+  const selectedSet = new Set();
+
+  function addMove(mName) {
+    if (!mName || selectedSet.has(mName) || selected.length >= 4) return false;
+    selected.push(mName);
+    selectedSet.add(mName);
+    return true;
+  }
+
+  // 1. Primary STAB 1
+  if (pTypes[0]) {
+    const stab1Moves = candMoves.filter(m => {
+      const md = movesDB[m.name] || {};
+      const cat = md.category || (isSpecial ? 'Special' : 'Physical');
+      const mType = md.type || m.type;
+      return mType === pTypes[0] && (cat === 'Physical' || cat === 'Special');
+    });
+    if (stab1Moves.length > 0) addMove(stab1Moves[0].name);
+  }
+
+  // 2. Primary STAB 2 (if dual type)
+  if (pTypes[1]) {
+    const stab2Moves = candMoves.filter(m => {
+      const md = movesDB[m.name] || {};
+      const cat = md.category || (isSpecial ? 'Special' : 'Physical');
+      const mType = md.type || m.type;
+      return mType === pTypes[1] && (cat === 'Physical' || cat === 'Special');
+    });
+    if (stab2Moves.length > 0) addMove(stab2Moves[0].name);
+  }
+
+  // 3. Super-Effective Coverage Move targeting team's missing defender types
+  if (uncoveredDefenders && uncoveredDefenders.length > 0) {
+    for (const uncDef of uncoveredDefenders) {
+      if (selected.length >= 3) break;
+      const covMove = candMoves.find(m => {
+        if (selectedSet.has(m.name)) return false;
+        const md = movesDB[m.name] || {};
+        if (md.category !== 'Physical' && md.category !== 'Special') return false;
+        const mType = md.type || m.type;
+        return TYPE_CHART[mType] && TYPE_CHART[mType][uncDef] >= 2;
+      });
+      if (covMove) addMove(covMove.name);
+    }
+  }
+
+  // 4. Key Setup / Utility / Priority / Recovery Move
+  const utilityPriorityList = [
+    'Swords Dance', 'Nasty Plot', 'Calm Mind', 'Dragon Dance', 'Quiver Dance', 'Shell Smash',
+    'Stealth Rock', 'Spikes', 'Toxic Spikes', 'Sticky Web',
+    'Roost', 'Recover', 'Moonlight', 'Slack Off', 'Synthesis', 'Soft-Boiled',
+    'Extreme Speed', 'Sucker Punch', 'Fake Out', 'Aqua Jet', 'Ice Shard', 'Bullet Punch', 'Mach Punch',
+    'U-turn', 'Volt Switch', 'Flip Turn', 'Parting Shot',
+    'Thunder Wave', 'Will-O-Wisp', 'Taunt', 'Encore', 'Protect'
+  ];
+  for (const utilName of utilityPriorityList) {
+    if (selected.length >= 4) break;
+    const match = candMoves.find(m => m.name === utilName);
+    if (match) addMove(match.name);
+  }
+
+  // 5. Fill remaining slots from top usage moves
+  for (const m of candMoves) {
+    if (selected.length >= 4) break;
+    addMove(m.name);
+  }
+
+  return selected.slice(0, 4);
+}
+
+function evaluateBestReplacementSlot(p, filledSlots, criticalWeakTypes = [], uncoveredDefenders = [], teamBalance = {}) {
+  if (!filledSlots || filledSlots.length === 0) return { idx: 0, name: '', reason: '' };
+
+  let bestSlotIdx = 0;
+  let bestScore = -999;
+  let bestReason = '';
+
+  const candBs = p.base_stats || { atk: 80, spa: 80, spe: 80 };
+  const candIsSpecial = (candBs.spa || 80) > (candBs.atk || 80);
+  const candTypes = p.types || [];
+
+  filledSlots.forEach(s => {
+    const slotIdx = teamSlots.indexOf(s);
+    if (slotIdx === -1) return;
+    const slotPoke = s.pokemon;
+    const slotTypes = slotPoke.types || [];
+    const slotBs = slotPoke.base_stats || { atk: 80, spa: 80, spe: 80 };
+    const slotIsSpecial = (slotBs.spa || 80) > (slotBs.atk || 80);
+
+    let repScore = 0;
+    const reasons = [];
+
+    // Factor A: Compounded Weakness Alleviation
+    let sharedWeaknessesRemoved = 0;
+    criticalWeakTypes.forEach(t => {
+      const slotMult = getDefensiveMultiplier(t, slotPoke, s.teraType);
+      const candMult = getDefensiveMultiplier(t, p, 'Default');
+      if (slotMult > 1 && candMult <= 1) {
+        sharedWeaknessesRemoved++;
+        repScore += (candMult === 0 ? 18 : 11);
+      }
+    });
+    if (sharedWeaknessesRemoved > 0) {
+      reasons.push(`eliminates shared team vulnerabilities`);
+    }
+
+    // Factor B: Type Redundancy
+    const typeOverlap = candTypes.filter(t => slotTypes.includes(t));
+    if (typeOverlap.length > 0) {
+      repScore += 14;
+      reasons.push(`upgrades overlapping ${typeOverlap.join('/')}-typing`);
+    }
+
+    // Factor C: Physical vs Special Balancing
+    if (teamBalance.needsSpecial && !slotIsSpecial && candIsSpecial) {
+      repScore += 14;
+      reasons.push(`converts physical skew into crucial Special wallbreaker`);
+    } else if (teamBalance.needsPhysical && slotIsSpecial && !candIsSpecial) {
+      repScore += 14;
+      reasons.push(`supplies required Physical wallbreaker`);
+    }
+
+    // Factor D: Tier & Stat Upgrade
+    const tierRanks = { 'S': 4, 'A': 3, 'B': 2, 'C': 1, 'D': 0 };
+    const tierDiff = (tierRanks[p.tier] || 0) - (tierRanks[slotPoke.tier] || 0);
+    if (tierDiff > 0) {
+      repScore += tierDiff * 12;
+      reasons.push(`upgrades ${slotPoke.tier}-Tier to ${p.tier}-Tier staple`);
+    }
+
+    // Factor E: Speed Tier
+    if ((candBs.spe || 80) > (slotBs.spe || 80) + 18) {
+      repScore += 7;
+      reasons.push(`adds +${(candBs.spe || 80) - (slotBs.spe || 80)} speed bracket advantage`);
+    }
+
+    if (repScore > bestScore) {
+      bestScore = repScore;
+      bestSlotIdx = slotIdx;
+      bestReason = reasons.length > 0
+        ? `Replaces ${slotPoke.name} — ${reasons.slice(0, 2).join(' & ')}.`
+        : `Replaces ${slotPoke.name} — elevates squad momentum and tier synergy.`;
+    }
+  });
+
+  const replacedPoke = teamSlots[bestSlotIdx] ? teamSlots[bestSlotIdx].pokemon : null;
+  return {
+    idx: bestSlotIdx,
+    name: replacedPoke ? replacedPoke.name : `Slot ${bestSlotIdx + 1}`,
+    reason: bestReason
+  };
+}
 
 function computeTeammateRecommendations() {
   const filled = teamSlots.filter(s => s && s.pokemon);
   if (filled.length === 0) return [];
 
-  const currentNames = new Set(filled.map(s => s.pokemon.name));
+  const currentNames = new Set(filled.map(s => s.pokemon.name.toLowerCase()));
+  const isTeamFull = filled.length === 6;
+  const emptySlotIdx = teamSlots.findIndex(s => s === null);
 
   // 1. Analyze Team Weaknesses (Defensive)
   const weakCount = {};
@@ -1688,43 +2009,62 @@ function computeTeammateRecommendations() {
     });
   });
 
-  // Team vulnerable types: types with 2+ weaknesses
-  const teamWeakTypes = ALL_TYPES.filter(t => weakCount[t] >= 2);
+  const criticalWeakTypes = ALL_TYPES.filter(t => weakCount[t] >= 2);
 
-  // 2. Analyze Team Offensive STAB Coverage
-  const currentStabTypes = new Set();
+  // 2. Analyze Team Offensive Coverage
+  const teamCoveredDefenders = new Set();
   filled.forEach(s => {
-    (s.pokemon.types || []).forEach(t => currentStabTypes.add(t));
-    if (s.teraType && s.teraType !== 'Default') currentStabTypes.add(s.teraType);
-  });
-
-  const missingStabTypes = ALL_TYPES.filter(targetType => {
-    let covered = false;
-    currentStabTypes.forEach(atkType => {
-      const chart = TYPE_CHART[atkType] || {};
-      if (chart[targetType] === 2) covered = true;
+    (s.moves || []).forEach(mName => {
+      const md = movesDB[mName] || {};
+      if (md.category === 'Physical' || md.category === 'Special') {
+        const mType = md.type || getMoveType(mName, s.pokemon);
+        ALL_TYPES.forEach(defType => {
+          if (TYPE_CHART[mType] && TYPE_CHART[mType][defType] >= 2) {
+            teamCoveredDefenders.add(defType);
+          }
+        });
+      }
     });
-    return !covered;
+    (s.pokemon.types || []).forEach(t => {
+      ALL_TYPES.forEach(defType => {
+        if (TYPE_CHART[t] && TYPE_CHART[t][defType] >= 2) {
+          teamCoveredDefenders.add(defType);
+        }
+      });
+    });
   });
+  const uncoveredDefenders = ALL_TYPES.filter(t => !teamCoveredDefenders.has(t));
 
-  // 3. Analyze Team Moveset Utility (Hazards, Speed Control, Priority)
-  const currentMoves = new Set();
+  // 3. Analyze Physical vs Special Balance
+  let physicalCount = 0;
+  let specialCount = 0;
   filled.forEach(s => {
-    (s.moves || []).forEach(m => currentMoves.add(m));
+    const bs = s.pokemon.base_stats || { atk: 80, spa: 80 };
+    if ((bs.atk || 80) >= (bs.spa || 80) + 12) physicalCount++;
+    else if ((bs.spa || 80) >= (bs.atk || 80) + 12) specialCount++;
+    else {
+      const pMoves = (s.moves || []).filter(m => movesDB[m]?.category === 'Physical').length;
+      const sMoves = (s.moves || []).filter(m => movesDB[m]?.category === 'Special').length;
+      if (pMoves > sMoves) physicalCount++;
+      else if (sMoves > pMoves) specialCount++;
+    }
   });
 
-  const hasHazards = ['Stealth Rock', 'Spikes', 'Toxic Spikes', 'Sticky Web'].some(m => currentMoves.has(m));
-  const hasSpeedControl = ['Tailwind', 'Trick Room', 'Icy Wind', 'Electroweb'].some(m => currentMoves.has(m));
-  const hasPriority = ['Fake Out', 'Aqua Jet', 'Grassy Glide', 'Extreme Speed', 'Sucker Punch', 'Bullet Punch', 'Ice Shard'].some(m => currentMoves.has(m));
+  const teamBalance = {
+    physicalCount,
+    specialCount,
+    needsSpecial: physicalCount >= 3 && specialCount <= 1,
+    needsPhysical: specialCount >= 3 && physicalCount <= 1
+  };
 
   // 4. Candidate Scoring Map
   const candidateScores = new Map();
 
-  // A. Co-occurrence analysis across all current team members
+  // A. Co-occurrence analysis
   filled.forEach(s => {
     const list = s.pokemon.teammates || [];
     list.forEach((partnerName, idx) => {
-      if (currentNames.has(partnerName)) return;
+      if (currentNames.has(partnerName.toLowerCase())) return;
 
       const p = pokemonDB.find(x => x.name.toLowerCase() === partnerName.toLowerCase());
       if (!p) return;
@@ -1735,9 +2075,10 @@ function computeTeammateRecommendations() {
           coCount: 0,
           coPartners: [],
           synergyScore: 0,
+          tierScore: 0,
           weaknessScore: 0,
           stabScore: 0,
-          utilityScore: 0,
+          balanceScore: 0,
           totalScore: 0,
           reasons: []
         });
@@ -1746,116 +2087,118 @@ function computeTeammateRecommendations() {
       const cand = candidateScores.get(p.name);
       cand.coCount += 1;
       cand.coPartners.push(s.pokemon.name);
-      // Position weight: earlier in teammates list gives higher synergy points (10..1)
       cand.synergyScore += (10 - Math.min(idx, 9));
     });
   });
 
-  // B. Also add top meta S/A-tier picks if candidate list is small
-  if (candidateScores.size < 8) {
-    pokemonDB.filter(p => (p.tier === 'S' || p.tier === 'A') && !currentNames.has(p.name)).forEach(p => {
-      if (!candidateScores.has(p.name)) {
-        candidateScores.set(p.name, {
-          pokemon: p,
-          coCount: 0,
-          coPartners: [],
-          synergyScore: 2,
-          weaknessScore: 0,
-          stabScore: 0,
-          utilityScore: 0,
-          totalScore: 0,
-          reasons: []
-        });
-      }
-    });
-  }
+  // B. Ensure Top Tier (S-Tier and A-Tier) staples are always scored and evaluated
+  pokemonDB.filter(p => (p.tier === 'S' || p.tier === 'A') && !currentNames.has(p.name.toLowerCase())).forEach(p => {
+    if (!candidateScores.has(p.name)) {
+      candidateScores.set(p.name, {
+        pokemon: p,
+        coCount: 0,
+        coPartners: [],
+        synergyScore: 5,
+        tierScore: 0,
+        weaknessScore: 0,
+        stabScore: 0,
+        balanceScore: 0,
+        totalScore: 0,
+        reasons: []
+      });
+    }
+  });
 
   // 5. Evaluate Multi-Factor Synergy for each candidate
   const candidates = Array.from(candidateScores.values());
 
   candidates.forEach(cand => {
     const p = cand.pokemon;
+    const bs = p.base_stats || { atk: 80, spa: 80, def: 80, spd: 80, spe: 80, bst: 500 };
     const candTypes = p.types || [];
+    const roleInfo = classifyPokemonRole(p);
+    cand.role = roleInfo.role;
+    cand.roleClass = roleInfo.roleClass;
 
-    // Factor 1: Whole-team tendency to go together
-    if (cand.coCount >= 2) {
-      cand.synergyScore *= (1 + (cand.coCount - 1) * 0.7);
-      cand.reasons.push(`Core partner with ${cand.coCount} teammates (${cand.coPartners.slice(0, 2).join(' & ')})`);
-    } else if (cand.coCount === 1) {
-      cand.reasons.push(`Meta teammate with ${cand.coPartners[0]}`);
+    // 1. Tier Priority Weighting (S-Tier top priority)
+    if (p.tier === 'S') cand.tierScore += 45;
+    else if (p.tier === 'A') cand.tierScore += 28;
+    else if (p.tier === 'B') cand.tierScore += 12;
+    cand.tierScore += Math.max(0, Math.round((120 - (p.rank || 100)) * 0.12));
+
+    // 2. Physical vs Special Nature
+    const isSpecialCand = (bs.spa || 80) > (bs.atk || 80);
+    if (teamBalance.needsSpecial && isSpecialCand) {
+      cand.balanceScore += 18;
+      cand.reasons.push(`Balances squad's physical skew with elite ${cand.role}`);
+    } else if (teamBalance.needsPhysical && !isSpecialCand) {
+      cand.balanceScore += 18;
+      cand.reasons.push(`Provides critical physical firepower as a ${cand.role}`);
+    } else {
+      cand.reasons.push(`Fills key ${p.tier}-Tier ${cand.role} role`);
     }
 
-    // Factor 2: Defensive Weakness Coverage
-    const coveredWeaknesses = [];
-    teamWeakTypes.forEach(t => {
+    // 3. Defensive Weakness Coverage
+    const patchedWeaknesses = [];
+    criticalWeakTypes.forEach(t => {
       const mult = getDefensiveMultiplier(t, p, 'Default');
       if (mult === 0) {
-        cand.weaknessScore += 12;
-        coveredWeaknesses.push(`${t} (Immune)`);
+        cand.weaknessScore += 16;
+        patchedWeaknesses.push(`${t} (Immune)`);
       } else if (mult < 1) {
-        cand.weaknessScore += 7;
-        coveredWeaknesses.push(t);
+        cand.weaknessScore += 9;
+        patchedWeaknesses.push(t);
       } else if (mult > 1) {
-        cand.weaknessScore -= 4; // penalty for compounding weakness
+        cand.weaknessScore -= 7;
       }
     });
 
-    if (coveredWeaknesses.length > 0) {
-      cand.reasons.push(`Defends team: ${coveredWeaknesses.slice(0, 3).join(', ')}`);
+    if (patchedWeaknesses.length > 0) {
+      cand.reasons.push(`Patches team vulnerabilities: ${patchedWeaknesses.slice(0, 3).join(', ')}`);
     }
 
-    // Factor 3: Offensive STAB Attack Coverage
+    // 4. Offensive Coverage Expansion
     const newCoverages = [];
-    missingStabTypes.forEach(missingType => {
+    uncoveredDefenders.forEach(uncType => {
       candTypes.forEach(atkType => {
-        const chart = TYPE_CHART[atkType] || {};
-        if (chart[missingType] === 2 && !newCoverages.includes(missingType)) {
-          newCoverages.push(missingType);
-          cand.stabScore += 9;
+        if (TYPE_CHART[atkType] && TYPE_CHART[atkType][uncType] >= 2 && !newCoverages.includes(uncType)) {
+          newCoverages.push(uncType);
+          cand.stabScore += 10;
         }
       });
     });
 
     if (newCoverages.length > 0) {
-      cand.reasons.push(`STAB coverage: ${newCoverages.slice(0, 3).join(', ')}`);
+      cand.reasons.push(`Expands 2× offensive coverage: ${newCoverages.slice(0, 3).join(', ')}`);
     }
 
-    // Factor 4: Missing Moveset / Utility Roles
-    const candMoves = (p.moves || []).map(m => m.name);
-    const addedUtility = [];
-
-    if (!hasHazards) {
-      const hazardMove = candMoves.find(m => ['Stealth Rock', 'Spikes', 'Toxic Spikes', 'Sticky Web'].includes(m));
-      if (hazardMove) {
-        cand.utilityScore += 6;
-        addedUtility.push(hazardMove);
-      }
+    // 5. Teammate Co-occurrence
+    if (cand.coCount >= 2) {
+      cand.synergyScore *= (1 + (cand.coCount - 1) * 0.6);
+      cand.reasons.push(`Core tournament partner with ${cand.coPartners.slice(0, 2).join(' & ')}`);
+    } else if (cand.coCount === 1) {
+      cand.reasons.push(`High tournament synergy with ${cand.coPartners[0]}`);
     }
 
-    if (!hasSpeedControl) {
-      const speedMove = candMoves.find(m => ['Tailwind', 'Trick Room', 'Icy Wind'].includes(m));
-      if (speedMove) {
-        cand.utilityScore += 6;
-        addedUtility.push(speedMove);
-      }
+    // 6. Optimal 4-Move Recommendation
+    cand.recommendedMoves = pickRecommendedMoves(p, uncoveredDefenders, teamBalance);
+
+    // 7. Target Slot or Replacement Calculation
+    if (isTeamFull) {
+      const rep = evaluateBestReplacementSlot(p, filled, criticalWeakTypes, uncoveredDefenders, teamBalance);
+      cand.targetSlotIdx = rep.idx;
+      cand.replacedPokemonName = rep.name;
+      cand.replacementReason = rep.reason;
+    } else {
+      cand.targetSlotIdx = emptySlotIdx;
+      cand.replacedPokemonName = null;
+      cand.replacementReason = null;
     }
 
-    if (!hasPriority) {
-      const prioMove = candMoves.find(m => ['Fake Out', 'Aqua Jet', 'Grassy Glide', 'Extreme Speed', 'Sucker Punch'].includes(m));
-      if (prioMove) {
-        cand.utilityScore += 5;
-        addedUtility.push(prioMove);
-      }
-    }
-
-    if (addedUtility.length > 0) {
-      cand.reasons.push(`Adds utility: ${addedUtility.join(', ')}`);
-    }
-
-    cand.totalScore = Math.round(cand.synergyScore + cand.weaknessScore + cand.stabScore + cand.utilityScore);
+    cand.totalScore = Math.round(cand.tierScore + cand.synergyScore + cand.weaknessScore + cand.stabScore + cand.balanceScore);
   });
 
-  // Sort descending by total score
+  // Sort candidates by totalScore descending
   candidates.sort((a, b) => b.totalScore - a.totalScore);
   return candidates;
 }
@@ -1896,7 +2239,7 @@ function renderQuickAddSuggestions() {
     <div class="quick-add-cards-row">
       ${recommendations.map(cand => {
         const p = cand.pokemon;
-        const reasonsTooltip = cand.reasons.join(' • ');
+        const reasonsTooltip = (cand.reasons || []).join(' • ');
         return `
           <div class="quick-add-card" title="${reasonsTooltip}">
             <img src="${getSpriteUrl(p.name)}" alt="${p.name}" class="quick-add-sprite" onerror="this.onerror=null; this.src='https://play.pokemonshowdown.com/sprites/dex/${getPokemonSlug(p.name)}.png';">
@@ -1920,68 +2263,182 @@ function renderTeammateRecommendations() {
   if (!container) return;
 
   const filled = teamSlots.filter(s => s && s.pokemon);
-  const hasEmptySlot = teamSlots.some(s => s === null);
-
   if (filled.length === 0) {
     container.innerHTML = `
-      <div style="grid-column: 1 / -1; text-align: center; padding: 2rem; color: var(--text-muted);">
-        Select at least one Pokémon to receive data-driven synergistic teammate recommendations.
+      <div style="grid-column: 1 / -1; text-align: center; padding: 2.5rem; color: var(--text-muted); background: rgba(15, 23, 42, 0.4); border-radius: 12px; border: 1px dashed rgba(255, 255, 255, 0.1);">
+        <p style="font-size: 1.1rem; font-weight: 700; color: #cbd5e1; margin-bottom: 0.4rem;">Select your first Pokémon to receive intelligent recommendations</p>
+        <span style="font-size: 0.85rem; color: #94a3b8;">Our coach evaluates Tier List staples, offensive coverage gaps, defensive weaknesses, and Physical vs Special balance.</span>
       </div>
     `;
     return;
   }
 
-  const recommendations = computeTeammateRecommendations().slice(0, 6);
+  const recommendations = (aiTeammateCache && aiTeammateCache.length > 0)
+    ? aiTeammateCache.slice(0, 6)
+    : computeTeammateRecommendations().slice(0, 6);
+
+  currentTeammateRecommendations = recommendations;
 
   if (recommendations.length === 0) {
     container.innerHTML = `
       <div style="grid-column: 1 / -1; text-align: center; padding: 2rem; color: var(--text-muted);">
-        No additional teammate suggestions found for current configuration.
+        No synergistic recommendations found for the current configuration.
       </div>
     `;
     return;
   }
 
-  container.innerHTML = recommendations.map(cand => {
+  const isTeamFull = filled.length === 6;
+
+  container.innerHTML = recommendations.map((cand, idx) => {
     const p = cand.pokemon;
     const bs = p.base_stats || { bst: 0, spe: 0 };
+    const roleClass = cand.roleClass || 'role-special';
+    const roleText = cand.role || 'Attacker';
+    const moves = cand.recommendedMoves || (p.moves || []).slice(0, 4).map(m => m.name);
+    const isAi = cand.isAi || false;
+
+    // Replacement or Target Slot banner
+    let slotBannerHtml = '';
+    if (isTeamFull && cand.replacedPokemonName) {
+      slotBannerHtml = `
+        <div class="teammate-replacement-banner">
+          <div class="replacement-header">
+            <span>🔄 Replaces <strong>${cand.replacedPokemonName} (Slot ${cand.targetSlotIdx + 1})</strong></span>
+          </div>
+          <div class="replacement-desc">${cand.replacementReason || 'Solves team weaknesses and optimizes squad dynamic.'}</div>
+        </div>
+      `;
+    } else {
+      const targetSlotNum = (cand.targetSlotIdx !== undefined && cand.targetSlotIdx >= 0)
+        ? (cand.targetSlotIdx + 1)
+        : (teamSlots.findIndex(s => s === null) + 1);
+      slotBannerHtml = `
+        <div class="teammate-slot-target-banner">
+          <span>➕ Recommended for <strong>Slot ${targetSlotNum}</strong></span>
+        </div>
+      `;
+    }
+
+    // Recommended Moves 4-grid
+    const movesHtml = moves.map(mName => {
+      const md = movesDB[mName] || {};
+      const cat = md.category || 'Special';
+      const mType = md.type || getMoveType(mName, p);
+      const catSym = cat === 'Physical' ? '💥' : (cat === 'Special' ? '✨' : '🛡️');
+      return `
+        <div class="teammate-move-pill" title="${mName} (${cat} · ${mType})">
+          <span class="move-cat-sym">${catSym}</span>
+          <span class="move-type-badge" style="background: ${TYPE_COLORS[mType] || '#64748b'};">${mType.slice(0, 3)}</span>
+          <span class="move-name-text">${mName}</span>
+        </div>
+      `;
+    }).join('');
+
+    // Strategic Reasons List
+    const reasonsHtml = (cand.reasons || []).slice(0, 4).map(r => `
+      <div class="strategic-reason-item">
+        <span class="reason-icon">⚡</span>
+        <span class="reason-text">${r}</span>
+      </div>
+    `).join('');
+
+    // Action button
+    const actionBtn = isTeamFull
+      ? `<button class="btn-apply-teammate btn-replace-action" onclick="applyTeammateRecommendation(${idx})">
+           🔄 Replace ${cand.replacedPokemonName || 'Slot ' + (cand.targetSlotIdx + 1)} (Slot ${cand.targetSlotIdx + 1})
+         </button>`
+      : `<button class="btn-apply-teammate btn-add-action" onclick="applyTeammateRecommendation(${idx})">
+           ➕ Add to Slot ${(cand.targetSlotIdx !== undefined ? cand.targetSlotIdx + 1 : 1)}
+         </button>`;
+
     return `
-      <div class="teammate-card">
+      <div class="teammate-card ${isAi ? 'ai-card-glow' : ''}">
         <div>
-          <div class="teammate-top">
+          <!-- Card Header -->
+          <div class="teammate-card-header">
             <div class="teammate-header-left">
-              <img src="${getSpriteUrl(p.name)}" alt="${p.name}" class="teammate-sprite" onerror="this.onerror=null; this.src='https://play.pokemonshowdown.com/sprites/dex/${getPokemonSlug(p.name)}.png';">
-              <div>
-                <span class="teammate-name">${p.name}</span>
-                <div style="display: flex; gap: 0.3rem; margin-top: 0.2rem;">
-                  <span class="tier-tag ${p.tier.toLowerCase()}">${p.tier}-TIER</span>
-                  ${p.types.map(t => `<span class="type-badge type-${t}">${t}</span>`).join('')}
+              <div class="teammate-sprite-frame">
+                <img src="${getSpriteUrl(p.name)}" alt="${p.name}" class="teammate-sprite" onerror="this.onerror=null; this.src='https://play.pokemonshowdown.com/sprites/dex/${getPokemonSlug(p.name)}.png';">
+              </div>
+              <div class="teammate-meta-info">
+                <div class="teammate-name-row">
+                  <span class="teammate-name">${p.name}</span>
+                  <span class="tier-tag ${(p.tier || 'b').toLowerCase()}">${p.tier || 'B'}-TIER</span>
+                  <span class="teammate-role-tag ${roleClass}">${roleText}</span>
+                </div>
+                <div class="teammate-type-badges">
+                  ${(p.types || []).map(t => `<span class="type-badge type-${t}">${t}</span>`).join('')}
                 </div>
               </div>
             </div>
-            <span class="teammate-synergy">+${cand.totalScore} Match</span>
+            <span class="teammate-score-pill ${isAi ? 'ai-badge' : ''}">${isAi ? 'AI Verified' : `+${cand.totalScore} Match`}</span>
           </div>
 
-          <div class="teammate-reasons-list">
-            ${cand.reasons.map(r => `
-              <div class="teammate-reason-item">
-                <span style="color: #38bdf8;">•</span>
-                <span>${r}</span>
-              </div>
-            `).join('')}
+          <!-- Slot/Replacement Target Banner -->
+          <div style="margin-top: 0.85rem;">
+            ${slotBannerHtml}
           </div>
 
-          <p style="font-size: 0.78rem; color: var(--text-muted); margin-top: 0.4rem;">
-            BST: <strong>${bs.bst}</strong> • Speed: <strong>${bs.spe}</strong> • Top Item: <strong>${p.items && p.items[0] ? p.items[0].name : 'N/A'}</strong>
+          <!-- Recommended Moves -->
+          <div class="teammate-moves-section" style="margin-top: 0.85rem;">
+            <div class="teammate-moves-header">Recommended Moveset</div>
+            <div class="teammate-moves-grid">
+              ${movesHtml}
+            </div>
+          </div>
+
+          <!-- Strategic Reasons -->
+          <div class="teammate-strategic-reasons" style="margin-top: 0.85rem;">
+            ${reasonsHtml}
+          </div>
+
+          <p style="font-size: 0.76rem; color: var(--text-muted); margin-top: 0.65rem;">
+            BST: <strong>${bs.bst || 0}</strong> • Speed: <strong>${bs.spe || 0}</strong> • Item: <strong>${(p.items && p.items[0]) ? p.items[0].name : 'Sitrus Berry'}</strong>
           </p>
         </div>
 
-        <button class="btn-add-teammate" onclick="addRecommendedPokemon(${p.rank})" ${!hasEmptySlot ? 'disabled title="Team is full (6/6)"' : ''}>
-          ${hasEmptySlot ? '+ Add to Available Slot' : 'Team is Full (6/6)'}
-        </button>
+        <div style="margin-top: 0.95rem;">
+          ${actionBtn}
+        </div>
       </div>
     `;
   }).join('');
+}
+
+function applyTeammateRecommendation(idx) {
+  const cand = currentTeammateRecommendations[idx];
+  if (!cand || !cand.pokemon) return;
+
+  const p = cand.pokemon;
+  const targetSlotIdx = (cand.targetSlotIdx !== undefined && cand.targetSlotIdx >= 0 && cand.targetSlotIdx < 6)
+    ? cand.targetSlotIdx
+    : teamSlots.findIndex(s => s === null);
+
+  if (targetSlotIdx < 0 || targetSlotIdx >= 6) {
+    showToast('No valid slot available for placement');
+    return;
+  }
+
+  const build = populateDefaultBuild(p);
+  if (cand.recommendedMoves && cand.recommendedMoves.length > 0) {
+    build.moves = [...cand.recommendedMoves];
+  }
+
+  const wasEmpty = teamSlots[targetSlotIdx] === null;
+  const oldPokeName = (teamSlots[targetSlotIdx] && teamSlots[targetSlotIdx].pokemon)
+    ? teamSlots[targetSlotIdx].pokemon.name
+    : null;
+
+  teamSlots[targetSlotIdx] = build;
+  aiTeammateCache = null;
+  renderAll();
+
+  if (wasEmpty) {
+    showToast(`Added ${p.name} to Slot ${targetSlotIdx + 1}`);
+  } else {
+    showToast(`Replaced ${oldPokeName} with ${p.name} in Slot ${targetSlotIdx + 1}`);
+  }
 }
 
 function addRecommendedPokemon(rank) {
@@ -1994,8 +2451,338 @@ function addRecommendedPokemon(rank) {
   if (!poke) return;
 
   teamSlots[emptyIdx] = populateDefaultBuild(poke);
+  aiTeammateCache = null;
   renderAll();
   showToast(`Added ${poke.name} to Slot ${emptyIdx + 1}`);
+}
+
+function buildTeammatePrompt() {
+  const filled = teamSlots.filter(s => s && s.pokemon);
+  const currentTeam = filled.map((s, idx) => ({
+    slot: idx + 1,
+    name: s.pokemon.name,
+    types: s.pokemon.types,
+    tier: s.pokemon.tier,
+    item: s.item,
+    moves: s.moves || []
+  }));
+
+  const isFull = filled.length === 6;
+  const currentNames = filled.map(s => s.pokemon.name);
+  const sAndAPool = pokemonDB
+    .filter(p => (p.tier === 'S' || p.tier === 'A') && !currentNames.includes(p.name))
+    .slice(0, 25)
+    .map(p => ({ name: p.name, tier: p.tier, types: p.types }));
+
+  return `Current Team (${filled.length}/6 Pokémon):
+${JSON.stringify(currentTeam, null, 2)}
+
+Is Team Full: ${isFull}
+Available Top Meta Candidate Pool (S & A Tier staples):
+${JSON.stringify(sAndAPool, null, 2)}
+
+TASK:
+Recommend the top 4-6 synergistic Pokémon to complete or optimize this squad in competitive Regulation M-C.
+Requirements:
+1. Prioritize Pokémon ranked higher in the tier list (S-tier and A-tier staples).
+2. Consider offensive type coverage, defensive weakness patching, and Physical vs Special nature balance.
+3. Recommend exactly 4 competitive moves that this Pokémon should run.
+4. Give concise, razor-sharp strategic reasons why it fits this specific team.
+5. IF THE TEAM IS FULL (6/6): Specify which existing member to replace (0-indexed 'targetSlotIdx', 'replacedPokemonName') and state the strategic reason why replacing that slot upgrades the squad.
+6. IF THE TEAM IS NOT FULL: targetSlotIdx should be the next empty slot (${filled.length}).
+
+Respond ONLY with this JSON structure:
+{
+  "recommendations": [
+    {
+      "name": "PokemonName",
+      "role": "Special Sweeper / Physical Wallbreaker / Defensive Wall / Pivot",
+      "roleClass": "role-special | role-physical | role-wall | role-pivot",
+      "recommendedMoves": ["Move1", "Move2", "Move3", "Move4"],
+      "reasons": [
+        "Strategic reason 1: Meta tier & role fit",
+        "Strategic reason 2: Type coverage / weakness patching",
+        "Strategic reason 3: Physical vs Special dynamic"
+      ],
+      "targetSlotIdx": 0,
+      "replacedPokemonName": "ReplacedPokemonName",
+      "replacementReason": "Why replacing this slot elevates the team"
+    }
+  ]
+}`;
+}
+
+async function callGeminiTeammateModel(apiKey, model, promptText, signal) {
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent?key=${encodeURIComponent(apiKey)}`;
+  const resp = await fetch(url, {
+    method: 'POST',
+    signal,
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      contents: [{ parts: [{ text: promptText }] }],
+      systemInstruction: {
+        parts: [{
+          text: "You are an elite competitive Pokémon coach for Regulation M-C. Return ONLY valid JSON matching the exact schema."
+        }]
+      },
+      generationConfig: {
+        responseMimeType: "application/json",
+        temperature: 0.2,
+        thinkingConfig: { thinkingBudget: 0 }
+      }
+    })
+  });
+
+  if (!resp.ok) {
+    const errJson = await resp.json().catch(() => ({}));
+    throw new Error(`[${model}] HTTP ${resp.status}: ${errJson.error?.message || 'Error'}`);
+  }
+
+  const data = await resp.json();
+  const rawText = data.candidates?.[0]?.content?.parts?.[0]?.text;
+  if (!rawText) throw new Error('Empty response');
+
+  const cleanJson = rawText.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+  const parsed = JSON.parse(cleanJson);
+  return { model, recommendations: parsed.recommendations || parsed };
+}
+
+async function fetchGeminiTeammateHedging(apiKey, preferredModel, promptText) {
+  const fallbackModel = 'gemini-3.1-flash-lite';
+  const targetPreferred = preferredModel || 'gemini-3.8-flash';
+  const isPreferredFallback = targetPreferred === fallbackModel;
+
+  if (isPreferredFallback) {
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), 18000);
+    try {
+      return await callGeminiTeammateModel(apiKey, fallbackModel, promptText, ctrl.signal);
+    } finally {
+      clearTimeout(timer);
+    }
+  }
+
+  return new Promise((resolve, reject) => {
+    let resolved = false;
+    let preferredResult = null;
+    let preferredError = null;
+    let fallbackResult = null;
+    let fallbackError = null;
+    let preferredDone = false;
+    let fallbackDone = false;
+
+    const prefCtrl = new AbortController();
+    const fallCtrl = new AbortController();
+
+    const maxGraceTimer = setTimeout(() => {
+      if (!resolved && fallbackResult) {
+        resolved = true;
+        prefCtrl.abort();
+        console.log(`[PokeChamp Teammates] Preferred ${targetPreferred} took >15s. Resolving with fallback ${fallbackModel}.`);
+        resolve(fallbackResult);
+      }
+    }, 15000);
+
+    const overallTimeout = setTimeout(() => {
+      if (!resolved) {
+        resolved = true;
+        prefCtrl.abort();
+        fallCtrl.abort();
+        if (preferredResult) resolve(preferredResult);
+        else if (fallbackResult) resolve(fallbackResult);
+        else reject(preferredError || fallbackError || new Error('Request timed out'));
+      }
+    }, 28000);
+
+    function evaluate() {
+      if (resolved) return;
+      if (preferredResult) {
+        resolved = true;
+        clearTimeout(maxGraceTimer);
+        clearTimeout(overallTimeout);
+        fallCtrl.abort();
+        resolve(preferredResult);
+        return;
+      }
+      if (preferredDone && preferredError && fallbackResult) {
+        resolved = true;
+        clearTimeout(maxGraceTimer);
+        clearTimeout(overallTimeout);
+        resolve(fallbackResult);
+        return;
+      }
+      if (preferredDone && preferredError && fallbackDone && fallbackError) {
+        resolved = true;
+        clearTimeout(maxGraceTimer);
+        clearTimeout(overallTimeout);
+        reject(preferredError);
+        return;
+      }
+    }
+
+    callGeminiTeammateModel(apiKey, targetPreferred, promptText, prefCtrl.signal)
+      .then(res => {
+        preferredResult = res;
+        preferredDone = true;
+        evaluate();
+      })
+      .catch(err => {
+        preferredError = err;
+        preferredDone = true;
+        evaluate();
+      });
+
+    callGeminiTeammateModel(apiKey, fallbackModel, promptText, fallCtrl.signal)
+      .then(res => {
+        fallbackResult = res;
+        fallbackDone = true;
+        evaluate();
+      })
+      .catch(err => {
+        fallbackError = err;
+        fallbackDone = true;
+        evaluate();
+      });
+  });
+}
+
+async function consultGeminiTeammateCoach() {
+  const apiKey = GEMINI_CONFIG.getKey();
+  if (!apiKey) {
+    openGeminiModal();
+    showToast('Connect your Gemini API Key to enable AI Coach');
+    return;
+  }
+
+  const filled = teamSlots.filter(s => s && s.pokemon);
+  if (filled.length === 0) {
+    showToast('Add at least one Pokémon to your team first');
+    return;
+  }
+
+  const btnAi = document.getElementById('btn-teammate-ask-ai');
+  const originalBtnText = btnAi ? btnAi.innerHTML : '⚡ Ask AI Coach';
+  if (btnAi) {
+    btnAi.disabled = true;
+    btnAi.innerHTML = '⏳ Consulting AI Coach...';
+  }
+
+  try {
+    const promptText = buildTeammatePrompt();
+    const model = GEMINI_CONFIG.getModel();
+    const raceResult = await fetchGeminiTeammateHedging(apiKey, model, promptText);
+
+    if (raceResult && raceResult.recommendations && raceResult.recommendations.length > 0) {
+      const isTeamFull = filled.length === 6;
+      const emptySlotIdx = teamSlots.findIndex(s => s === null);
+
+      const resolved = [];
+      raceResult.recommendations.forEach(rec => {
+        const p = pokemonDB.find(x => x.name.toLowerCase() === (rec.name || '').toLowerCase());
+        if (!p) return;
+
+        let roleInfo = classifyPokemonRole(p);
+        let targetSlot = isTeamFull
+          ? (typeof rec.targetSlotIdx === 'number' && rec.targetSlotIdx >= 0 && rec.targetSlotIdx < 6 ? rec.targetSlotIdx : 0)
+          : emptySlotIdx;
+
+        let replacedName = isTeamFull
+          ? (rec.replacedPokemonName || (teamSlots[targetSlot] ? teamSlots[targetSlot].pokemon.name : `Slot ${targetSlot + 1}`))
+          : null;
+
+        resolved.push({
+          pokemon: p,
+          role: rec.role || roleInfo.role,
+          roleClass: rec.roleClass || roleInfo.roleClass,
+          recommendedMoves: Array.isArray(rec.recommendedMoves) && rec.recommendedMoves.length === 4
+            ? rec.recommendedMoves
+            : pickRecommendedMoves(p),
+          reasons: Array.isArray(rec.reasons) ? rec.reasons : ['Top AI synergy pick for current squad'],
+          totalScore: 99,
+          targetSlotIdx: targetSlot,
+          replacedPokemonName: replacedName,
+          replacementReason: rec.replacementReason || 'Tactically selected by Gemini AI Coach to maximize team synergy.',
+          isAi: true
+        });
+      });
+
+      if (resolved.length > 0) {
+        aiTeammateCache = resolved;
+        renderTeammateRecommendations();
+        showToast(`AI Coach recommendations synthesized via ${raceResult.model}!`);
+        return;
+      }
+    }
+    throw new Error('No valid recommendations in AI output');
+  } catch (err) {
+    console.warn('Gemini Teammate Coach request failed, falling back to heuristic engine:', err);
+    aiTeammateCache = null;
+    renderTeammateRecommendations();
+    showToast('Gemini busy / timed out. Displaying heuristic recommendations.');
+  } finally {
+    if (btnAi) {
+      btnAi.disabled = false;
+      btnAi.innerHTML = originalBtnText;
+    }
+  }
+}
+
+async function testTeammateGeminiKey(keyVal, modelVal) {
+  const feedbackEl = document.getElementById('key-test-feedback');
+  if (!feedbackEl) return;
+  feedbackEl.style.display = 'block';
+  feedbackEl.className = 'key-test-feedback test-testing';
+  feedbackEl.textContent = `Testing connection with ${modelVal}...`;
+
+  const fallback = 'gemini-3.1-flash-lite';
+  let primaryErr = null;
+
+  try {
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(modelVal)}:generateContent?key=${encodeURIComponent(keyVal)}`;
+    const resp = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: "Respond with 'OK'." }] }],
+        generationConfig: { maxOutputTokens: 5, temperature: 0.1 }
+      })
+    });
+    if (resp.ok) {
+      feedbackEl.className = 'key-test-feedback test-success';
+      feedbackEl.textContent = `✓ Connection verified! Active Preferred Model: ${modelVal}`;
+      return;
+    } else {
+      const err = await resp.json().catch(() => ({}));
+      primaryErr = new Error(err.error?.message || `HTTP ${resp.status}`);
+    }
+  } catch (err) {
+    primaryErr = err;
+  }
+
+  if (modelVal !== fallback) {
+    feedbackEl.textContent = `${modelVal} busy/rate-limited (${primaryErr.message}). Testing peak fallback (${fallback})...`;
+    try {
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(fallback)}:generateContent?key=${encodeURIComponent(keyVal)}`;
+      const resp = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: "Respond with 'OK'." }] }],
+          generationConfig: { maxOutputTokens: 5, temperature: 0.1 }
+        })
+      });
+      if (resp.ok) {
+        feedbackEl.className = 'key-test-feedback test-success';
+        feedbackEl.textContent = `✓ API key is valid! Note: ${modelVal} is at quota/busy (${primaryErr.message}). The app will use ${modelVal} whenever available, and seamlessly fall back to ${fallback} during peak congestion.`;
+        return;
+      }
+    } catch (e) {
+      // both failed
+    }
+  }
+
+  feedbackEl.className = 'key-test-feedback test-failed';
+  feedbackEl.textContent = `✕ Connection failed: ${primaryErr ? primaryErr.message : 'Unknown error'}`;
 }
 
 // =====================================================================
@@ -2656,6 +3443,81 @@ function setupUIEventListeners() {
     });
   }
 
+  // Gemini AI Coach Key Modal & Controls
+  const statusBadge = document.getElementById('teammate-status-badge');
+  const btnConnectKey = document.getElementById('btn-teammate-open-key');
+  const btnAskAi = document.getElementById('btn-teammate-ask-ai');
+  const btnCloseGemini = document.getElementById('btn-close-gemini-modal');
+  const btnToggleEye = document.getElementById('btn-toggle-key-eye');
+  const btnSaveGemini = document.getElementById('btn-save-gemini-key');
+  const btnClearGemini = document.getElementById('btn-clear-gemini-key');
+  const btnTestGemini = document.getElementById('btn-test-gemini-key');
+  const inputGeminiKey = document.getElementById('input-gemini-key');
+  const selectGeminiModel = document.getElementById('select-gemini-model');
+
+  if (statusBadge) statusBadge.addEventListener('click', openGeminiModal);
+  if (btnConnectKey) btnConnectKey.addEventListener('click', openGeminiModal);
+  if (btnAskAi) btnAskAi.addEventListener('click', consultGeminiTeammateCoach);
+  if (btnCloseGemini) btnCloseGemini.addEventListener('click', hideGeminiModal);
+
+  const modalGeminiEl = document.getElementById('modal-gemini-key');
+  if (modalGeminiEl) {
+    modalGeminiEl.addEventListener('click', (e) => {
+      if (e.target.id === 'modal-gemini-key') hideGeminiModal();
+    });
+  }
+
+  if (btnToggleEye && inputGeminiKey) {
+    btnToggleEye.addEventListener('click', () => {
+      if (inputGeminiKey.type === 'password') {
+        inputGeminiKey.type = 'text';
+        btnToggleEye.textContent = '🔒';
+      } else {
+        inputGeminiKey.type = 'password';
+        btnToggleEye.textContent = '👁️';
+      }
+    });
+  }
+
+  if (btnSaveGemini && inputGeminiKey && selectGeminiModel) {
+    btnSaveGemini.addEventListener('click', () => {
+      const keyVal = inputGeminiKey.value.trim();
+      if (!keyVal) {
+        showToast('Please enter a valid API key');
+        return;
+      }
+      GEMINI_CONFIG.setKey(keyVal);
+      GEMINI_CONFIG.setModel(selectGeminiModel.value);
+      updateTeammateStatusBadge();
+      hideGeminiModal();
+      showToast('Gemini API key saved! Running AI analysis...');
+      consultGeminiTeammateCoach();
+    });
+  }
+
+  if (btnClearGemini && inputGeminiKey) {
+    btnClearGemini.addEventListener('click', () => {
+      GEMINI_CONFIG.clearKey();
+      inputGeminiKey.value = '';
+      updateTeammateStatusBadge();
+      hideGeminiModal();
+      aiTeammateCache = null;
+      renderTeammateRecommendations();
+      showToast('API key removed. Switched to Heuristic Coach.');
+    });
+  }
+
+  if (btnTestGemini && inputGeminiKey && selectGeminiModel) {
+    btnTestGemini.addEventListener('click', () => {
+      const keyVal = inputGeminiKey.value.trim();
+      if (!keyVal) {
+        showToast('Please enter an API key to test');
+        return;
+      }
+      testTeammateGeminiKey(keyVal, selectGeminiModel.value);
+    });
+  }
+
   // Escape key to close modals and drawer
   window.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
@@ -2664,6 +3526,7 @@ function setupUIEventListeners() {
       closeShowdown();
       closeSpreadModal();
       closeDrawer();
+      hideGeminiModal();
       hideTbTooltip();
     }
   });
@@ -3303,3 +4166,7 @@ window.closeSpreadModal = closeSpreadModal;
 window.onSpreadSliderChange = onSpreadSliderChange;
 window.onSpreadModalNatureChange = onSpreadModalNatureChange;
 window.renderQuickAddSuggestions = renderQuickAddSuggestions;
+window.applyTeammateRecommendation = applyTeammateRecommendation;
+window.consultGeminiTeammateCoach = consultGeminiTeammateCoach;
+window.openGeminiModal = openGeminiModal;
+window.hideGeminiModal = hideGeminiModal;

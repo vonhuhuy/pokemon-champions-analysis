@@ -57,7 +57,7 @@
 
   const TYPE_COLORS = {
     Normal: '#a8a77a',
-    Fire: '#ee8130',
+    Fire: '#ea3829',
     Water: '#6390f0',
     Electric: '#f7d02c',
     Grass: '#7ac74c',
@@ -89,7 +89,7 @@
     Ghost: 'rgba(115, 87, 151, 0.45)',
     Grass: 'rgba(122, 199, 76, 0.45)',
     Dark: 'rgba(112, 87, 70, 0.45)',
-    Fire: 'rgba(238, 129, 48, 0.45)',
+    Fire: 'rgba(234, 56, 41, 0.45)',
     Electric: 'rgba(247, 208, 44, 0.45)',
     Rock: 'rgba(182, 161, 54, 0.45)',
     Poison: 'rgba(163, 62, 161, 0.45)',
