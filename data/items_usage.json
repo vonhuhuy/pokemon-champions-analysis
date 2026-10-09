@@ -793,321 +793,328 @@
   {
     "rank": 114,
     "item_id": 114,
-    "name": "Psychic Seed",
+    "name": "Poison Barb",
     "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 115,
     "item_id": 115,
-    "name": "Pyroarite",
+    "name": "Psychic Seed",
     "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 116,
     "item_id": 116,
-    "name": "Quick Claw",
+    "name": "Pyroarite",
     "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 117,
     "item_id": 117,
-    "name": "Raichunite X",
+    "name": "Quick Claw",
     "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 118,
     "item_id": 118,
-    "name": "Raichunite Y",
+    "name": "Raichunite X",
     "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 119,
     "item_id": 119,
-    "name": "Red Card",
+    "name": "Raichunite Y",
     "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 120,
     "item_id": 120,
-    "name": "Rindo Berry",
+    "name": "Red Card",
     "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 121,
     "item_id": 121,
-    "name": "Rocky Helmet",
+    "name": "Rindo Berry",
     "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 122,
     "item_id": 122,
-    "name": "Roseli Berry",
+    "name": "Rocky Helmet",
     "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 123,
     "item_id": 123,
-    "name": "Sablenite",
+    "name": "Roseli Berry",
     "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 124,
     "item_id": 124,
-    "name": "Salamencite",
+    "name": "Sablenite",
     "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 125,
     "item_id": 125,
-    "name": "Sceptilite",
+    "name": "Salamencite",
     "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 126,
     "item_id": 126,
-    "name": "Scizorite",
+    "name": "Sceptilite",
     "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 127,
     "item_id": 127,
-    "name": "Scolipite",
+    "name": "Scizorite",
     "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 128,
     "item_id": 128,
-    "name": "Scope Lens",
+    "name": "Scolipite",
     "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 129,
     "item_id": 129,
-    "name": "Scovillainite",
+    "name": "Scope Lens",
     "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 130,
     "item_id": 130,
-    "name": "Scraftinite",
+    "name": "Scovillainite",
     "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 131,
     "item_id": 131,
-    "name": "Sharp Beak",
+    "name": "Scraftinite",
     "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 132,
     "item_id": 132,
-    "name": "Sharpedonite",
+    "name": "Sharp Beak",
     "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 133,
     "item_id": 133,
-    "name": "Shed Shell",
+    "name": "Sharpedonite",
     "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 134,
     "item_id": 134,
-    "name": "Shell Bell",
+    "name": "Shed Shell",
     "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 135,
     "item_id": 135,
-    "name": "Shuca Berry",
+    "name": "Shell Bell",
     "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 136,
     "item_id": 136,
-    "name": "Silk Scarf",
+    "name": "Shuca Berry",
     "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 137,
     "item_id": 137,
-    "name": "Silver Powder",
+    "name": "Silk Scarf",
     "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 138,
     "item_id": 138,
-    "name": "Sitrus Berry",
+    "name": "Silver Powder",
     "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 139,
     "item_id": 139,
-    "name": "Skarmorite",
+    "name": "Sitrus Berry",
     "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 140,
     "item_id": 140,
-    "name": "Slowbronite",
+    "name": "Skarmorite",
     "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 141,
     "item_id": 141,
-    "name": "Smooth Rock",
+    "name": "Slowbronite",
     "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 142,
     "item_id": 142,
-    "name": "Soft Sand",
+    "name": "Smooth Rock",
     "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 143,
     "item_id": 143,
-    "name": "Spell Tag",
+    "name": "Soft Sand",
     "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 144,
     "item_id": 144,
-    "name": "Staraptite",
+    "name": "Spell Tag",
     "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 145,
     "item_id": 145,
-    "name": "Starminite",
+    "name": "Staraptite",
     "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 146,
     "item_id": 146,
-    "name": "Steelixite",
+    "name": "Starminite",
     "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 147,
     "item_id": 147,
-    "name": "Swampertite",
+    "name": "Steelixite",
     "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 148,
     "item_id": 148,
-    "name": "Tanga Berry",
+    "name": "Swampertite",
     "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 149,
     "item_id": 149,
-    "name": "Terrain Extender",
+    "name": "Tanga Berry",
     "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 150,
     "item_id": 150,
-    "name": "Twisted Spoon",
+    "name": "Terrain Extender",
     "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 151,
     "item_id": 151,
-    "name": "Tyranitarite",
+    "name": "Twisted Spoon",
     "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 152,
     "item_id": 152,
-    "name": "Venusaurite",
+    "name": "Tyranitarite",
     "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 153,
     "item_id": 153,
-    "name": "Victreebelite",
+    "name": "Venusaurite",
     "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 154,
     "item_id": 154,
-    "name": "Wacan Berry",
+    "name": "Victreebelite",
     "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 155,
     "item_id": 155,
-    "name": "White Herb",
+    "name": "Wacan Berry",
     "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 156,
     "item_id": 156,
-    "name": "Wide Lens",
+    "name": "White Herb",
     "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 157,
     "item_id": 157,
-    "name": "Wise Glasses",
+    "name": "Wide Lens",
     "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 158,
     "item_id": 158,
-    "name": "Yache Berry",
+    "name": "Wise Glasses",
     "usage_count": 0,
     "regulation": "M-C"
   },
   {
     "rank": 159,
     "item_id": 159,
+    "name": "Yache Berry",
+    "usage_count": 0,
+    "regulation": "M-C"
+  },
+  {
+    "rank": 160,
+    "item_id": 160,
     "name": "Zoom Lens",
     "usage_count": 0,
     "regulation": "M-C"
